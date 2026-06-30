@@ -21,43 +21,56 @@
     .container { width: 100%; max-width: 640px; }
 
     header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 2px solid #1a1a2e;
+    }
+
+    .header-row1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .title { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.04em; }
-    .title span { color: #c0392b; }
-
-    .header-right {
+    .header-row2 {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .tabs { display: flex; gap: 4px; }
-
-    .tab {
-      padding: 6px 14px;
-      border: 2px solid #1a1a2e;
-      background: transparent;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: all 0.1s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    .tab.active { background: #1a1a2e; color: white; }
+    .title { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.04em; }
+    .title span { color: #c0392b; }
 
     .stats { display: flex; gap: 12px; font-size: 0.9rem; font-weight: 600; }
     .streak { color: #c0392b; }
+
+    .btn-group { display: flex; gap: 4px; }
+
+    .tab, .lvl-btn {
+      padding: 5px 12px;
+      border: 2px solid #1a1a2e;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      transition: all 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      letter-spacing: 0.02em;
+    }
+
+    .tab.active { background: #1a1a2e; color: white; }
+
+    .lvl-btn { border-color: #bbb; color: #999; }
+    .lvl-btn.active { border-color: #1a1a2e; color: #1a1a2e; background: #e8e8e0; }
+    .lvl-btn[data-lv="n5"].active { border-color: #2980b9; color: #2980b9; background: #eaf4fb; }
+    .lvl-btn[data-lv="n4"].active { border-color: #8e44ad; color: #8e44ad; background: #f5eefb; }
+    .lvl-btn[data-lv="n3"].active { border-color: #c0392b; color: #c0392b; background: #fef0f0; }
 
     .progress { height: 4px; background: #e0e0d8; border-radius: 2px; margin-bottom: 16px; }
     .progress-bar { height: 100%; background: #c0392b; border-radius: 2px; transition: width 0.3s; }
@@ -79,16 +92,21 @@
     .word { font-size: 3rem; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
     .reading { font-size: 1rem; color: #666; }
 
-    .grammar-pattern {
-      font-size: 0.75rem;
-      color: #c0392b;
+    .lv-tag {
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
-      margin-bottom: 12px;
-      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-bottom: 10px;
     }
+    .lv-tag.n5 { background: #eaf4fb; color: #2980b9; }
+    .lv-tag.n4 { background: #f5eefb; color: #8e44ad; }
+    .lv-tag.n3 { background: #fef0f0; color: #c0392b; }
 
-    .grammar-sentence { font-size: 1.25rem; line-height: 2; }
+    .grammar-pattern { font-size: 0.8rem; color: #888; font-weight: 600; margin-bottom: 10px; }
+    .grammar-sentence { font-size: 1.2rem; line-height: 2; }
+    .blank { color: #c0392b; font-weight: 700; }
 
     .choices {
       display: grid;
@@ -116,9 +134,7 @@
     }
     .choice:active { background: #f5f5f5; }
     .choice:hover:not(:disabled) { border-color: #888; }
-
     .choice .num { font-weight: 700; color: #bbb; min-width: 16px; flex-shrink: 0; padding-top: 1px; }
-
     .choice.correct { border-color: #27ae60; background: #f0faf4; }
     .choice.correct .num { color: #27ae60; }
     .choice.wrong { border-color: #c0392b; background: #fef0f0; }
@@ -156,10 +172,18 @@
     .hint { font-size: 0.75rem; color: #bbb; text-align: center; margin-top: 12px; }
     kbd { background: #eee; border: 1px solid #ccc; border-radius: 3px; padding: 1px 5px; font-size: 0.7rem; }
 
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #888;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
     @media (max-width: 500px) {
       .choices { grid-template-columns: 1fr; }
       .word { font-size: 2.4rem; }
-      .grammar-sentence { font-size: 1.1rem; }
+      .grammar-sentence { font-size: 1.05rem; }
       .hint { display: none; }
       .card { padding: 24px 16px; }
     }
@@ -168,15 +192,22 @@
 <body>
 <div class="container">
   <header>
-    <div class="title">つ<span>ば</span>き · N3</div>
-    <div class="header-right">
-      <div class="tabs">
-        <button class="tab active" id="tab-vocab" onclick="setMode('vocab')">語彙</button>
-        <button class="tab" id="tab-grammar" onclick="setMode('grammar')">文法</button>
-      </div>
+    <div class="header-row1">
+      <div class="title">つ<span>ば</span>き</div>
       <div class="stats">
         <span id="score-display">0 / 0</span>
         <span class="streak" id="streak-display">🔥 0</span>
+      </div>
+    </div>
+    <div class="header-row2">
+      <div class="btn-group">
+        <button class="tab active" id="tab-vocab" onclick="setMode('vocab')">語彙</button>
+        <button class="tab" id="tab-grammar" onclick="setMode('grammar')">文法</button>
+      </div>
+      <div class="btn-group">
+        <button class="lvl-btn" data-lv="n5" onclick="toggleLevel('n5')">N5</button>
+        <button class="lvl-btn" data-lv="n4" onclick="toggleLevel('n4')">N4</button>
+        <button class="lvl-btn active" data-lv="n3" onclick="toggleLevel('n3')">N3</button>
       </div>
     </div>
   </header>
@@ -191,623 +222,463 @@
 </div>
 
 <script>
-// ── VOCAB DATA ──────────────────────────────────────────────────────────────
+// ── VOCAB ────────────────────────────────────────────────────────────────────
 const vocab = [
-  // Nouns
-  { w:'以上', r:'いじょう', m:'more than; above; that\'s all' },
-  { w:'以下', r:'いか', m:'below; less than; the following' },
-  { w:'以外', r:'いがい', m:'other than; except for' },
-  { w:'以内', r:'いない', m:'within; no more than' },
-  { w:'意見', r:'いけん', m:'opinion; view' },
-  { w:'意味', r:'いみ', m:'meaning; significance' },
-  { w:'印象', r:'いんしょう', m:'impression' },
-  { w:'運動', r:'うんどう', m:'exercise; movement; campaign' },
-  { w:'影響', r:'えいきょう', m:'influence; effect; impact' },
-  { w:'笑顔', r:'えがお', m:'smiling face; smile' },
-  { w:'選手', r:'せんしゅ', m:'athlete; player; competitor' },
-  { w:'記念', r:'きねん', m:'commemoration; memorial' },
-  { w:'気持ち', r:'きもち', m:'feeling; mood; sensation' },
-  { w:'機会', r:'きかい', m:'opportunity; chance' },
-  { w:'規則', r:'きそく', m:'rule; regulation' },
-  { w:'記録', r:'きろく', m:'record; note; document' },
-  { w:'競争', r:'きょうそう', m:'competition; rivalry' },
-  { w:'経験', r:'けいけん', m:'experience' },
-  { w:'計画', r:'けいかく', m:'plan; project; schedule' },
-  { w:'結果', r:'けっか', m:'result; outcome; consequence' },
-  { w:'健康', r:'けんこう', m:'health; healthy' },
-  { w:'研究', r:'けんきゅう', m:'research; study; investigation' },
-  { w:'現在', r:'げんざい', m:'present time; now; currently' },
-  { w:'効果', r:'こうか', m:'effect; result; efficacy' },
-  { w:'交通', r:'こうつう', m:'traffic; transportation' },
-  { w:'国際', r:'こくさい', m:'international' },
-  { w:'最近', r:'さいきん', m:'recently; lately; these days' },
-  { w:'最初', r:'さいしょ', m:'first; beginning; outset' },
-  { w:'最後', r:'さいご', m:'last; final; end' },
-  { w:'参加', r:'さんか', m:'participation; joining' },
-  { w:'事故', r:'じこ', m:'accident; incident' },
-  { w:'自然', r:'しぜん', m:'nature; natural; naturally' },
-  { w:'社会', r:'しゃかい', m:'society; community; public' },
-  { w:'習慣', r:'しゅうかん', m:'habit; custom; practice' },
-  { w:'将来', r:'しょうらい', m:'future; prospects' },
-  { w:'正直', r:'しょうじき', m:'honest; truthful; frankly' },
-  { w:'丁寧', r:'ていねい', m:'polite; careful; thorough' },
-  { w:'特に', r:'とくに', m:'especially; particularly' },
-  { w:'努力', r:'どりょく', m:'effort; hard work' },
-  { w:'内容', r:'ないよう', m:'content; substance; matter' },
-  { w:'人気', r:'にんき', m:'popularity; popular' },
-  { w:'能力', r:'のうりょく', m:'ability; skill; capacity' },
-  { w:'場合', r:'ばあい', m:'case; situation; circumstance' },
-  { w:'発展', r:'はってん', m:'development; growth; advancement' },
-  { w:'発表', r:'はっぴょう', m:'announcement; presentation' },
-  { w:'必要', r:'ひつよう', m:'necessary; need; essential' },
-  { w:'複雑', r:'ふくざつ', m:'complex; complicated' },
-  { w:'変化', r:'へんか', m:'change; variation; alteration' },
-  { w:'方法', r:'ほうほう', m:'method; way; means' },
-  { w:'目的', r:'もくてき', m:'purpose; goal; objective' },
-  { w:'問題', r:'もんだい', m:'problem; question; issue' },
-  { w:'理解', r:'りかい', m:'understanding; comprehension' },
-  { w:'理由', r:'りゆう', m:'reason; cause' },
-  { w:'留学', r:'りゅうがく', m:'studying abroad' },
-  { w:'連絡', r:'れんらく', m:'contact; communication' },
-  { w:'安全', r:'あんぜん', m:'safety; security; safe' },
-  { w:'以前', r:'いぜん', m:'before; formerly; previously' },
-  { w:'関係', r:'かんけい', m:'relation; relationship; connection' },
-  { w:'感情', r:'かんじょう', m:'emotion; feeling; sentiment' },
-  { w:'感謝', r:'かんしゃ', m:'gratitude; thanks; appreciation' },
-  { w:'関心', r:'かんしん', m:'interest; concern; attention' },
-  { w:'管理', r:'かんり', m:'management; administration; control' },
-  { w:'機能', r:'きのう', m:'function; feature; ability' },
-  { w:'基本', r:'きほん', m:'basics; foundation; fundamental' },
-  { w:'技術', r:'ぎじゅつ', m:'technology; skill; technique' },
-  { w:'議論', r:'ぎろん', m:'discussion; debate; argument' },
-  { w:'具体的', r:'ぐたいてき', m:'concrete; specific; tangible' },
-  { w:'経済', r:'けいざい', m:'economy; economics' },
-  { w:'原因', r:'げんいん', m:'cause; origin; reason' },
-  { w:'現代', r:'げんだい', m:'modern times; present day' },
-  { w:'合格', r:'ごうかく', m:'passing an exam; success' },
-  { w:'行動', r:'こうどう', m:'action; behavior; conduct' },
-  { w:'材料', r:'ざいりょう', m:'ingredient; material; data' },
-  { w:'事実', r:'じじつ', m:'fact; truth; reality' },
-  { w:'失敗', r:'しっぱい', m:'failure; mistake; blunder' },
-  { w:'実際', r:'じっさい', m:'actual; reality; in practice' },
-  { w:'重要', r:'じゅうよう', m:'important; significant; crucial' },
-  { w:'状況', r:'じょうきょう', m:'situation; circumstances; state' },
-  { w:'成功', r:'せいこう', m:'success; achievement' },
-  { w:'政治', r:'せいじ', m:'politics; government' },
-  { w:'責任', r:'せきにん', m:'responsibility; duty; obligation' },
-  { w:'説明', r:'せつめい', m:'explanation; description' },
-  { w:'全体', r:'ぜんたい', m:'whole; overall; entire' },
-  { w:'想像', r:'そうぞう', m:'imagination; supposition' },
-  { w:'存在', r:'そんざい', m:'existence; presence; being' },
-  { w:'対象', r:'たいしょう', m:'target; object; subject' },
-  { w:'大切', r:'たいせつ', m:'important; precious; valuable' },
-  { w:'態度', r:'たいど', m:'attitude; manner; behavior' },
-  { w:'注意', r:'ちゅうい', m:'caution; attention; warning' },
-  { w:'直接', r:'ちょくせつ', m:'direct; immediate; in person' },
-  { w:'通常', r:'つうじょう', m:'usually; normally; ordinary' },
-  { w:'適切', r:'てきせつ', m:'appropriate; suitable; proper' },
-  { w:'当然', r:'とうぜん', m:'natural; obvious; of course' },
-  { w:'特別', r:'とくべつ', m:'special; particular; extraordinary' },
-  { w:'独立', r:'どくりつ', m:'independence; self-sufficiency' },
-  { w:'判断', r:'はんだん', m:'judgment; decision; assessment' },
-  { w:'反対', r:'はんたい', m:'opposition; opposite; against' },
-  { w:'表現', r:'ひょうげん', m:'expression; representation' },
-  { w:'普通', r:'ふつう', m:'normal; ordinary; usually' },
-  { w:'文化', r:'ぶんか', m:'culture; civilization' },
-  { w:'文章', r:'ぶんしょう', m:'sentence; text; writing' },
-  { w:'報告', r:'ほうこく', m:'report; information; notification' },
-  { w:'豊か', r:'ゆたか', m:'abundant; rich; plentiful' },
-  { w:'予定', r:'よてい', m:'plan; schedule; arrangement' },
-  { w:'様子', r:'ようす', m:'state; situation; appearance' },
-  { w:'利用', r:'りよう', m:'use; utilization; application' },
-  { w:'両方', r:'りょうほう', m:'both; both sides' },
-  { w:'流行', r:'りゅうこう', m:'trend; fashion; epidemic' },
-  { w:'例えば', r:'たとえば', m:'for example; for instance' },
-  { w:'割合', r:'わりあい', m:'ratio; percentage; comparatively' },
-  // Verbs
-  { w:'諦める', r:'あきらめる', m:'to give up; to abandon' },
-  { w:'集まる', r:'あつまる', m:'to gather; to assemble; to collect' },
-  { w:'調べる', r:'しらべる', m:'to investigate; to check; to examine' },
-  { w:'断る', r:'ことわる', m:'to refuse; to decline; to turn down' },
-  { w:'比べる', r:'くらべる', m:'to compare; to contrast' },
-  { w:'答える', r:'こたえる', m:'to answer; to reply; to respond' },
-  { w:'困る', r:'こまる', m:'to be troubled; to be in difficulty' },
-  { w:'確かめる', r:'たしかめる', m:'to confirm; to check; to verify' },
-  { w:'頼む', r:'たのむ', m:'to request; to ask; to rely on' },
-  { w:'続ける', r:'つづける', m:'to continue; to keep up; to go on' },
-  { w:'届ける', r:'とどける', m:'to deliver; to report; to send' },
-  { w:'直す', r:'なおす', m:'to fix; to correct; to repair' },
-  { w:'残る', r:'のこる', m:'to remain; to be left; to stay' },
-  { w:'離れる', r:'はなれる', m:'to separate; to leave; to be apart' },
-  { w:'増える', r:'ふえる', m:'to increase; to multiply; to grow' },
-  { w:'減る', r:'へる', m:'to decrease; to diminish; to reduce' },
-  { w:'迷う', r:'まよう', m:'to get lost; to hesitate; to be puzzled' },
-  { w:'認める', r:'みとめる', m:'to recognize; to admit; to acknowledge' },
-  { w:'申し込む', r:'もうしこむ', m:'to apply; to register; to request' },
-  { w:'喜ぶ', r:'よろこぶ', m:'to be glad; to rejoice; to be pleased' },
-  { w:'伝える', r:'つたえる', m:'to convey; to tell; to report' },
-  { w:'変わる', r:'かわる', m:'to change; to vary; to be different' },
-  // Adjectives / adverbs
-  { w:'穏やか', r:'おだやか', m:'calm; gentle; mild; peaceful' },
-  { w:'活発', r:'かっぱつ', m:'active; lively; energetic' },
-  { w:'厳しい', r:'きびしい', m:'strict; severe; harsh; tough' },
-  { w:'細かい', r:'こまかい', m:'fine; detailed; minute; small' },
-  { w:'残念', r:'ざんねん', m:'regrettable; unfortunate; too bad' },
-  { w:'親切', r:'しんせつ', m:'kind; helpful; considerate' },
-  { w:'正確', r:'せいかく', m:'accurate; precise; exact' },
-  { w:'素直', r:'すなお', m:'obedient; honest; straightforward' },
-  { w:'大変', r:'たいへん', m:'difficult; hard; terrible; very' },
-  { w:'得意', r:'とくい', m:'proud; skilled at; one\'s forte' },
-  { w:'苦手', r:'にがて', m:'poor at; not good with; weak point' },
-  { w:'不思議', r:'ふしぎ', m:'mysterious; strange; wonderful' },
-  { w:'真剣', r:'しんけん', m:'serious; earnest; sincere' },
-  { w:'便利', r:'べんり', m:'convenient; useful; handy' },
-  { w:'珍しい', r:'めずらしい', m:'rare; unusual; novel; unique' },
-  { w:'面倒', r:'めんどう', m:'trouble; bother; care; troublesome' },
-  { w:'勇気', r:'ゆうき', m:'courage; bravery' },
-  { w:'優しい', r:'やさしい', m:'gentle; kind; easy' },
-  { w:'様々', r:'さまざま', m:'various; diverse; all sorts of' },
-  { w:'幸せ', r:'しあわせ', m:'happiness; happy; fortunate' },
+
+  // ── N5 ──────────────────────────────────────────────────────────────────
+  { w:'食べる', r:'たべる', m:'to eat', lv:'n5' },
+  { w:'飲む', r:'のむ', m:'to drink', lv:'n5' },
+  { w:'見る', r:'みる', m:'to see; to look; to watch', lv:'n5' },
+  { w:'聞く', r:'きく', m:'to listen; to ask; to hear', lv:'n5' },
+  { w:'読む', r:'よむ', m:'to read', lv:'n5' },
+  { w:'書く', r:'かく', m:'to write', lv:'n5' },
+  { w:'話す', r:'はなす', m:'to speak; to talk', lv:'n5' },
+  { w:'行く', r:'いく', m:'to go', lv:'n5' },
+  { w:'来る', r:'くる', m:'to come', lv:'n5' },
+  { w:'帰る', r:'かえる', m:'to return; to go home', lv:'n5' },
+  { w:'起きる', r:'おきる', m:'to wake up; to get up', lv:'n5' },
+  { w:'寝る', r:'ねる', m:'to sleep; to go to bed', lv:'n5' },
+  { w:'買う', r:'かう', m:'to buy', lv:'n5' },
+  { w:'待つ', r:'まつ', m:'to wait', lv:'n5' },
+  { w:'使う', r:'つかう', m:'to use', lv:'n5' },
+  { w:'入る', r:'はいる', m:'to enter; to go in', lv:'n5' },
+  { w:'出る', r:'でる', m:'to go out; to leave; to exit', lv:'n5' },
+  { w:'分かる', r:'わかる', m:'to understand; to know', lv:'n5' },
+  { w:'大きい', r:'おおきい', m:'big; large', lv:'n5' },
+  { w:'小さい', r:'ちいさい', m:'small; little', lv:'n5' },
+  { w:'高い', r:'たかい', m:'expensive; tall; high', lv:'n5' },
+  { w:'安い', r:'やすい', m:'cheap; inexpensive', lv:'n5' },
+  { w:'おいしい', r:'おいしい', m:'delicious; tasty', lv:'n5' },
+  { w:'楽しい', r:'たのしい', m:'fun; enjoyable; pleasant', lv:'n5' },
+  { w:'寒い', r:'さむい', m:'cold (weather)', lv:'n5' },
+  { w:'暑い', r:'あつい', m:'hot (weather)', lv:'n5' },
+  { w:'新しい', r:'あたらしい', m:'new; fresh; recent', lv:'n5' },
+  { w:'古い', r:'ふるい', m:'old; ancient; stale', lv:'n5' },
+  { w:'難しい', r:'むずかしい', m:'difficult; hard', lv:'n5' },
+  { w:'易しい', r:'やさしい', m:'easy; simple', lv:'n5' },
+  { w:'きれい', r:'きれい', m:'pretty; clean; neat', lv:'n5' },
+  { w:'すき', r:'すき', m:'like; fond of; pleasing', lv:'n5' },
+  { w:'きらい', r:'きらい', m:'dislike; hate', lv:'n5' },
+  { w:'学校', r:'がっこう', m:'school', lv:'n5' },
+  { w:'会社', r:'かいしゃ', m:'company; office', lv:'n5' },
+  { w:'駅', r:'えき', m:'station', lv:'n5' },
+  { w:'店', r:'みせ', m:'store; shop', lv:'n5' },
+  { w:'家', r:'うち', m:'house; home; one\'s family', lv:'n5' },
+  { w:'本', r:'ほん', m:'book', lv:'n5' },
+  { w:'電話', r:'でんわ', m:'telephone; phone call', lv:'n5' },
+  { w:'車', r:'くるま', m:'car; vehicle', lv:'n5' },
+  { w:'お金', r:'おかね', m:'money', lv:'n5' },
+  { w:'友だち', r:'ともだち', m:'friend', lv:'n5' },
+  { w:'家族', r:'かぞく', m:'family', lv:'n5' },
+  { w:'今日', r:'きょう', m:'today', lv:'n5' },
+  { w:'明日', r:'あした', m:'tomorrow', lv:'n5' },
+  { w:'昨日', r:'きのう', m:'yesterday', lv:'n5' },
+  { w:'毎日', r:'まいにち', m:'every day', lv:'n5' },
+  { w:'時間', r:'じかん', m:'time; hours', lv:'n5' },
+  { w:'名前', r:'なまえ', m:'name', lv:'n5' },
+  { w:'仕事', r:'しごと', m:'work; job; occupation', lv:'n5' },
+  { w:'勉強', r:'べんきょう', m:'study; learning', lv:'n5' },
+  { w:'犬', r:'いぬ', m:'dog', lv:'n5' },
+  { w:'猫', r:'ねこ', m:'cat', lv:'n5' },
+  { w:'魚', r:'さかな', m:'fish', lv:'n5' },
+  { w:'水', r:'みず', m:'water', lv:'n5' },
+  { w:'ご飯', r:'ごはん', m:'rice; meal; cooked rice', lv:'n5' },
+  { w:'お茶', r:'おちゃ', m:'tea; green tea', lv:'n5' },
+  { w:'野菜', r:'やさい', m:'vegetables', lv:'n5' },
+  { w:'肉', r:'にく', m:'meat', lv:'n5' },
+  { w:'くだもの', r:'くだもの', m:'fruit', lv:'n5' },
+  { w:'目', r:'め', m:'eye', lv:'n5' },
+  { w:'耳', r:'みみ', m:'ear', lv:'n5' },
+  { w:'手', r:'て', m:'hand; arm', lv:'n5' },
+  { w:'足', r:'あし', m:'foot; leg', lv:'n5' },
+  { w:'頭', r:'あたま', m:'head; brain; mind', lv:'n5' },
+  { w:'白い', r:'しろい', m:'white', lv:'n5' },
+  { w:'黒い', r:'くろい', m:'black; dark', lv:'n5' },
+  { w:'赤い', r:'あかい', m:'red', lv:'n5' },
+  { w:'青い', r:'あおい', m:'blue; green (traffic light)', lv:'n5' },
+
+  // ── N4 ──────────────────────────────────────────────────────────────────
+  { w:'安心', r:'あんしん', m:'relief; peace of mind; reassurance', lv:'n4' },
+  { w:'案内', r:'あんない', m:'guidance; information; tour', lv:'n4' },
+  { w:'受ける', r:'うける', m:'to receive; to take (an exam); to undergo', lv:'n4' },
+  { w:'動く', r:'うごく', m:'to move; to stir; to operate', lv:'n4' },
+  { w:'思い出', r:'おもいで', m:'memory; recollection; reminiscence', lv:'n4' },
+  { w:'会話', r:'かいわ', m:'conversation; dialogue', lv:'n4' },
+  { w:'形', r:'かたち', m:'shape; form; figure', lv:'n4' },
+  { w:'観光', r:'かんこう', m:'sightseeing; tourism', lv:'n4' },
+  { w:'気をつける', r:'きをつける', m:'to be careful; to pay attention; to watch out', lv:'n4' },
+  { w:'急に', r:'きゅうに', m:'suddenly; abruptly; unexpectedly', lv:'n4' },
+  { w:'景色', r:'けしき', m:'scenery; view; landscape', lv:'n4' },
+  { w:'決める', r:'きめる', m:'to decide; to determine; to fix upon', lv:'n4' },
+  { w:'自分', r:'じぶん', m:'oneself; myself; yourself', lv:'n4' },
+  { w:'失礼', r:'しつれい', m:'rude; discourteous; Excuse me', lv:'n4' },
+  { w:'心配', r:'しんぱい', m:'worry; concern; anxiety', lv:'n4' },
+  { w:'正しい', r:'ただしい', m:'correct; right; proper', lv:'n4' },
+  { w:'足りる', r:'たりる', m:'to be enough; to suffice; to be sufficient', lv:'n4' },
+  { w:'違う', r:'ちがう', m:'to be different; to be wrong; to differ', lv:'n4' },
+  { w:'調子', r:'ちょうし', m:'condition; tone; pace; how things are going', lv:'n4' },
+  { w:'続く', r:'つづく', m:'to continue; to last; to go on', lv:'n4' },
+  { w:'途中', r:'とちゅう', m:'on the way; midway; in the middle of', lv:'n4' },
+  { w:'泊まる', r:'とまる', m:'to stay overnight; to lodge; to spend the night', lv:'n4' },
+  { w:'日記', r:'にっき', m:'diary; journal', lv:'n4' },
+  { w:'場所', r:'ばしょ', m:'place; location; spot', lv:'n4' },
+  { w:'発音', r:'はつおん', m:'pronunciation', lv:'n4' },
+  { w:'不便', r:'ふべん', m:'inconvenient; impractical; unhelpful', lv:'n4' },
+  { w:'本当に', r:'ほんとうに', m:'really; truly; indeed; honestly', lv:'n4' },
+  { w:'見つける', r:'みつける', m:'to find; to discover; to spot', lv:'n4' },
+  { w:'見つかる', r:'みつかる', m:'to be found; to be discovered', lv:'n4' },
+  { w:'役に立つ', r:'やくにたつ', m:'to be useful; to be helpful; to serve a purpose', lv:'n4' },
+  { w:'用意', r:'ようい', m:'preparation; arrangements; getting ready', lv:'n4' },
+  { w:'若い', r:'わかい', m:'young; youthful', lv:'n4' },
+  { w:'慣れる', r:'なれる', m:'to get used to; to become accustomed to', lv:'n4' },
+  { w:'変える', r:'かえる', m:'to change; to alter; to modify', lv:'n4' },
+  { w:'生活', r:'せいかつ', m:'life; living; livelihood; daily life', lv:'n4' },
+  { w:'生まれる', r:'うまれる', m:'to be born', lv:'n4' },
+  { w:'送る', r:'おくる', m:'to send; to see off; to spend (time)', lv:'n4' },
+  { w:'落ちる', r:'おちる', m:'to fall; to drop; to fail (exam)', lv:'n4' },
+  { w:'押す', r:'おす', m:'to push; to press; to stamp', lv:'n4' },
+  { w:'引く', r:'ひく', m:'to pull; to look up (dictionary); to catch (a cold)', lv:'n4' },
+  { w:'気がつく', r:'きがつく', m:'to notice; to realize; to become aware', lv:'n4' },
+  { w:'渡す', r:'わたす', m:'to hand over; to pass; to give', lv:'n4' },
+  { w:'渡る', r:'わたる', m:'to cross; to go across; to span', lv:'n4' },
+  { w:'戻る', r:'もどる', m:'to return; to go back; to come back', lv:'n4' },
+  { w:'知らせる', r:'しらせる', m:'to inform; to notify; to let know', lv:'n4' },
+  { w:'捨てる', r:'すてる', m:'to throw away; to discard; to abandon', lv:'n4' },
+  { w:'倒れる', r:'たおれる', m:'to fall down; to collapse; to topple', lv:'n4' },
+  { w:'暖かい', r:'あたたかい', m:'warm; mild; genial', lv:'n4' },
+  { w:'細い', r:'ほそい', m:'thin; slender; narrow', lv:'n4' },
+  { w:'太い', r:'ふとい', m:'thick; fat; bold (line)', lv:'n4' },
+  { w:'遅い', r:'おそい', m:'late; slow; tardy', lv:'n4' },
+  { w:'速い', r:'はやい', m:'fast; quick; swift', lv:'n4' },
+  { w:'重い', r:'おもい', m:'heavy; serious; severe', lv:'n4' },
+  { w:'軽い', r:'かるい', m:'light (weight); minor; casual; slight', lv:'n4' },
+  { w:'眠い', r:'ねむい', m:'sleepy; drowsy', lv:'n4' },
+  { w:'恥ずかしい', r:'はずかしい', m:'embarrassing; ashamed; shy', lv:'n4' },
+  { w:'嬉しい', r:'うれしい', m:'happy; glad; pleased; delighted', lv:'n4' },
+  { w:'悲しい', r:'かなしい', m:'sad; sorrowful; miserable', lv:'n4' },
+  { w:'怖い', r:'こわい', m:'scary; frightening; dreadful', lv:'n4' },
+  { w:'痛い', r:'いたい', m:'painful; sore; it hurts', lv:'n4' },
+  { w:'大人', r:'おとな', m:'adult; grown-up', lv:'n4' },
+  { w:'返事', r:'へんじ', m:'reply; answer; response', lv:'n4' },
+  { w:'挨拶', r:'あいさつ', m:'greeting; salutation', lv:'n4' },
+  { w:'練習', r:'れんしゅう', m:'practice; exercise; drill', lv:'n4' },
+  { w:'準備', r:'じゅんび', m:'preparation; arrangements; getting ready', lv:'n4' },
+  { w:'注文', r:'ちゅうもん', m:'order (food/items); request', lv:'n4' },
+  { w:'予約', r:'よやく', m:'reservation; booking; appointment', lv:'n4' },
+  { w:'約束', r:'やくそく', m:'promise; appointment; engagement', lv:'n4' },
+  { w:'部屋', r:'へや', m:'room', lv:'n4' },
+  { w:'財布', r:'さいふ', m:'wallet; purse', lv:'n4' },
+  { w:'鍵', r:'かぎ', m:'key; lock', lv:'n4' },
+  { w:'荷物', r:'にもつ', m:'luggage; baggage; parcel', lv:'n4' },
+  { w:'お土産', r:'おみやげ', m:'souvenir; present brought from a trip', lv:'n4' },
+  { w:'女性', r:'じょせい', m:'woman; female', lv:'n4' },
+  { w:'男性', r:'だんせい', m:'man; male', lv:'n4' },
+
+  // ── N3 ──────────────────────────────────────────────────────────────────
+  { w:'以上', r:'いじょう', m:'more than; above; that\'s all', lv:'n3' },
+  { w:'以下', r:'いか', m:'below; less than; the following', lv:'n3' },
+  { w:'以外', r:'いがい', m:'other than; except for', lv:'n3' },
+  { w:'以内', r:'いない', m:'within; no more than', lv:'n3' },
+  { w:'意見', r:'いけん', m:'opinion; view', lv:'n3' },
+  { w:'意味', r:'いみ', m:'meaning; significance', lv:'n3' },
+  { w:'印象', r:'いんしょう', m:'impression', lv:'n3' },
+  { w:'運動', r:'うんどう', m:'exercise; movement; campaign', lv:'n3' },
+  { w:'影響', r:'えいきょう', m:'influence; effect; impact', lv:'n3' },
+  { w:'笑顔', r:'えがお', m:'smiling face; smile', lv:'n3' },
+  { w:'選手', r:'せんしゅ', m:'athlete; player; competitor', lv:'n3' },
+  { w:'記念', r:'きねん', m:'commemoration; memorial', lv:'n3' },
+  { w:'気持ち', r:'きもち', m:'feeling; mood; sensation', lv:'n3' },
+  { w:'機会', r:'きかい', m:'opportunity; chance', lv:'n3' },
+  { w:'規則', r:'きそく', m:'rule; regulation', lv:'n3' },
+  { w:'記録', r:'きろく', m:'record; note; document', lv:'n3' },
+  { w:'競争', r:'きょうそう', m:'competition; rivalry', lv:'n3' },
+  { w:'経験', r:'けいけん', m:'experience', lv:'n3' },
+  { w:'計画', r:'けいかく', m:'plan; project; schedule', lv:'n3' },
+  { w:'結果', r:'けっか', m:'result; outcome; consequence', lv:'n3' },
+  { w:'健康', r:'けんこう', m:'health; healthy', lv:'n3' },
+  { w:'研究', r:'けんきゅう', m:'research; study; investigation', lv:'n3' },
+  { w:'現在', r:'げんざい', m:'present time; now; currently', lv:'n3' },
+  { w:'効果', r:'こうか', m:'effect; result; efficacy', lv:'n3' },
+  { w:'交通', r:'こうつう', m:'traffic; transportation', lv:'n3' },
+  { w:'国際', r:'こくさい', m:'international', lv:'n3' },
+  { w:'最近', r:'さいきん', m:'recently; lately; these days', lv:'n3' },
+  { w:'最初', r:'さいしょ', m:'first; beginning; outset', lv:'n3' },
+  { w:'最後', r:'さいご', m:'last; final; end', lv:'n3' },
+  { w:'参加', r:'さんか', m:'participation; joining', lv:'n3' },
+  { w:'事故', r:'じこ', m:'accident; incident', lv:'n3' },
+  { w:'自然', r:'しぜん', m:'nature; natural; naturally', lv:'n3' },
+  { w:'社会', r:'しゃかい', m:'society; community; public', lv:'n3' },
+  { w:'習慣', r:'しゅうかん', m:'habit; custom; practice', lv:'n3' },
+  { w:'将来', r:'しょうらい', m:'future; prospects', lv:'n3' },
+  { w:'正直', r:'しょうじき', m:'honest; truthful; frankly', lv:'n3' },
+  { w:'丁寧', r:'ていねい', m:'polite; careful; thorough', lv:'n3' },
+  { w:'特に', r:'とくに', m:'especially; particularly', lv:'n3' },
+  { w:'努力', r:'どりょく', m:'effort; hard work', lv:'n3' },
+  { w:'内容', r:'ないよう', m:'content; substance; matter', lv:'n3' },
+  { w:'人気', r:'にんき', m:'popularity; popular', lv:'n3' },
+  { w:'能力', r:'のうりょく', m:'ability; skill; capacity', lv:'n3' },
+  { w:'場合', r:'ばあい', m:'case; situation; circumstance', lv:'n3' },
+  { w:'発展', r:'はってん', m:'development; growth; advancement', lv:'n3' },
+  { w:'発表', r:'はっぴょう', m:'announcement; presentation', lv:'n3' },
+  { w:'必要', r:'ひつよう', m:'necessary; need; essential', lv:'n3' },
+  { w:'複雑', r:'ふくざつ', m:'complex; complicated', lv:'n3' },
+  { w:'変化', r:'へんか', m:'change; variation; alteration', lv:'n3' },
+  { w:'方法', r:'ほうほう', m:'method; way; means', lv:'n3' },
+  { w:'目的', r:'もくてき', m:'purpose; goal; objective', lv:'n3' },
+  { w:'問題', r:'もんだい', m:'problem; question; issue', lv:'n3' },
+  { w:'理解', r:'りかい', m:'understanding; comprehension', lv:'n3' },
+  { w:'理由', r:'りゆう', m:'reason; cause', lv:'n3' },
+  { w:'留学', r:'りゅうがく', m:'studying abroad', lv:'n3' },
+  { w:'連絡', r:'れんらく', m:'contact; communication', lv:'n3' },
+  { w:'安全', r:'あんぜん', m:'safety; security; safe', lv:'n3' },
+  { w:'以前', r:'いぜん', m:'before; formerly; previously', lv:'n3' },
+  { w:'関係', r:'かんけい', m:'relation; relationship; connection', lv:'n3' },
+  { w:'感情', r:'かんじょう', m:'emotion; feeling; sentiment', lv:'n3' },
+  { w:'感謝', r:'かんしゃ', m:'gratitude; thanks; appreciation', lv:'n3' },
+  { w:'関心', r:'かんしん', m:'interest; concern; attention', lv:'n3' },
+  { w:'管理', r:'かんり', m:'management; administration; control', lv:'n3' },
+  { w:'機能', r:'きのう', m:'function; feature; ability', lv:'n3' },
+  { w:'基本', r:'きほん', m:'basics; foundation; fundamental', lv:'n3' },
+  { w:'技術', r:'ぎじゅつ', m:'technology; skill; technique', lv:'n3' },
+  { w:'議論', r:'ぎろん', m:'discussion; debate; argument', lv:'n3' },
+  { w:'具体的', r:'ぐたいてき', m:'concrete; specific; tangible', lv:'n3' },
+  { w:'経済', r:'けいざい', m:'economy; economics', lv:'n3' },
+  { w:'原因', r:'げんいん', m:'cause; origin; reason', lv:'n3' },
+  { w:'現代', r:'げんだい', m:'modern times; present day', lv:'n3' },
+  { w:'合格', r:'ごうかく', m:'passing an exam; success', lv:'n3' },
+  { w:'行動', r:'こうどう', m:'action; behavior; conduct', lv:'n3' },
+  { w:'材料', r:'ざいりょう', m:'ingredient; material; data', lv:'n3' },
+  { w:'事実', r:'じじつ', m:'fact; truth; reality', lv:'n3' },
+  { w:'失敗', r:'しっぱい', m:'failure; mistake; blunder', lv:'n3' },
+  { w:'実際', r:'じっさい', m:'actual; reality; in practice', lv:'n3' },
+  { w:'重要', r:'じゅうよう', m:'important; significant; crucial', lv:'n3' },
+  { w:'状況', r:'じょうきょう', m:'situation; circumstances; state', lv:'n3' },
+  { w:'成功', r:'せいこう', m:'success; achievement', lv:'n3' },
+  { w:'政治', r:'せいじ', m:'politics; government', lv:'n3' },
+  { w:'責任', r:'せきにん', m:'responsibility; duty; obligation', lv:'n3' },
+  { w:'説明', r:'せつめい', m:'explanation; description', lv:'n3' },
+  { w:'全体', r:'ぜんたい', m:'whole; overall; entire', lv:'n3' },
+  { w:'想像', r:'そうぞう', m:'imagination; supposition', lv:'n3' },
+  { w:'存在', r:'そんざい', m:'existence; presence; being', lv:'n3' },
+  { w:'対象', r:'たいしょう', m:'target; object; subject', lv:'n3' },
+  { w:'大切', r:'たいせつ', m:'important; precious; valuable', lv:'n3' },
+  { w:'態度', r:'たいど', m:'attitude; manner; behavior', lv:'n3' },
+  { w:'注意', r:'ちゅうい', m:'caution; attention; warning', lv:'n3' },
+  { w:'直接', r:'ちょくせつ', m:'direct; immediate; in person', lv:'n3' },
+  { w:'通常', r:'つうじょう', m:'usually; normally; ordinary', lv:'n3' },
+  { w:'適切', r:'てきせつ', m:'appropriate; suitable; proper', lv:'n3' },
+  { w:'当然', r:'とうぜん', m:'natural; obvious; of course', lv:'n3' },
+  { w:'特別', r:'とくべつ', m:'special; particular; extraordinary', lv:'n3' },
+  { w:'独立', r:'どくりつ', m:'independence; self-sufficiency', lv:'n3' },
+  { w:'判断', r:'はんだん', m:'judgment; decision; assessment', lv:'n3' },
+  { w:'反対', r:'はんたい', m:'opposition; opposite; against', lv:'n3' },
+  { w:'表現', r:'ひょうげん', m:'expression; representation', lv:'n3' },
+  { w:'普通', r:'ふつう', m:'normal; ordinary; usually', lv:'n3' },
+  { w:'文化', r:'ぶんか', m:'culture; civilization', lv:'n3' },
+  { w:'文章', r:'ぶんしょう', m:'sentence; text; writing', lv:'n3' },
+  { w:'報告', r:'ほうこく', m:'report; information; notification', lv:'n3' },
+  { w:'豊か', r:'ゆたか', m:'abundant; rich; plentiful', lv:'n3' },
+  { w:'予定', r:'よてい', m:'plan; schedule; arrangement', lv:'n3' },
+  { w:'様子', r:'ようす', m:'state; situation; appearance', lv:'n3' },
+  { w:'利用', r:'りよう', m:'use; utilization; application', lv:'n3' },
+  { w:'両方', r:'りょうほう', m:'both; both sides', lv:'n3' },
+  { w:'流行', r:'りゅうこう', m:'trend; fashion; epidemic', lv:'n3' },
+  { w:'例えば', r:'たとえば', m:'for example; for instance', lv:'n3' },
+  { w:'割合', r:'わりあい', m:'ratio; percentage; comparatively', lv:'n3' },
+  { w:'諦める', r:'あきらめる', m:'to give up; to abandon', lv:'n3' },
+  { w:'集まる', r:'あつまる', m:'to gather; to assemble; to collect', lv:'n3' },
+  { w:'調べる', r:'しらべる', m:'to investigate; to check; to examine', lv:'n3' },
+  { w:'断る', r:'ことわる', m:'to refuse; to decline; to turn down', lv:'n3' },
+  { w:'比べる', r:'くらべる', m:'to compare; to contrast', lv:'n3' },
+  { w:'答える', r:'こたえる', m:'to answer; to reply; to respond', lv:'n3' },
+  { w:'困る', r:'こまる', m:'to be troubled; to be in difficulty', lv:'n3' },
+  { w:'確かめる', r:'たしかめる', m:'to confirm; to check; to verify', lv:'n3' },
+  { w:'頼む', r:'たのむ', m:'to request; to ask; to rely on', lv:'n3' },
+  { w:'続ける', r:'つづける', m:'to continue; to keep up; to go on', lv:'n3' },
+  { w:'届ける', r:'とどける', m:'to deliver; to report; to send', lv:'n3' },
+  { w:'直す', r:'なおす', m:'to fix; to correct; to repair', lv:'n3' },
+  { w:'残る', r:'のこる', m:'to remain; to be left; to stay', lv:'n3' },
+  { w:'離れる', r:'はなれる', m:'to separate; to leave; to be apart', lv:'n3' },
+  { w:'増える', r:'ふえる', m:'to increase; to multiply; to grow', lv:'n3' },
+  { w:'減る', r:'へる', m:'to decrease; to diminish; to reduce', lv:'n3' },
+  { w:'迷う', r:'まよう', m:'to get lost; to hesitate; to be puzzled', lv:'n3' },
+  { w:'認める', r:'みとめる', m:'to recognize; to admit; to acknowledge', lv:'n3' },
+  { w:'申し込む', r:'もうしこむ', m:'to apply; to register; to request', lv:'n3' },
+  { w:'喜ぶ', r:'よろこぶ', m:'to be glad; to rejoice; to be pleased', lv:'n3' },
+  { w:'伝える', r:'つたえる', m:'to convey; to tell; to report', lv:'n3' },
+  { w:'変わる', r:'かわる', m:'to change; to vary; to be different', lv:'n3' },
+  { w:'穏やか', r:'おだやか', m:'calm; gentle; mild; peaceful', lv:'n3' },
+  { w:'活発', r:'かっぱつ', m:'active; lively; energetic', lv:'n3' },
+  { w:'厳しい', r:'きびしい', m:'strict; severe; harsh; tough', lv:'n3' },
+  { w:'細かい', r:'こまかい', m:'fine; detailed; minute; small', lv:'n3' },
+  { w:'残念', r:'ざんねん', m:'regrettable; unfortunate; too bad', lv:'n3' },
+  { w:'親切', r:'しんせつ', m:'kind; helpful; considerate', lv:'n3' },
+  { w:'正確', r:'せいかく', m:'accurate; precise; exact', lv:'n3' },
+  { w:'素直', r:'すなお', m:'obedient; honest; straightforward', lv:'n3' },
+  { w:'大変', r:'たいへん', m:'difficult; hard; terrible; very', lv:'n3' },
+  { w:'得意', r:'とくい', m:'proud; skilled at; one\'s forte', lv:'n3' },
+  { w:'苦手', r:'にがて', m:'poor at; not good with; weak point', lv:'n3' },
+  { w:'不思議', r:'ふしぎ', m:'mysterious; strange; wonderful', lv:'n3' },
+  { w:'真剣', r:'しんけん', m:'serious; earnest; sincere', lv:'n3' },
+  { w:'便利', r:'べんり', m:'convenient; useful; handy', lv:'n3' },
+  { w:'珍しい', r:'めずらしい', m:'rare; unusual; novel; unique', lv:'n3' },
+  { w:'面倒', r:'めんどう', m:'trouble; bother; care; troublesome', lv:'n3' },
+  { w:'勇気', r:'ゆうき', m:'courage; bravery', lv:'n3' },
+  { w:'様々', r:'さまざま', m:'various; diverse; all sorts of', lv:'n3' },
+  { w:'幸せ', r:'しあわせ', m:'happiness; happy; fortunate', lv:'n3' },
 ];
 
-// ── GRAMMAR DATA ─────────────────────────────────────────────────────────────
+// ── GRAMMAR ──────────────────────────────────────────────────────────────────
 const grammar = [
-  {
-    s: '日本語が上手になる（　）、毎日練習しています。',
-    a: 'ために',
-    c: ['ために', 'ように', 'からに', 'として'],
-    p: '〜ために',
-    e: 'ために = "in order to" (purpose)'
-  },
-  {
-    s: '雨が降っ（　）、試合は続けられました。',
-    a: 'ても',
-    c: ['ても', 'から', 'ので', 'たら'],
-    p: '〜ても',
-    e: 'ても = "even if / even though"'
-  },
-  {
-    s: '彼は医者（　）、患者に優しく接しました。',
-    a: 'として',
-    c: ['として', 'にとって', 'において', 'に対して'],
-    p: '〜として',
-    e: 'として = "as; in the role/capacity of"'
-  },
-  {
-    s: '子供（　）、この問題は難しすぎる。',
-    a: 'にとって',
-    c: ['にとって', 'として', 'によって', 'に対して'],
-    p: '〜にとって',
-    e: 'にとって = "for (someone); from one\'s perspective"'
-  },
-  {
-    s: '結果は人（　）違います。',
-    a: 'によって',
-    c: ['によって', 'にとって', 'として', 'について'],
-    p: '〜によって',
-    e: 'によって = "depending on / according to / by"'
-  },
-  {
-    s: '日本の文化（　）もっと知りたいです。',
-    a: 'について',
-    c: ['について', 'によって', 'において', 'に対して'],
-    p: '〜について',
-    e: 'について = "about; concerning"'
-  },
-  {
-    s: '外国人の意見（　）、日本人は敏感です。',
-    a: 'に対して',
-    c: ['に対して', 'について', 'にとって', 'によって'],
-    p: '〜に対して',
-    e: 'に対して = "towards; regarding; in contrast to"'
-  },
-  {
-    s: '音楽を聴き（　）、勉強しています。',
-    a: 'ながら',
-    c: ['ながら', 'てから', 'たあとで', 'ながらも'],
-    p: '〜ながら',
-    e: 'ながら = "while doing ~" (two simultaneous actions)'
-  },
-  {
-    s: '財布を家に忘れて（　）。',
-    a: 'しまいました',
-    c: ['しまいました', 'おきました', 'みました', 'きました'],
-    p: '〜てしまう',
-    e: 'てしまう = "ended up doing ~" (often with regret)'
-  },
-  {
-    s: '日本語が話せる（　）なりました。',
-    a: 'ように',
-    c: ['ように', 'ために', 'ことに', 'はずに'],
-    p: '〜ようになる',
-    e: 'ようになる = "to have come to be able to; to start doing"'
-  },
-  {
-    s: '毎朝ジョギングをする（　）しています。',
-    a: 'ように',
-    c: ['ように', 'ために', 'ことに', 'はずに'],
-    p: '〜ようにする',
-    e: 'ようにする = "to make a point of; to try to ensure that"'
-  },
-  {
-    s: '彼女は来ない（　）。メッセージも返信しない。',
-    a: 'らしい',
-    c: ['らしい', 'そうだ', 'はずだ', 'ようだ'],
-    p: '〜らしい',
-    e: 'らしい = "seems like; apparently" (based on indirect evidence)'
-  },
-  {
-    s: '空が暗い。雨が降り（　）。',
-    a: 'そうだ',
-    c: ['そうだ', 'らしい', 'はずだ', 'ようだ'],
-    p: '〜そうだ (appearance)',
-    e: 'そうだ (visual) = "looks like it will ~" (judged from appearance)'
-  },
-  {
-    s: '彼は一生懸命勉強したから、合格する（　）。',
-    a: 'はずだ',
-    c: ['はずだ', 'らしい', 'そうだ', 'かもしれない'],
-    p: '〜はずだ',
-    e: 'はずだ = "should be; expected to be" (logical expectation)'
-  },
-  {
-    s: '彼女が犯人に違い（　）。証拠がある。',
-    a: 'ない',
-    c: ['ない', 'ある', 'なかった', 'あった'],
-    p: '〜に違いない',
-    e: 'に違いない = "must be; there\'s no doubt that"'
-  },
-  {
-    s: '大学を卒業したら、留学する（　）にしました。',
-    a: 'こと',
-    c: ['こと', 'よう', 'はず', 'わけ'],
-    p: '〜ことにする',
-    e: 'ことにする = "to decide to do; to make it a rule to"'
-  },
-  {
-    s: '来年から新しいルールが適用される（　）になった。',
-    a: 'こと',
-    c: ['こと', 'よう', 'はず', 'わけ'],
-    p: '〜ことになる',
-    e: 'ことになる = "it has been decided that; it turns out that"'
-  },
-  {
-    s: '子供の頃、よく川で泳いだ（　）があります。',
-    a: 'こと',
-    c: ['こと', 'もの', 'はず', 'わけ'],
-    p: '〜ことがある',
-    e: 'ことがある = "there are times when; I have experienced ~"'
-  },
-  {
-    s: '毎日運動する（　）にしています。',
-    a: 'こと',
-    c: ['こと', 'もの', 'はず', 'ため'],
-    p: '〜ことにしている',
-    e: 'ことにしている = "I make it a rule/habit to ~"'
-  },
-  {
-    s: '寝る（　）、歯を磨いてください。',
-    a: '前に',
-    c: ['前に', '後で', 'ながら', 'てから'],
-    p: '〜前に',
-    e: '前に = "before doing ~"'
-  },
-  {
-    s: 'ここに座って（　）いいですか。',
-    a: 'も',
-    c: ['も', 'は', 'が', 'さえ'],
-    p: '〜てもいい',
-    e: 'てもいい = "it\'s okay to; may I ~"'
-  },
-  {
-    s: 'ここでタバコを吸って（　）いけません。',
-    a: 'は',
-    c: ['は', 'も', 'が', 'さえ'],
-    p: '〜てはいけない',
-    e: 'てはいけない = "must not; not allowed to"'
-  },
-  {
-    s: '明日までにレポートを出さ（　）なりません。',
-    a: 'なければ',
-    c: ['なければ', 'なくても', 'ないと', 'なかったら'],
-    p: '〜なければならない',
-    e: 'なければならない = "must; have to; obligated to"'
-  },
-  {
-    s: '全部食べ（　）もいいですよ。',
-    a: 'なくて',
-    c: ['なくて', 'ないで', 'なければ', 'ずに'],
-    p: '〜なくてもいい',
-    e: 'なくてもいい = "don\'t have to; it\'s okay not to"'
-  },
-  {
-    s: '子供に野菜を食べ（　）。',
-    a: 'させました',
-    c: ['させました', 'られました', 'てもらいました', 'てあげました'],
-    p: '〜させる (causative)',
-    e: 'させる = causative form "to make/let someone do ~"'
-  },
-  {
-    s: '先生に作文を直して（　）。',
-    a: 'もらいました',
-    c: ['もらいました', 'あげました', 'くれました', 'やりました'],
-    p: '〜てもらう',
-    e: 'てもらう = "to have someone do for me; to receive the favour of"'
-  },
-  {
-    s: '友達の引越しを手伝って（　）。',
-    a: 'あげました',
-    c: ['あげました', 'もらいました', 'くれました', 'いただきました'],
-    p: '〜てあげる',
-    e: 'てあげる = "to do something for someone (as a favour)"'
-  },
-  {
-    s: '友達が誕生日プレゼントを買って（　）。',
-    a: 'くれました',
-    c: ['くれました', 'あげました', 'もらいました', 'やりました'],
-    p: '〜てくれる',
-    e: 'てくれる = "someone does me a favour; to do for me"'
-  },
-  {
-    s: '旅行のために切符を買って（　）ました。',
-    a: 'おき',
-    c: ['おき', 'あり', 'しまい', 'み'],
-    p: '〜ておく',
-    e: 'ておく = "to do in advance; to leave in that state"'
-  },
-  {
-    s: '新しいレストランに行って（　）ました。',
-    a: 'み',
-    c: ['み', 'おき', 'しまい', 'き'],
-    p: '〜てみる',
-    e: 'てみる = "to try doing ~ (to see what happens)"'
-  },
-  {
-    s: 'この本は読めば読む（　）面白くなります。',
-    a: 'ほど',
-    c: ['ほど', 'より', 'だけ', 'ばかり'],
-    p: '〜ば〜ほど',
-    e: 'ば〜ほど = "the more ~ the more ~"'
-  },
-  {
-    s: 'バスより電車の（　）速いです。',
-    a: '方が',
-    c: ['方が', 'ほうで', 'ほど', 'だけ'],
-    p: '〜より〜の方が',
-    e: 'AよりBの方が = "B is more ~ than A"'
-  },
-  {
-    s: '5人（　）チケットがありません。',
-    a: 'しか',
-    c: ['しか', 'だけ', 'ばかり', 'のみ'],
-    p: '〜しか〜ない',
-    e: 'しか〜ない = "only; nothing but ~" (with negative verb)'
-  },
-  {
-    s: '彼女は甘いものを食べて（　）います。',
-    a: 'ばかり',
-    c: ['ばかり', 'しか', 'だけ', 'さえ'],
-    p: '〜ばかり',
-    e: 'ばかり = "only; nothing but; just ~"'
-  },
-  {
-    s: '英語（　）でなく、日本語も話せます。',
-    a: 'だけ',
-    c: ['だけ', 'しか', 'ばかり', 'のみ'],
-    p: '〜だけでなく',
-    e: 'だけでなく = "not only ~ but also ~"'
-  },
-  {
-    s: '彼が来（　）、パーティーを始めましょう。',
-    a: 'たら',
-    c: ['たら', 'ば', 'と', 'なら'],
-    p: '〜たら',
-    e: 'たら = "when / if / after" (conditional on completion)'
-  },
-  {
-    s: 'ボタンを押す（　）、ドアが開きます。',
-    a: 'と',
-    c: ['と', 'たら', 'ば', 'なら'],
-    p: '〜と',
-    e: '〜と = "whenever; if (natural/automatic consequence)"'
-  },
-  {
-    s: '日本に行く（　）、お土産を買ってきてください。',
-    a: 'なら',
-    c: ['なら', 'たら', 'ば', 'と'],
-    p: '〜なら',
-    e: 'なら = "if it is the case that; given that; since you mention it"'
-  },
-  {
-    s: '彼は病気な（　）、学校へ行きました。',
-    a: 'のに',
-    c: ['のに', 'から', 'ので', 'けど'],
-    p: '〜のに (contrast)',
-    e: 'のに = "even though; despite the fact that" (surprise/complaint)'
-  },
-  {
-    s: '頭が痛い（　）、病院へ行きます。',
-    a: 'ので',
-    c: ['ので', 'のに', 'から', 'し'],
-    p: '〜ので',
-    e: 'ので = "because; since" (softer/more objective than から)'
-  },
-  {
-    s: '仕事が忙しい（　）、宿題もあるし、大変です。',
-    a: 'し',
-    c: ['し', 'から', 'ので', 'のに'],
-    p: '〜し〜し',
-    e: '〜し = "and also; what\'s more" (listing reasons or qualities)'
-  },
-  {
-    s: '子供の頃はよく公園で遊んだ（　）です。',
-    a: 'もの',
-    c: ['もの', 'こと', 'はず', 'わけ'],
-    p: '〜ものだ (reminiscing)',
-    e: 'ものだ = "used to do; I remember that ~" (nostalgia/habit in past)'
-  },
-  {
-    s: 'この本は難しい。子供には読めない（　）だ。',
-    a: 'わけ',
-    c: ['わけ', 'こと', 'もの', 'はず'],
-    p: '〜わけだ',
-    e: 'わけだ = "that\'s why; it naturally follows that; no wonder"'
-  },
-  {
-    s: '失敗した（　）、あきらめるつもりはありません。',
-    a: 'からといって',
-    c: ['からといって', 'からには', 'ことから', 'ことに'],
-    p: '〜からといって',
-    e: 'からといって = "just because ~, doesn\'t mean ~"'
-  },
-  {
-    s: '日本に来た（　）は、日本語をマスターしたい。',
-    a: 'からには',
-    c: ['からには', 'からといって', 'ことから', 'ためには'],
-    p: '〜からには',
-    e: 'からには = "now that; since; given that ~ (strong commitment)"'
-  },
-  {
-    s: 'もっと練習すれ（　）よかったのに。',
-    a: 'ば',
-    c: ['ば', 'たら', 'と', 'なら'],
-    p: '〜ばよかった',
-    e: 'ばよかった = "I wish I had ~; should have ~" (regret)'
-  },
-  {
-    s: '試験に合格でき（　）かもしれない。',
-    a: 'る',
-    c: ['る', 'た', 'ない', 'なかった'],
-    p: '〜かもしれない',
-    e: 'かもしれない = "might; maybe; possibly"'
-  },
-  {
-    s: '彼は忙しい（　）、手伝ってくれました。',
-    a: 'にもかかわらず',
-    c: ['にもかかわらず', 'のに', 'ながら', 'から'],
-    p: '〜にもかかわらず',
-    e: 'にもかかわらず = "despite; in spite of; nevertheless"'
-  },
-  {
-    s: '会議（　）、スマホを使ってはいけません。',
-    a: '中は',
-    c: ['中は', 'の前に', 'の後で', 'ながら'],
-    p: '〜中（じゅう/ちゅう）',
-    e: '中 = "throughout; during all of ~"'
-  },
-  {
-    s: 'すぐに返事をくれ（　）、助かります。',
-    a: 'れば',
-    c: ['れば', 'たら', 'ると', 'るなら'],
-    p: '〜てくれれば / 〜てくれたら',
-    e: 'くれれば = "if you do ~ (for me), I would appreciate it"'
-  },
-  {
-    s: '彼女は怒っている（　）、何も言いませんでした。',
-    a: 'くせに',
-    c: ['くせに', 'のに', 'ながら', 'から'],
-    p: '〜くせに',
-    e: 'くせに = "even though; and yet" (with criticism/resentment)'
-  },
-  {
-    s: '安い（　）、品質がいいですね。',
-    a: 'わりに',
-    c: ['わりに', 'くせに', 'のに', 'ながら'],
-    p: '〜わりに',
-    e: 'わりに = "for ~; considering ~; in proportion to"'
-  },
-  {
-    s: '彼は医者だ（　）、あまり健康に気を使わない。',
-    a: 'わりに',
-    c: ['わりに', 'くせに', 'のに', 'ながら'],
-    p: '〜わりに',
-    e: 'わりに = "for a ~; considering he is ~" (unexpected contrast)'
-  },
-  {
-    s: 'この問題は難しい（　）、誰も解けなかった。',
-    a: 'だけあって',
-    c: ['だけあって', 'からこそ', 'せいで', 'おかげで'],
-    p: '〜だけあって',
-    e: 'だけあって = "as expected of; it\'s no wonder that" (justifies result)'
-  },
-  {
-    s: '彼が成功した（　）は、努力を続けたからだ。',
-    a: 'のは',
-    c: ['のは', 'ことは', 'わけは', 'はずは'],
-    p: '〜のは〜からだ',
-    e: 'のは〜からだ = "the reason ~ is because ~"'
-  },
-  {
-    s: '先生の（　）、試験に合格できました。',
-    a: 'おかげで',
-    c: ['おかげで', 'せいで', 'ために', 'によって'],
-    p: '〜おかげで',
-    e: 'おかげで = "thanks to ~; because of ~ (positive outcome)"'
-  },
-  {
-    s: '電車が遅れた（　）、会議に遅刻した。',
-    a: 'せいで',
-    c: ['せいで', 'おかげで', 'ために', 'によって'],
-    p: '〜せいで',
-    e: 'せいで = "because of ~ (negative outcome); to blame"'
-  },
+
+  // ── N5 ──────────────────────────────────────────────────────────────────
+  { s:'毎日学校（　）行きます。', a:'に', c:['に','で','を','が'], p:'〜に行く (direction)', e:'に = direction marker "to; towards"', lv:'n5' },
+  { s:'公園（　）サッカーをします。', a:'で', c:['で','に','を','が'], p:'〜で (location of action)', e:'で = where an action takes place "at; in"', lv:'n5' },
+  { s:'りんご（　）食べてもいいですか。', a:'を', c:['を','は','が','で'], p:'〜を (object marker)', e:'を = direct object marker', lv:'n5' },
+  { s:'宿題を（　）から、ゲームをしましょう。', a:'して', c:['して','する','した','しない'], p:'〜てから (after)', e:'てから = "after doing ~" (て form + から)', lv:'n5' },
+  { s:'もっと野菜を食べ（　）です。', a:'たい', c:['たい','たく','たに','たな'], p:'〜たい (want to)', e:'たい = "want to do ~" (attaches to verb stem)', lv:'n5' },
+  { s:'一緒に映画を見（　）か。', a:'ませんか', c:['ませんか','ましょう','ますか','ません'], p:'〜ませんか (invitation)', e:'ませんか = "Won\'t you ~? / Shall we ~?"', lv:'n5' },
+  { s:'図書館で話し（　）ください。', a:'ないで', c:['ないで','なくて','ない','なかった'], p:'〜ないでください', e:'ないでください = "Please don\'t ~"', lv:'n5' },
+  { s:'寒い（　）、窓を閉めました。', a:'から', c:['から','ので','のに','けど'], p:'〜から (reason)', e:'から = "because; since" (subjective reason)', lv:'n5' },
+  { s:'雨が降って（　）。', a:'います', c:['います','あります','きます','いきます'], p:'〜ています (ongoing)', e:'ています = ongoing action or current state', lv:'n5' },
+  { s:'バスより電車の（　）が速いです。', a:'ほう', c:['ほう','より','もの','こと'], p:'AよりBのほうが (comparison)', e:'AよりBのほうが = "B is more ~ than A"', lv:'n5' },
+  { s:'日本語（　）勉強しています。', a:'を', c:['を','が','は','に'], p:'〜を勉強する', e:'を marks the object of study', lv:'n5' },
+  { s:'ここに座って（　）いいですか。', a:'も', c:['も','は','が','を'], p:'〜てもいい (permission)', e:'てもいい = "it\'s okay to; may I ~"', lv:'n5' },
+  { s:'今（　）何時ですか。', a:'何', c:['何','どの','どこ','いくつ'], p:'〜何時 (what time)', e:'何時 = "what time is it?"', lv:'n5' },
+  { s:'このケーキは（　）ですか。だれのですか。', a:'だれ', c:['だれ','どこ','いつ','なに'], p:'だれ (who)', e:'だれ = "who" (person question word)', lv:'n5' },
+  { s:'病気（　）、学校を休みました。', a:'だから', c:['だから','なのに','だけど','なので'], p:'〜だから (reason - casual)', e:'だから = "so; that\'s why; because of that"', lv:'n5' },
+
+  // ── N4 ──────────────────────────────────────────────────────────────────
+  { s:'昨日、この映画を見た（　）があります。', a:'こと', c:['こと','もの','はず','わけ'], p:'〜たことがある', e:'たことがある = "have done ~ before; have experience of"', lv:'n4' },
+  { s:'日本語が少し話せる（　）なりました。', a:'ように', c:['ように','ために','ことに','はずに'], p:'〜ようになる', e:'ようになる = "to have come to be able to; to start ~"', lv:'n4' },
+  { s:'毎朝運動する（　）しています。', a:'ように', c:['ように','ために','ことに','はずに'], p:'〜ようにする', e:'ようにする = "to make a point of; to try to ensure ~"', lv:'n4' },
+  { s:'財布を家に忘れて（　）。', a:'しまいました', c:['しまいました','おきました','みました','きました'], p:'〜てしまう', e:'てしまう = "ended up doing ~" (often with regret)', lv:'n4' },
+  { s:'旅行のために切符を買って（　）ました。', a:'おき', c:['おき','あり','しまい','み'], p:'〜ておく', e:'ておく = "to do in advance; to leave things ready"', lv:'n4' },
+  { s:'新しいレストランに行って（　）ました。', a:'み', c:['み','おき','しまい','き'], p:'〜てみる', e:'てみる = "to try doing ~ (to see what it\'s like)"', lv:'n4' },
+  { s:'音楽を聴き（　）、勉強しています。', a:'ながら', c:['ながら','てから','たあとで','ながらも'], p:'〜ながら', e:'ながら = "while doing ~" (two simultaneous actions)', lv:'n4' },
+  { s:'子供に部屋を掃除（　）ました。', a:'させ', c:['させ','され','して','させられ'], p:'〜させる (causative)', e:'させる = "to make/let someone do ~"', lv:'n4' },
+  { s:'先生に作文を直して（　）。', a:'もらいました', c:['もらいました','あげました','くれました','やりました'], p:'〜てもらう', e:'てもらう = "to have someone do for me; to receive the favour of"', lv:'n4' },
+  { s:'友達の引越しを手伝って（　）。', a:'あげました', c:['あげました','もらいました','くれました','いただきました'], p:'〜てあげる', e:'てあげる = "to do something for someone (as a favour)"', lv:'n4' },
+  { s:'友達が誕生日プレゼントを買って（　）。', a:'くれました', c:['くれました','あげました','もらいました','やりました'], p:'〜てくれる', e:'てくれる = "someone does me a favour; to do for me"', lv:'n4' },
+  { s:'明日までにレポートを出さ（　）なりません。', a:'なければ', c:['なければ','なくても','ないと','なかったら'], p:'〜なければならない', e:'なければならない = "must; have to; obligated to"', lv:'n4' },
+  { s:'全部食べ（　）もいいですよ。', a:'なくて', c:['なくて','ないで','なければ','ずに'], p:'〜なくてもいい', e:'なくてもいい = "don\'t have to; it\'s okay not to ~"', lv:'n4' },
+  { s:'ここでタバコを吸って（　）いけません。', a:'は', c:['は','も','が','さえ'], p:'〜てはいけない', e:'てはいけない = "must not; not allowed to"', lv:'n4' },
+  { s:'彼女は来ない（　）。メッセージも返信しない。', a:'らしい', c:['らしい','そうだ','はずだ','ようだ'], p:'〜らしい', e:'らしい = "seems like; apparently" (based on indirect evidence)', lv:'n4' },
+  { s:'空が暗い。雨が降り（　）。', a:'そうだ', c:['そうだ','らしい','はずだ','ようだ'], p:'〜そうだ (appearance)', e:'そうだ (visual) = "looks like it will ~" (judged from appearance)', lv:'n4' },
+  { s:'彼は一生懸命勉強したから、合格する（　）。', a:'はずだ', c:['はずだ','らしい','そうだ','かもしれない'], p:'〜はずだ', e:'はずだ = "should be; expected to be" (logical expectation)', lv:'n4' },
+  { s:'試験に合格でき（　）かもしれない。', a:'る', c:['る','た','ない','なかった'], p:'〜かもしれない', e:'かもしれない = "might; maybe; possibly"', lv:'n4' },
+  { s:'彼が来（　）、パーティーを始めましょう。', a:'たら', c:['たら','ば','と','なら'], p:'〜たら (conditional)', e:'たら = "when / if / after" (conditional on completion)', lv:'n4' },
+  { s:'ボタンを押す（　）、ドアが開きます。', a:'と', c:['と','たら','ば','なら'], p:'〜と (natural result)', e:'〜と = "whenever; if (natural/automatic consequence)"', lv:'n4' },
+  { s:'日本に行く（　）、お土産を買ってきてください。', a:'なら', c:['なら','たら','ば','と'], p:'〜なら (conditional)', e:'なら = "if it\'s the case that; since you mention; given that"', lv:'n4' },
+  { s:'このケーキは甘（　）ぎます。', a:'す', c:['す','さ','く','に'], p:'〜すぎる', e:'すぎる = "too much; excessively ~" (verb/adj stem + すぎる)', lv:'n4' },
+  { s:'この漢字は書き（　）です。', a:'にくい', c:['にくい','やすい','たい','すぎる'], p:'〜にくい', e:'にくい = "hard / difficult to do ~"', lv:'n4' },
+  { s:'会議は3時（　）に終わる予定です。', a:'まで', c:['まで','までに','ながら','てから'], p:'〜まで (until)', e:'まで = "until ~" (the meeting lasts until 3)', lv:'n4' },
+  { s:'レポートは3時（　）出してください。', a:'までに', c:['までに','まで','ながら','てから'], p:'〜までに (by deadline)', e:'までに = "by ~ (deadline)"; submit before the time', lv:'n4' },
+
+  // ── N3 ──────────────────────────────────────────────────────────────────
+  { s:'日本語が上手になる（　）、毎日練習しています。', a:'ために', c:['ために','ように','からに','として'], p:'〜ために (purpose)', e:'ために = "in order to" (purpose)', lv:'n3' },
+  { s:'彼は医者（　）、患者に優しく接しました。', a:'として', c:['として','にとって','において','に対して'], p:'〜として', e:'として = "as; in the role/capacity of"', lv:'n3' },
+  { s:'子供（　）、この問題は難しすぎる。', a:'にとって', c:['にとって','として','によって','に対して'], p:'〜にとって', e:'にとって = "for (someone); from one\'s perspective"', lv:'n3' },
+  { s:'結果は人（　）違います。', a:'によって', c:['によって','にとって','として','について'], p:'〜によって', e:'によって = "depending on / according to / by (agent)"', lv:'n3' },
+  { s:'日本の文化（　）もっと知りたいです。', a:'について', c:['について','によって','において','に対して'], p:'〜について', e:'について = "about; concerning; regarding"', lv:'n3' },
+  { s:'外国人の意見（　）、日本人は敏感です。', a:'に対して', c:['に対して','について','にとって','によって'], p:'〜に対して', e:'に対して = "towards; regarding; in contrast to"', lv:'n3' },
+  { s:'大学を卒業したら、留学する（　）にしました。', a:'こと', c:['こと','よう','はず','わけ'], p:'〜ことにする', e:'ことにする = "to decide to do; to make it a rule"', lv:'n3' },
+  { s:'来年から新しいルールが適用される（　）になった。', a:'こと', c:['こと','よう','はず','わけ'], p:'〜ことになる', e:'ことになる = "it has been decided that; it turns out that"', lv:'n3' },
+  { s:'子供の頃、よく川で泳いだ（　）があります。', a:'こと', c:['こと','もの','はず','わけ'], p:'〜ことがある', e:'ことがある = "there are times when; I have experienced ~"', lv:'n3' },
+  { s:'彼女が犯人に違い（　）。証拠がある。', a:'ない', c:['ない','ある','なかった','あった'], p:'〜に違いない', e:'に違いない = "must be; there\'s no doubt that"', lv:'n3' },
+  { s:'彼は病気な（　）、学校へ行きました。', a:'のに', c:['のに','から','ので','けど'], p:'〜のに (contrast)', e:'のに = "even though; despite the fact that" (surprise/complaint)', lv:'n3' },
+  { s:'頭が痛い（　）、病院へ行きます。', a:'ので', c:['ので','のに','から','し'], p:'〜ので (reason)', e:'ので = "because; since" (softer/more objective than から)', lv:'n3' },
+  { s:'仕事が忙しい（　）、宿題もあるし、大変です。', a:'し', c:['し','から','ので','のに'], p:'〜し〜し', e:'〜し = "and also; what\'s more" (listing reasons or qualities)', lv:'n3' },
+  { s:'子供の頃はよく公園で遊んだ（　）です。', a:'もの', c:['もの','こと','はず','わけ'], p:'〜ものだ (reminiscing)', e:'ものだ = "used to do; I remember that ~" (nostalgia)', lv:'n3' },
+  { s:'この本は難しい。子供には読めない（　）だ。', a:'わけ', c:['わけ','こと','もの','はず'], p:'〜わけだ', e:'わけだ = "that\'s why; it naturally follows; no wonder"', lv:'n3' },
+  { s:'この本は読めば読む（　）面白くなります。', a:'ほど', c:['ほど','より','だけ','ばかり'], p:'〜ば〜ほど', e:'ば〜ほど = "the more ~ the more ~"', lv:'n3' },
+  { s:'5人（　）チケットがありません。', a:'しか', c:['しか','だけ','ばかり','のみ'], p:'〜しか〜ない', e:'しか〜ない = "only; nothing but ~" (with negative verb)', lv:'n3' },
+  { s:'英語（　）でなく、日本語も話せます。', a:'だけ', c:['だけ','しか','ばかり','のみ'], p:'〜だけでなく', e:'だけでなく = "not only ~ but also ~"', lv:'n3' },
+  { s:'失敗した（　）、あきらめるつもりはありません。', a:'からといって', c:['からといって','からには','ことから','ことに'], p:'〜からといって', e:'からといって = "just because ~, doesn\'t mean ~"', lv:'n3' },
+  { s:'日本に来た（　）は、日本語をマスターしたい。', a:'からには', c:['からには','からといって','ことから','ためには'], p:'〜からには', e:'からには = "now that; since; given that ~" (strong commitment)', lv:'n3' },
+  { s:'先生の（　）、試験に合格できました。', a:'おかげで', c:['おかげで','せいで','ために','によって'], p:'〜おかげで', e:'おかげで = "thanks to ~; because of ~ (positive outcome)"', lv:'n3' },
+  { s:'電車が遅れた（　）、会議に遅刻した。', a:'せいで', c:['せいで','おかげで','ために','によって'], p:'〜せいで', e:'せいで = "because of ~ (negative outcome); to blame"', lv:'n3' },
+  { s:'彼は忙しい（　）、手伝ってくれました。', a:'にもかかわらず', c:['にもかかわらず','のに','ながら','から'], p:'〜にもかかわらず', e:'にもかかわらず = "despite; in spite of; nevertheless"', lv:'n3' },
+  { s:'安い（　）、品質がいいですね。', a:'わりに', c:['わりに','くせに','のに','ながら'], p:'〜わりに', e:'わりに = "for ~; considering ~; in proportion to"', lv:'n3' },
+  { s:'もっと練習すれ（　）よかったのに。', a:'ば', c:['ば','たら','と','なら'], p:'〜ばよかった (regret)', e:'ばよかった = "I wish I had ~; should have ~"', lv:'n3' },
 ];
 
-// ── STATE ────────────────────────────────────────────────────────────────────
+// ── STATE ─────────────────────────────────────────────────────────────────────
 let mode = 'vocab';
-let score = 0;
-let total = 0;
-let streak = 0;
-let answered = false;
-let current = null;
+let activeLevels = new Set(['n3']);
+let score = 0, total = 0, streak = 0;
+let answered = false, current = null;
 let recentKeys = [];
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────────────────────
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-function pickRandom(arr, exclude = -1) {
-  let i;
-  do { i = Math.floor(Math.random() * arr.length); } while (i === exclude);
-  return i;
-}
+function activeVocab() { return vocab.filter(v => activeLevels.has(v.lv)); }
+function activeGrammar() { return grammar.filter(g => activeLevels.has(g.lv)); }
 
-// ── QUESTION GENERATORS ──────────────────────────────────────────────────────
+// ── GENERATORS ────────────────────────────────────────────────────────────────
 function genVocab() {
-  let idx;
-  do { idx = Math.floor(Math.random() * vocab.length); }
-  while (recentKeys.includes('v' + idx) && recentKeys.length < vocab.length);
-  recentKeys.push('v' + idx);
-  if (recentKeys.length > 12) recentKeys.shift();
+  const pool = activeVocab();
+  if (pool.length < 4) return null;
 
-  const item = vocab[idx];
-  const wrong = shuffle(vocab.filter((_, i) => i !== idx)).slice(0, 3).map(v => v.m);
+  let idx;
+  let tries = 0;
+  do {
+    idx = Math.floor(Math.random() * pool.length);
+    tries++;
+  } while (recentKeys.includes('v' + idx) && tries < pool.length);
+
+  recentKeys.push('v' + idx);
+  if (recentKeys.length > 15) recentKeys.shift();
+
+  const item = pool[idx];
+  const wrong = shuffle(pool.filter((_, i) => i !== idx)).slice(0, 3).map(v => v.m);
   const choices = shuffle([item.m, ...wrong]);
-  return { type: 'vocab', word: item.w, reading: item.r, answer: item.m, choices };
+  return { type: 'vocab', word: item.w, reading: item.r, answer: item.m, choices, lv: item.lv };
 }
 
 function genGrammar() {
-  let idx;
-  do { idx = Math.floor(Math.random() * grammar.length); }
-  while (recentKeys.includes('g' + idx) && recentKeys.length < grammar.length);
-  recentKeys.push('g' + idx);
-  if (recentKeys.length > 12) recentKeys.shift();
+  const pool = activeGrammar();
+  if (pool.length === 0) return null;
 
-  const item = grammar[idx];
+  let idx;
+  let tries = 0;
+  do {
+    idx = Math.floor(Math.random() * pool.length);
+    tries++;
+  } while (recentKeys.includes('g' + idx) && tries < pool.length);
+
+  recentKeys.push('g' + idx);
+  if (recentKeys.length > 15) recentKeys.shift();
+
+  const item = pool[idx];
   const choices = shuffle(item.c);
-  return { type: 'grammar', sentence: item.s, pattern: item.p, answer: item.a, choices, explanation: item.e };
+  return { type: 'grammar', sentence: item.s, pattern: item.p, answer: item.a, choices, explanation: item.e, lv: item.lv };
 }
 
-// ── RENDER ───────────────────────────────────────────────────────────────────
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderQuestion() {
   const card = document.getElementById('question-card');
   const choicesEl = document.getElementById('choices-container');
+  const fb = document.getElementById('feedback');
+  const nextBtn = document.getElementById('next-btn');
+
+  fb.className = 'feedback';
+  nextBtn.classList.remove('visible');
+
+  if (!current) {
+    card.innerHTML = `<div class="empty-state">No questions available.<br>Select at least one level above.</div>`;
+    choicesEl.innerHTML = '';
+    return;
+  }
+
+  const lvTag = `<div class="lv-tag ${current.lv}">${current.lv.toUpperCase()}</div>`;
 
   if (current.type === 'vocab') {
-    card.innerHTML = `<div class="word">${current.word}</div><div class="reading">${current.reading}</div>`;
+    card.innerHTML = `${lvTag}<div class="word">${current.word}</div><div class="reading">${current.reading}</div>`;
   } else {
-    const display = current.sentence.replace('（　）',
-      '<span class="blank">（　）</span>');
-    card.innerHTML = `<div class="grammar-pattern">${current.pattern}</div><div class="grammar-sentence">${display}</div>`;
+    const display = current.sentence.replace('（　）', '<span class="blank">（　）</span>');
+    card.innerHTML = `${lvTag}<div class="grammar-pattern">${current.pattern}</div><div class="grammar-sentence">${display}</div>`;
   }
 
   choicesEl.innerHTML = current.choices.map((c, i) =>
@@ -815,9 +686,6 @@ function renderQuestion() {
       <span class="num">${i + 1}</span><span>${c}</span>
     </button>`
   ).join('');
-
-  document.getElementById('feedback').className = 'feedback';
-  document.getElementById('next-btn').classList.remove('visible');
 }
 
 function updateStats() {
@@ -827,17 +695,15 @@ function updateStats() {
   document.getElementById('progress-bar').style.width = pct + '%';
 }
 
-// ── INTERACTION ──────────────────────────────────────────────────────────────
+// ── INTERACTION ───────────────────────────────────────────────────────────────
 function choose(idx) {
-  if (answered) return;
+  if (answered || !current) return;
   answered = true;
   total++;
 
   const chosen = current.choices[idx];
   const correct = chosen === current.answer;
-
-  if (correct) { score++; streak++; }
-  else { streak = 0; }
+  if (correct) { score++; streak++; } else { streak = 0; }
 
   document.querySelectorAll('.choice').forEach((el, i) => {
     el.disabled = true;
@@ -872,11 +738,24 @@ function setMode(m) {
   nextQuestion();
 }
 
-// ── KEYBOARD ─────────────────────────────────────────────────────────────────
+function toggleLevel(lv) {
+  if (activeLevels.has(lv) && activeLevels.size === 1) return; // keep at least one
+  if (activeLevels.has(lv)) activeLevels.delete(lv);
+  else activeLevels.add(lv);
+
+  document.querySelectorAll('.lvl-btn').forEach(btn => {
+    btn.classList.toggle('active', activeLevels.has(btn.dataset.lv));
+  });
+
+  recentKeys = [];
+  nextQuestion();
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (['1','2','3','4'].includes(e.key)) {
     const i = parseInt(e.key) - 1;
-    if (!answered && i < current.choices.length) choose(i);
+    if (!answered && current && i < current.choices.length) choose(i);
   }
   if (e.key === ' ' || e.key === 'Enter') {
     e.preventDefault();
@@ -884,7 +763,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────────
 nextQuestion();
 </script>
 </body>
