@@ -65,7 +65,8 @@
     .choice.wrong { border-color: #c0392b; background: #fef0f0; }
     .choice.wrong .num { color: #c0392b; }
     .choice:disabled { cursor: default; }
-    .feedback { font-size: 0.88rem; padding: 12px 16px; border-radius: 4px; margin-bottom: 12px; line-height: 1.6; display: none; }
+    .feedback { font-size: 0.9rem; padding: 12px 16px; border-radius: 4px; margin-bottom: 12px; line-height: 1.8; display: none; }
+    .feedback small { font-size: 0.78rem; opacity: 0.85; }
     .feedback.show { display: block; }
     .feedback.correct { background: #f0faf4; border: 1px solid #27ae60; color: #1a7a3c; }
     .feedback.wrong { background: #fef0f0; border: 1px solid #c0392b; color: #a93226; }
@@ -554,13 +555,13 @@ const grammar = [
   {s:'彼女は来ない（　）。メッセージも返信しない。',a:'らしい',c:['らしい','そうだ','はずだ','ようだ'],p:'〜らしい',e:'らしい = "seems like; apparently" (based on indirect evidence)',lv:'n4',pr:1},
   {s:'空が暗い。雨が降り（　）。',a:'そうだ',c:['そうだ','らしい','はずだ','ようだ'],p:'〜そうだ (appearance)',e:'そうだ = "looks like it will ~" (judged from appearance)',lv:'n4',pr:1},
   {s:'彼は一生懸命勉強したから、合格する（　）。',a:'はずだ',c:['はずだ','らしい','そうだ','かもしれない'],p:'〜はずだ',e:'はずだ = "should be; expected to be" (logical expectation)',lv:'n4',pr:1},
-  {s:'試験に合格でき（　）かもしれない。',a:'る',c:['る','た','ない','なかった'],p:'〜かもしれない',e:'かもしれない = "might; maybe; possibly"',lv:'n4',pr:1},
+  {s:'明日、雨が降る（　）。天気予報で言っていた。',a:'かもしれない',c:['かもしれない','はずだ','らしい','ようだ'],p:'〜かもしれない',e:'かもしれない = "might; maybe; possibly" (uncertainty, ~50% chance)',lv:'n4',pr:1},
   {s:'彼が来（　）、パーティーを始めましょう。',a:'たら',c:['たら','ば','と','なら'],p:'〜たら (conditional)',e:'たら = "when / if / after" (conditional on completion)',lv:'n4',pr:1},
   {s:'ボタンを押す（　）、ドアが開きます。',a:'と',c:['と','たら','ば','なら'],p:'〜と (natural result)',e:'〜と = "whenever; if (natural/automatic consequence)"',lv:'n4',pr:1},
   {s:'日本に行く（　）、お土産を買ってきてください。',a:'なら',c:['なら','たら','ば','と'],p:'〜なら (conditional)',e:'なら = "if it\'s the case that; given that; since you mention"',lv:'n4',pr:1},
   {s:'このケーキは甘（　）ぎます。',a:'す',c:['す','さ','く','に'],p:'〜すぎる',e:'すぎる = "too much; excessively ~"',lv:'n4',pr:1},
-  {s:'この漢字は書き（　）です。',a:'にくい',c:['にくい','やすい','たい','すぎる'],p:'〜にくい',e:'にくい = "hard / difficult to do ~"',lv:'n4',pr:1},
-  {s:'この漢字は書き（　）です。',a:'やすい',c:['やすい','にくい','たい','すぎる'],p:'〜やすい',e:'やすい = "easy to do; prone to ~"',lv:'n4'},
+  {s:'この道は車が多くて、歩き（　）です。',a:'にくい',c:['にくい','やすい','たい','すぎる'],p:'〜にくい',e:'にくい = "hard / difficult to do ~"',lv:'n4',pr:1},
+  {s:'この漢字は形がシンプルで、覚え（　）です。',a:'やすい',c:['やすい','にくい','たい','すぎる'],p:'〜やすい',e:'やすい = "easy to do; prone to ~"',lv:'n4'},
   {s:'会議は3時（　）に終わる予定です。',a:'まで',c:['まで','までに','ながら','てから'],p:'〜まで (until)',e:'まで = "until ~" (duration continues until the time)',lv:'n4',pr:1},
   {s:'レポートは3時（　）出してください。',a:'までに',c:['までに','まで','ながら','てから'],p:'〜までに (by deadline)',e:'までに = "by ~ (deadline)"; action must complete before the time',lv:'n4',pr:1},
 
@@ -710,12 +711,25 @@ function choose(idx) {
     else if (i === idx) el.classList.add('wrong');
   });
   const fb = document.getElementById('feedback');
-  if (correct) {
-    fb.className = 'feedback correct show';
-    fb.textContent = '✓ Correct!';
+  if (current.type === 'vocab') {
+    const detail = `${current.word}【${current.reading}】= ${current.answer}`;
+    if (correct) {
+      fb.className = 'feedback correct show';
+      fb.textContent = `✓ Correct! ${detail}`;
+    } else {
+      fb.className = 'feedback wrong show';
+      fb.textContent = `✗ Wrong. ${detail}`;
+    }
   } else {
-    fb.className = 'feedback wrong show';
-    fb.textContent = `✗ Wrong. ${current.explanation || 'Correct: '+current.answer}`;
+    const filled = current.sentence.replace('（　）', `「${current.answer}」`);
+    const explanation = current.explanation || '';
+    if (correct) {
+      fb.className = 'feedback correct show';
+      fb.innerHTML = `✓ Correct! <br>${filled}<br><small>${explanation}</small>`;
+    } else {
+      fb.className = 'feedback wrong show';
+      fb.innerHTML = `✗ Wrong. <br>${filled}<br><small>${explanation}</small>`;
+    }
   }
   document.getElementById('next-btn').classList.add('visible');
   updateStats();
