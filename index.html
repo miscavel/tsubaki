@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>つばき</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+      background: #f7f6f2;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .title span { color: #c0392b; }
+    .subtitle { font-size: 0.85rem; color: #888; margin-bottom: 40px; }
+    .projects { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px; }
+    .project-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      background: white;
+      border: 2px solid #1a1a2e;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #1a1a2e;
+      transition: background 0.1s;
+    }
+    .project-link:hover { background: #1a1a2e; color: white; }
+    .project-link:hover .arrow { color: white; }
+    .proj-name { font-weight: 700; font-size: 1rem; }
+    .proj-desc { font-size: 0.8rem; color: #888; margin-top: 2px; }
+    .project-link:hover .proj-desc { color: #bbb; }
+    .arrow { font-size: 1.2rem; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="title">つ<span>ば</span>き</div>
+  <div class="subtitle">a collection of tools</div>
+  <div class="projects">
+    <a class="project-link" href="./n3-driller/">
+      <div>
+        <div class="proj-name">N3 Driller</div>
+        <div class="proj-desc">JLPT N3 vocabulary &amp; grammar flashcards</div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</body>
+</html>
