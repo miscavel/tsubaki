@@ -186,6 +186,7 @@ body {
 .badge.pat { background: #1a237e; color: #c5cae9; font-size: 0.68rem; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .badge.cat { background: #1a3a4a; color: #b0d4e8; }
 .badge.game-lbl { background: #2a1a4a; color: #c9b0e8; }
+.badge.prio { background: transparent; padding: 0; font-size: 0.85rem; }
 
 body.light .badge.n5  { background: #c8e6c9; color: #1b5e20; }
 body.light .badge.n4  { background: #ffe0b2; color: #e65100; }
@@ -488,14 +489,14 @@ function genVocabQuestion() {
   const wrong = pool.filter(v => v.w !== item.w)
     .sort(() => Math.random() - 0.5).slice(0, 3).map(v => v.m);
   const choices = [item.m, ...wrong].sort(() => Math.random() - 0.5);
-  return { type: 'vocab', word: item.w, reading: item.r, answer: item.m, choices, lv: item.lv };
+  return { type: 'vocab', word: item.w, reading: item.r, answer: item.m, choices, lv: item.lv, prio: !!item.p };
 }
 function genGrammarQuestion() {
   const pool = jlptGrammarPool();
   if (pool.length < 4) return null;
   const item = pickRandom(pool, g => g.p);
   const choices = item.c.slice().sort(() => Math.random() - 0.5);
-  return { type: 'grammar', sentence: item.s, answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv };
+  return { type: 'grammar', sentence: item.s, answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv, prio: !!item.pr };
 }
 function genGameQuestion() {
   if (gameCategory === 'セリフ') {
@@ -535,16 +536,18 @@ function renderQuestion() {
   current = q;
   answered = false;
 
+  const prioBadge = q.prio ? '<span class="badge prio">⭐</span>' : '';
   if (q.type === 'vocab') {
     const rc = hideReading ? 'reading hidden-reading' : 'reading';
     card.innerHTML = `
-      <div class="badges"><span class="badge ${q.lv}">${q.lv.toUpperCase()}</span></div>
+      <div class="badges"><span class="badge ${q.lv}">${q.lv.toUpperCase()}</span>${prioBadge}</div>
       <div class="word">${q.word}</div>
       <div class="${rc}" id="reading-display">${q.reading}</div>`;
   } else if (q.type === 'grammar') {
     card.innerHTML = `
       <div class="badges">
         <span class="badge ${q.lv}">${q.lv.toUpperCase()}</span>
+        ${prioBadge}
         <span class="badge pat">${q.pattern}</span>
       </div>
       <div class="sentence">${q.sentence}</div>`;
