@@ -739,7 +739,13 @@ document.getElementById('prio-btn').addEventListener('click', () => {
   priorityOnly = !priorityOnly; recentKeys = []; syncUI(); renderQuestion();
 });
 document.getElementById('reading-btn').addEventListener('click', () => {
-  hideReading = !hideReading; syncUI();
+  hideReading = !hideReading;
+  syncUI();
+  const readingEl = document.getElementById('reading-display');
+  if (readingEl) {
+    // hide only if not yet answered; if answered, reading was already revealed by choose()
+    readingEl.classList.toggle('hidden-reading', hideReading && !answered);
+  }
 });
 document.querySelectorAll('#game-selector .ctrl-btn').forEach(b => {
   b.addEventListener('click', () => {
