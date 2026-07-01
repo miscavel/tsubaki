@@ -36,6 +36,14 @@
     .hidden-reading { visibility: hidden; }
     .reset-btn { background: none; border: none; cursor: pointer; color: #ccc; font-size: 0.9rem; padding: 0 2px; line-height: 1; }
     .reset-btn:hover { color: #888; }
+    #code-panel { display: none; background: #f0efe8; border: 1px solid #ccc; border-radius: 4px; padding: 10px; margin-bottom: 12px; }
+    #code-panel.open { display: block; }
+    .code-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: stretch; }
+    .code-row textarea, .code-row input { flex: 1; font-family: monospace; font-size: 0.75rem; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; background: white; }
+    .code-row textarea { height: 46px; resize: none; }
+    .code-row input { height: 32px; }
+    .code-row button { padding: 0 12px; background: #1a1a2e; color: white; border: none; cursor: pointer; border-radius: 3px; font-size: 0.8rem; white-space: nowrap; }
+    #code-msg { font-size: 0.75rem; min-height: 1em; }
     .progress { height: 4px; background: #e0e0d8; border-radius: 2px; margin-bottom: 16px; }
     .progress-bar { height: 100%; background: #c0392b; border-radius: 2px; transition: width 0.3s; }
     .card {
@@ -100,6 +108,7 @@
         <span id="score-display">0 / 0</span>
         <span class="streak" id="streak-display">🔥 0</span>
         <button class="reset-btn" onclick="resetProgress()" title="Reset score">↺</button>
+        <button class="reset-btn" onclick="toggleCodePanel()" title="Save / Load code">💾</button>
       </div>
     </div>
     <div class="header-row">
@@ -117,6 +126,17 @@
     </div>
   </header>
 
+  <div id="code-panel">
+    <div class="code-row">
+      <textarea id="code-out" readonly onclick="this.select()"></textarea>
+      <button onclick="copyCode()">Copy</button>
+    </div>
+    <div class="code-row">
+      <input id="code-in" type="text" placeholder="Paste code to load…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button onclick="applyCode()">Load</button>
+    </div>
+    <div id="code-msg"></div>
+  </div>
   <div class="progress"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
   <div class="card" id="question-card"></div>
   <div class="choices" id="choices-container"></div>
@@ -699,14 +719,38 @@ function renderQuestion() {
   ).join('');
 }
 
+function encodeState() {
+  return btoa(JSON.stringify({
+    s: score, t: total, x: streak,
+    m: mode, lv: [...activeLevels],
+    p: priorityOnly ? 1 : 0, hr: hideReading ? 1 : 0,
+  }));
+}
+
+function applyState(state) {
+  score = state.s || 0; total = state.t || 0; streak = state.x || 0;
+  mode = state.m || 'vocab';
+  activeLevels = new Set(state.lv || ['n3']);
+  priorityOnly = !!state.p; hideReading = !!state.hr;
+  syncUI();
+}
+
+function syncUI() {
+  document.querySelectorAll('.lvl-btn').forEach(b => b.classList.toggle('active', activeLevels.has(b.dataset.lv)));
+  document.getElementById('tab-vocab').classList.toggle('active', mode === 'vocab');
+  document.getElementById('tab-grammar').classList.toggle('active', mode === 'grammar');
+  document.getElementById('prio-btn').classList.toggle('active', priorityOnly);
+  document.getElementById('reading-btn').classList.toggle('active', hideReading);
+}
+
 function saveProgress() {
-  try { localStorage.setItem('tsubaki_progress', JSON.stringify({score, total, streak})); } catch(e) {}
+  try { localStorage.setItem('tsubaki_progress', encodeState()); } catch(e) {}
 }
 
 function loadProgress() {
   try {
-    const s = JSON.parse(localStorage.getItem('tsubaki_progress') || '{}');
-    score = s.score || 0; total = s.total || 0; streak = s.streak || 0;
+    const raw = localStorage.getItem('tsubaki_progress');
+    if (raw) applyState(JSON.parse(atob(raw)));
   } catch(e) {}
 }
 
@@ -715,6 +759,38 @@ function resetProgress() {
   score = 0; total = 0; streak = 0;
   saveProgress();
   updateStats();
+}
+
+function toggleCodePanel() {
+  const panel = document.getElementById('code-panel');
+  const opening = !panel.classList.contains('open');
+  panel.classList.toggle('open', opening);
+  if (opening) document.getElementById('code-out').value = encodeState();
+}
+
+function copyCode() {
+  const out = document.getElementById('code-out');
+  out.select();
+  navigator.clipboard?.writeText(out.value).catch(() => {});
+  showCodeMsg('Copied!', '#27ae60');
+}
+
+function applyCode() {
+  try {
+    applyState(JSON.parse(atob(document.getElementById('code-in').value.trim())));
+    saveProgress(); updateStats(); recentKeys = []; nextQuestion();
+    document.getElementById('code-panel').classList.remove('open');
+    document.getElementById('code-in').value = '';
+    showCodeMsg('Loaded!', '#27ae60');
+  } catch(e) {
+    showCodeMsg('Invalid code.', '#c0392b');
+  }
+}
+
+function showCodeMsg(text, color) {
+  const el = document.getElementById('code-msg');
+  el.textContent = text; el.style.color = color;
+  setTimeout(() => el.textContent = '', 2500);
 }
 
 function updateStats() {
@@ -808,6 +884,7 @@ document.addEventListener('keydown', e => {
 });
 
 loadProgress();
+syncUI();
 updateStats();
 nextQuestion();
 </script>
