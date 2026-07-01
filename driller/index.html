@@ -498,6 +498,13 @@ function genGrammarQuestion() {
   return { type: 'grammar', sentence: item.s, answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv };
 }
 function genGameQuestion() {
+  if (gameCategory === 'セリフ') {
+    const pool = gameData[gameId].dialogues;
+    if (!pool || pool.length < 4) return null;
+    const item = pickRandom(pool, d => d.s);
+    const choices = item.c.slice().sort(() => Math.random() - 0.5);
+    return { type: 'dialogue', sentence: item.s, speaker: item.sp, answer: item.a, choices, explanation: item.e };
+  }
   const pool = gamePool();
   if (pool.length < 4) return null;
   const item = pickRandom(pool, v => v.w);
@@ -541,6 +548,13 @@ function renderQuestion() {
         <span class="badge pat">${q.pattern}</span>
       </div>
       <div class="sentence">${q.sentence}</div>`;
+  } else if (q.type === 'dialogue') {
+    card.innerHTML = `
+      <div class="badges">
+        <span class="badge game-lbl">${gameData[gameId].label}</span>
+        <span class="badge cat">${q.speaker}</span>
+      </div>
+      <div class="sentence">${q.sentence}</div>`;
   } else {
     const showR = q.word !== q.reading;
     card.innerHTML = `
@@ -553,6 +567,7 @@ function renderQuestion() {
   }
 
   const choicesDiv = document.getElementById('choices');
+  choicesDiv.style.gridTemplateColumns = q.type === 'dialogue' ? '1fr' : '';
   q.choices.forEach((ch, i) => {
     const btn = document.createElement('button');
     btn.className = 'choice';
@@ -591,6 +606,9 @@ function choose(choice) {
     const filled = current.sentence.replace('（　）', `「${current.answer}」`);
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
     fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br>${filled}<br><small>${current.explanation}</small>`;
+  } else if (current.type === 'dialogue') {
+    fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
+    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.explanation}</small>`;
   } else {
     const detail = `${current.word} = ${current.answer}`;
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';

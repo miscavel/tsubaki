@@ -284,7 +284,305 @@ const gameData = {
   dq11: {
     label: 'DQ XI',
     diff: 'N4–N3',
-    cats: ['すべて', 'バトル', 'じゅもん', 'アイテム', 'ストーリー', 'しょくぎょう', 'まち', 'かいわ'],
+    cats: ['すべて', 'バトル', 'じゅもん', 'アイテム', 'ストーリー', 'しょくぎょう', 'まち', 'かいわ', 'セリフ'],
+    // セリフ = dialogue comprehension questions (separate from vocab)
+    dialogues: [
+      // ── やどや・まちのNPC ────────────────────────────────────────────
+      {
+        s:'ゆっくりお休みください。旅の疲れをいやしていってくださいね。',
+        sp:'やどや',
+        a:'Please rest well. Let yourself recover from the fatigue of your journey.',
+        c:[
+          'Please rest well. Let yourself recover from the fatigue of your journey.',
+          'You look tired. Have you been travelling long? Where are you headed?',
+          'We\'re fully booked tonight, I\'m afraid. Please try again tomorrow.',
+          'You can rest here, but watch out — monsters have been seen nearby.',
+        ],
+        e:'疲れをいやす = to soothe / recover from fatigue. いやしていって = "go and heal yourself here"',
+      },
+      {
+        s:'このあたりでは魔物が増えていて、夜は外に出られないんですよ。本当に困っています。',
+        sp:'村人',
+        a:'Monsters have been increasing around here, so we can\'t go outside at night. We\'re really struggling.',
+        c:[
+          'Monsters have been increasing around here, so we can\'t go outside at night. We\'re really struggling.',
+          'The monsters here only come out at night, so travelling in the day is fine.',
+          'We\'ve been catching lots of monsters lately. It\'s actually been quite profitable.',
+          'The monsters left after a hero defeated them. Things have been peaceful since.',
+        ],
+        e:'増えている = increasing (ている = ongoing state). 出られない = cannot go out (potential negative). 困っています = we are troubled / struggling',
+      },
+      {
+        s:'西に進むと、デルカダール王国があります。国王様にご用がおありなのですか？',
+        sp:'村人',
+        a:'If you go west, you\'ll find the Kingdom of Heliodor. Do you have business with the king?',
+        c:[
+          'If you go west, you\'ll find the Kingdom of Heliodor. Do you have business with the king?',
+          'The Kingdom of Heliodor is to the east. The king is expecting you.',
+          'The road west is blocked. You\'ll need permission from the king to pass.',
+          'Heliodor is far to the north. Few travellers make it there safely.',
+        ],
+        e:'〜に進む = to advance / head towards ~. ご用がおありですか = polite "do you have business/an errand?"',
+      },
+      {
+        s:'道具屋でやくそうをたくさん買っておくといいですよ。この先の洞窟は手強いらしいので。',
+        sp:'村人',
+        a:'You should stock up on medicinal herbs at the item shop. Apparently the cave ahead is tough.',
+        c:[
+          'You should stock up on medicinal herbs at the item shop. Apparently the cave ahead is tough.',
+          'The item shop sells herbs, but they\'re expensive. You\'re better off finding them in the cave.',
+          'Don\'t bother with herbs — the monsters in the cave drop plenty of items.',
+          'The item shop is closed today. You\'ll have to manage without supplies.',
+        ],
+        e:'〜ておく = do in advance / stock up. 手強い = tough / formidable. 〜らしい = apparently / I hear that',
+      },
+      {
+        s:'まおうが現れてから、世界はずっと暗くなる一方だ。誰かが何とかしてくれないと…。',
+        sp:'村人',
+        a:'Ever since the Dark Lord appeared, the world has only been getting darker. If someone doesn\'t do something…',
+        c:[
+          'Ever since the Dark Lord appeared, the world has only been getting darker. If someone doesn\'t do something…',
+          'The Dark Lord appeared once before, but a hero defeated him. It will happen again.',
+          'People say the world is getting darker, but I think things will improve on their own.',
+          'Since the Dark Lord appeared, trade has boomed. Dark times can be profitable.',
+        ],
+        e:'〜て以来 / から = ever since ~. 〜一方だ = keeps doing ~; only getting more ~. 何とかする = to do something about it',
+      },
+      {
+        s:'勇者のしるしを持つ者が、いつかこの地に現れると言い伝えられておる。',
+        sp:'長老',
+        a:'It is passed down in legend that one who bears the mark of the hero will one day appear in this land.',
+        c:[
+          'It is passed down in legend that one who bears the mark of the hero will one day appear in this land.',
+          'The hero\'s mark was lost long ago. No one alive has ever seen it.',
+          'A person bearing the mark appeared here before, but they failed and disappeared.',
+          'The mark of the hero is said to choose its bearer — you cannot seek it out.',
+        ],
+        e:'〜と言い伝えられている = it is passed down / legend has it that ~. 〜おる = archaic/dialect form of いる (elder speech)',
+      },
+      // ── ロウ（老人口調：〜じゃ）───────────────────────────────────
+      {
+        s:'そうじゃ、お主が本当の勇者なのじゃ。ワシはずっと信じておったぞ。',
+        sp:'ロウ',
+        a:'That\'s right — you are the true Luminary. I always believed in you.',
+        c:[
+          'That\'s right — you are the true Luminary. I always believed in you.',
+          'So you really think you\'re the hero? You still have much to prove, I\'m afraid.',
+          'Is that so? Others have claimed to be the hero before. I\'ll wait and see.',
+          'You\'re the hero? I had my doubts, but perhaps the mark doesn\'t lie.',
+        ],
+        e:'お主 = archaic "you" (used by elders). 〜のじゃ = elder sentence-ender (= 〜のだ). 信じておった = had been believing (past progressive, archaic)',
+      },
+      {
+        s:'この先の道は険しいのじゃ。じゃが、お主ならきっと乗り越えられるじゃろう。',
+        sp:'ロウ',
+        a:'The road ahead is steep and harsh. But knowing you, you will surely overcome it.',
+        c:[
+          'The road ahead is steep and harsh. But knowing you, you will surely overcome it.',
+          'The road ahead is easy enough. Even alone you should have no trouble.',
+          'The road is too dangerous. I cannot allow you to go any further.',
+          'The path is long. We should rest here before continuing tomorrow.',
+        ],
+        e:'険しい = steep / harsh / severe. じゃが = elder form of "but / however". 乗り越えられる = can overcome / surmount',
+      },
+      {
+        s:'無茶だけはしないでくれよ。お主のことが心配なんじゃ。',
+        sp:'ロウ',
+        a:'Just please don\'t do anything reckless. I\'m worried about you.',
+        c:[
+          'Just please don\'t do anything reckless. I\'m worried about you.',
+          'Go ahead and take risks — that\'s what being a hero is about. I\'m proud of you.',
+          'Don\'t hold back. The enemy is reckless, so you need to be too.',
+          'You worry too much. I\'m fine — focus on the mission.',
+        ],
+        e:'無茶をする = to be reckless / overdo it. 〜ないでくれ = please don\'t ~. 心配 = worried / concerned',
+      },
+      // ── エリック（タメ口・若者言葉）──────────────────────────────────
+      {
+        s:'おいおい、マジかよ。あんな数の魔物、どうやって倒すんだよ。',
+        sp:'エリック',
+        a:'Whoa whoa, are you serious? How are we supposed to beat that many monsters?',
+        c:[
+          'Whoa whoa, are you serious? How are we supposed to beat that many monsters?',
+          'Hey, look at all those monsters! This is going to be so easy for us.',
+          'Hmm, there are a lot of enemies. I\'ve handled worse though. Let\'s go.',
+          'Oh no, monsters ahead. You go first — I\'ll cover you from behind.',
+        ],
+        e:'おいおい = "hey hey / whoa" (casual surprise). マジかよ = "seriously? / for real?" (casual). あんな = "that kind of / that many (over there)"',
+      },
+      {
+        s:'まあ、なんとかなるって。俺たちがいるんだから、心配すんなよ。',
+        sp:'エリック',
+        a:'Eh, it\'ll work out. We\'re here with you, so don\'t worry.',
+        c:[
+          'Eh, it\'ll work out. We\'re here with you, so don\'t worry.',
+          'Actually, I\'m not sure we can win this one. We should think carefully.',
+          'I know it looks bad, but run if you have to — no shame in it.',
+          'It\'s not going to work out. We need to find another way.',
+        ],
+        e:'なんとかなる = it\'ll work out somehow. 〜って = casual sentence-ender (assertion). 心配すんな = don\'t worry (すんな = casual negative command of する)',
+      },
+      {
+        s:'この戦いが終わったら、みんなでゆっくり旅をしようじゃないか。',
+        sp:'エリック',
+        a:'When this battle is over, let\'s all travel together at our own pace.',
+        c:[
+          'When this battle is over, let\'s all travel together at our own pace.',
+          'After this, I\'m going back home. I\'ve had enough of travelling.',
+          'This battle might be our last. Let\'s make it count.',
+          'Once we win, the others can go. I\'ll stay and keep watch.',
+        ],
+        e:'〜たら = when/after ~ (conditional on completion). 〜ようじゃないか = "let\'s ~, shall we?" (casual suggestion)',
+      },
+      // ── ベロニカ（お嬢様口調：〜ですわ）─────────────────────────────
+      {
+        s:'わたくしの魔法の腕前、とくとごらんなさいですわ！',
+        sp:'ベロニカ',
+        a:'Take a good, close look at my magical skills!',
+        c:[
+          'Take a good, close look at my magical skills!',
+          'Please lend me your magical power — mine isn\'t strong enough alone.',
+          'Don\'t watch me — focus on the enemy. I can handle myself.',
+          'My magic is a secret. I\'d rather you didn\'t watch.',
+        ],
+        e:'わたくし = formal "I" (refined feminine). とくとごらんなさい = "take a good look / watch closely" (instructive, slightly theatrical). 〜ですわ = refined feminine sentence-ender',
+      },
+      {
+        s:'べ、別にあなたのことを心配してたわけじゃないんだからね！',
+        sp:'ベロニカ',
+        a:'I-It\'s not like I was worried about you or anything!',
+        c:[
+          'I-It\'s not like I was worried about you or anything!',
+          'Of course I was worried about you. Don\'t do that again.',
+          'I wasn\'t watching you at all. I had my own things to deal with.',
+          'Why would I be worried? You\'re the hero. You\'ll be fine.',
+        ],
+        e:'Classic tsundere line. 別に〜わけじゃない = "it\'s not like ~". 〜だからね！ = assertive self-justification. The hesitation (べ、別に) signals embarrassment.',
+      },
+      // ── セーニャ（丁寧・やさしい口調）──────────────────────────────
+      {
+        s:'あなたの力を信じています。どうか、無事でいてください。',
+        sp:'セーニャ',
+        a:'I believe in your strength. Please, stay safe.',
+        c:[
+          'I believe in your strength. Please, stay safe.',
+          'I\'m not sure you can do this alone. Let me come with you.',
+          'Your power is fading. Please rest before you go any further.',
+          'I believe in you, but please be careful — I have a bad feeling.',
+        ],
+        e:'〜を信じています = I believe in ~. どうか = please (earnest, emotional). 無事でいる = to be safe / to remain unharmed',
+      },
+      {
+        s:'みんなで力を合わせれば、きっと乗り越えられます。あきらめないでください。',
+        sp:'セーニャ',
+        a:'If we all combine our strength, we can surely overcome this. Please don\'t give up.',
+        c:[
+          'If we all combine our strength, we can surely overcome this. Please don\'t give up.',
+          'Our combined strength isn\'t enough. We need to find another way.',
+          'I know it\'s hard, but sometimes giving up is the right choice.',
+          'I\'ll combine my strength with yours, but the others can\'t help us here.',
+        ],
+        e:'力を合わせる = to combine strength / join forces. 〜ば = if ~ (conditional). 乗り越えられる = can overcome. あきらめないで = don\'t give up',
+      },
+      // ── グレイグ（武人口調：〜ぬ / 〜だ）────────────────────────────
+      {
+        s:'お前が勇者だというなら、その力を見せてみろ。言葉だけでは信じられぬ。',
+        sp:'グレイグ',
+        a:'If you claim to be the hero, show me your strength. I cannot believe words alone.',
+        c:[
+          'If you claim to be the hero, show me your strength. I cannot believe words alone.',
+          'So you are the hero. I\'ve been waiting for you — your reputation precedes you.',
+          'The hero, you say? I\'ll take your word for it. We need all the help we can get.',
+          'You don\'t need to prove anything to me. The mark speaks for itself.',
+        ],
+        e:'〜というなら = if you say / if you claim ~. 見せてみろ = show me (strong command). 〜ぬ = archaic/formal negative (= 〜ない), used by stern warrior types',
+      },
+      {
+        s:'国を守るのが我らの使命だ。たとえ命を賭けることになろうとも。',
+        sp:'グレイグ',
+        a:'Protecting the kingdom is our duty. Even if it means risking our lives.',
+        c:[
+          'Protecting the kingdom is our duty. Even if it means risking our lives.',
+          'Protecting the kingdom is important, but we must also protect ourselves first.',
+          'Our duty to the kingdom is over. Now we fight for ourselves.',
+          'The king has ordered us to retreat. Protecting the kingdom means surviving.',
+        ],
+        e:'我ら = archaic "we / us" (soldier speech). 使命 = duty / mission. たとえ〜とも = even if ~. 命を賭ける = to risk one\'s life',
+      },
+      // ── ストーリー・感情的な場面 ──────────────────────────────────────
+      {
+        s:'まさか…。あの人が敵だったとは、信じたくないが、現実を受け入れるしかない。',
+        sp:'パーティー',
+        a:'No way…. I don\'t want to believe that person was our enemy, but we have no choice but to accept reality.',
+        c:[
+          'No way…. I don\'t want to believe that person was our enemy, but we have no choice but to accept reality.',
+          'Of course that person was the enemy — I always suspected it.',
+          'That person helped us all along. We\'d be nothing without them.',
+          'The enemy fooled us into thinking that person was our ally. We\'ve been betrayed.',
+        ],
+        e:'まさか = "no way / surely not" (shock). 〜だったとは = "that ~ was the case" (shocked realization). 受け入れるしかない = have no choice but to accept',
+      },
+      {
+        s:'いったい、何が起きているんだ…？こんなはずじゃなかったのに。',
+        sp:'エリック',
+        a:'What on earth is going on…? This isn\'t how it was supposed to be.',
+        c:[
+          'What on earth is going on…? This isn\'t how it was supposed to be.',
+          'Everything is going exactly as planned. This is what we hoped for.',
+          'I know what\'s happening. I\'ve seen this before — don\'t panic.',
+          'Something is happening, but it\'s nothing to worry about. Trust me.',
+        ],
+        e:'いったい = "on earth / just what" (intensifier in questions). こんなはずじゃなかった = "it wasn\'t supposed to be like this" — very common JRPG line',
+      },
+      {
+        s:'世界を救うのに、ひとりの力では足りない。仲間を信じて、共に戦うしかないんだ。',
+        sp:'ナレーション',
+        a:'To save the world, the power of one person is not enough. All you can do is believe in your companions and fight together.',
+        c:[
+          'To save the world, the power of one person is not enough. All you can do is believe in your companions and fight together.',
+          'To save the world, you must become stronger alone. Relying on others is a weakness.',
+          'The world can be saved, but not through battle. You must find a peaceful solution.',
+          'One person\'s power is enough. You just need to believe in yourself.',
+        ],
+        e:'〜のに = in order to ~. 足りない = not enough / insufficient. 信じて = believing in (て = and then / by). 〜しかない = have no choice but to ~',
+      },
+      {
+        s:'たとえ何度倒されても、また立ち上がる。それが勇者というものだ。',
+        sp:'ロウ',
+        a:'No matter how many times you are knocked down, you rise again. That is what it means to be a hero.',
+        c:[
+          'No matter how many times you are knocked down, you rise again. That is what it means to be a hero.',
+          'A hero should never fall. If you are defeated, your journey is over.',
+          'Being a hero means never fighting alone. Never face an enemy by yourself.',
+          'A hero knows when to retreat. Living to fight another day is true courage.',
+        ],
+        e:'たとえ〜ても = even if ~; no matter how ~. 何度 = how many times. 立ち上がる = to stand up / rise again. 〜というものだ = that is what ~ is; that\'s the nature of ~',
+      },
+      {
+        s:'この呪いを解くには、せかいじゅの雫が必要じゃ。じゃが、あれを手に入れるのは容易ではないぞ。',
+        sp:'ロウ',
+        a:'To break this curse, the Yggdrasil Dew is needed. However, obtaining it is no easy matter.',
+        c:[
+          'To break this curse, the Yggdrasil Dew is needed. However, obtaining it is no easy matter.',
+          'The curse can be broken with holy water. You can buy it at the item shop.',
+          'The Yggdrasil Dew will break the curse, and it\'s easy to get — I know where it is.',
+          'There\'s no known way to break this curse. We must find another solution.',
+        ],
+        e:'〜を解く = to break / undo ~ (a curse, a code, a problem). 〜には〜が必要 = ~ is needed in order to ~. 容易ではない = not easy / no easy feat',
+      },
+      {
+        s:'あなたに出会えてよかった。これからも、ずっと一緒にいてください。',
+        sp:'セーニャ',
+        a:'I\'m so glad I met you. Please stay with us — always.',
+        c:[
+          'I\'m so glad I met you. Please stay with us — always.',
+          'I\'m glad we met, but our journey together ends here. Go on without me.',
+          'Meeting you changed everything. But I think it\'s time for us to part ways.',
+          'I\'m glad to have met you. I hope our paths cross again someday.',
+        ],
+        e:'〜に出会えてよかった = I\'m glad I was able to meet ~. これからも = from now on too / going forward. ずっと = always / the whole time',
+      },
+    ],
     vocab: [
       // ── バトル ───────────────────────────────────────────────────────
       {w:'こうげき',r:'こうげき',m:'attack',cat:'バトル'},
