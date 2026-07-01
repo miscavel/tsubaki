@@ -33,6 +33,9 @@
     .lvl-btn[data-lv="n3"].active { border-color: #c0392b; color: #c0392b; background: #fef0f0; }
     .prio-btn { border-color: #ccc; color: #aaa; }
     .prio-btn.active { border-color: #d4a017; color: #d4a017; background: #fdf8e8; }
+    .hidden-reading { visibility: hidden; }
+    .reset-btn { background: none; border: none; cursor: pointer; color: #ccc; font-size: 0.9rem; padding: 0 2px; line-height: 1; }
+    .reset-btn:hover { color: #888; }
     .progress { height: 4px; background: #e0e0d8; border-radius: 2px; margin-bottom: 16px; }
     .progress-bar { height: 100%; background: #c0392b; border-radius: 2px; transition: width 0.3s; }
     .card {
@@ -96,6 +99,7 @@
       <div class="stats">
         <span id="score-display">0 / 0</span>
         <span class="streak" id="streak-display">🔥 0</span>
+        <button class="reset-btn" onclick="resetProgress()" title="Reset score">↺</button>
       </div>
     </div>
     <div class="header-row">
@@ -108,6 +112,7 @@
         <button class="lvl-btn" data-lv="n4" onclick="toggleLevel('n4')">N4</button>
         <button class="lvl-btn active" data-lv="n3" onclick="toggleLevel('n3')">N3</button>
         <button class="prio-btn" id="prio-btn" onclick="togglePriority()">⭐ Priority</button>
+        <button class="prio-btn" id="reading-btn" onclick="toggleReading()">ふり</button>
       </div>
     </div>
   </header>
@@ -628,6 +633,7 @@ const grammar = [
 let mode = 'vocab';
 let activeLevels = new Set(['n3']);
 let priorityOnly = false;
+let hideReading = false;
 let score = 0, total = 0, streak = 0;
 let answered = false, current = null;
 let recentKeys = [];
@@ -681,7 +687,8 @@ function renderQuestion() {
   const badges = `<div class="badges">${lvTag}${prioTag}</div>`;
 
   if (current.type === 'vocab') {
-    card.innerHTML = `${badges}<div class="word">${current.word}</div><div class="reading">${current.reading}</div>`;
+    const readingClass = hideReading ? 'reading hidden-reading' : 'reading';
+    card.innerHTML = `${badges}<div class="word">${current.word}</div><div class="${readingClass}" id="reading-display">${current.reading}</div>`;
   } else {
     const display = current.sentence.replace('（　）','<span class="blank">（　）</span>');
     card.innerHTML = `${badges}<div class="grammar-pattern">${current.pattern}</div><div class="grammar-sentence">${display}</div>`;
@@ -692,11 +699,36 @@ function renderQuestion() {
   ).join('');
 }
 
+function saveProgress() {
+  try { localStorage.setItem('tsubaki_progress', JSON.stringify({score, total, streak})); } catch(e) {}
+}
+
+function loadProgress() {
+  try {
+    const s = JSON.parse(localStorage.getItem('tsubaki_progress') || '{}');
+    score = s.score || 0; total = s.total || 0; streak = s.streak || 0;
+  } catch(e) {}
+}
+
+function resetProgress() {
+  if (!confirm('Reset score?')) return;
+  score = 0; total = 0; streak = 0;
+  saveProgress();
+  updateStats();
+}
+
 function updateStats() {
   const pct = total > 0 ? Math.round((score/total)*100) : 0;
   document.getElementById('score-display').textContent = `${score} / ${total}`;
   document.getElementById('streak-display').textContent = `🔥 ${streak}`;
   document.getElementById('progress-bar').style.width = pct+'%';
+  saveProgress();
+}
+
+function toggleReading() {
+  hideReading = !hideReading;
+  document.getElementById('reading-btn').classList.toggle('active', hideReading);
+  renderQuestion();
 }
 
 // ── INTERACTION ───────────────────────────────────────────────────────────────
@@ -710,6 +742,9 @@ function choose(idx) {
     if (current.choices[i] === current.answer) el.classList.add('correct');
     else if (i === idx) el.classList.add('wrong');
   });
+  if (hideReading && current.type === 'vocab') {
+    document.getElementById('reading-display')?.classList.remove('hidden-reading');
+  }
   const fb = document.getElementById('feedback');
   if (current.type === 'vocab') {
     const detail = `${current.word}【${current.reading}】= ${current.answer}`;
@@ -772,6 +807,8 @@ document.addEventListener('keydown', e => {
   if (e.key===' '||e.key==='Enter') { e.preventDefault(); if (answered) nextQuestion(); }
 });
 
+loadProgress();
+updateStats();
 nextQuestion();
 </script>
 </body>
