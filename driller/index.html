@@ -186,7 +186,8 @@ body {
 .badge.pat { background: #1a237e; color: #c5cae9; font-size: 0.68rem; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .badge.cat { background: #1a3a4a; color: #b0d4e8; }
 .badge.game-lbl { background: #2a1a4a; color: #c9b0e8; }
-.badge.prio { background: transparent; padding: 0; font-size: 0.85rem; }
+.badge.prio  { background: transparent; padding: 0; font-size: 0.85rem; }
+.badge.retry { background: #4a2800; color: #ffcc80; }
 
 body.light .badge.n5  { background: #c8e6c9; color: #1b5e20; }
 body.light .badge.n4  { background: #ffe0b2; color: #e65100; }
@@ -379,6 +380,7 @@ body.light .badge.game-lbl { background: #c9b0e8; color: #2a1a4a; }
     <div class="btn-row">
       <button class="ctrl-btn active" id="tab-vocab">語彙</button>
       <button class="ctrl-btn" id="tab-grammar">文法</button>
+      <button class="ctrl-btn" id="tab-mix">まぜ</button>
     </div>
   </div>
 
@@ -434,13 +436,14 @@ let score = 0, total = 0, streak = 0;
 let answered = false;
 let current = null;
 let recentKeys = [];
+let retryQueue = []; // wrong answers come back here
 let theme = 'dark';
 let uiLang = 'ja';
 
 // ── UI labels ────────────────────────────────────────────────────────────────
 const L = {
   ja: {
-    tabGame: 'ゲーム', tabVocab: '語彙', tabGrammar: '文法',
+    tabGame: 'ゲーム', tabVocab: '語彙', tabGrammar: '文法', tabMix: 'まぜ',
     prio: '⭐ 優先', furigana: 'ふり',
     save: '💾 セーブ', next: '→ 次へ',
     load: '読み込む', loadPlaceholder: 'セーブコードを貼り付け…',
@@ -448,7 +451,7 @@ const L = {
     noItems: '項目が少なすぎます。フィルターを変えてください。',
   },
   en: {
-    tabGame: 'Game', tabVocab: 'Vocab', tabGrammar: 'Grammar',
+    tabGame: 'Game', tabVocab: 'Vocab', tabGrammar: 'Grammar', tabMix: 'Mix',
     prio: '⭐ Priority', furigana: 'Furigana',
     save: '💾 Save', next: '→ Next',
     load: 'Load', loadPlaceholder: 'Paste save code…',
@@ -517,6 +520,16 @@ function genGameQuestion() {
 }
 function genQuestion() {
   if (appMode === 'game') return genGameQuestion();
+  // 40% chance to retry a wrong item from earlier in the session
+  if (retryQueue.length && Math.random() < 0.4) {
+    const retry = retryQueue.shift();
+    retry.choices = retry.choices.slice().sort(() => Math.random() - 0.5);
+    retry._retry = true;
+    return retry;
+  }
+  if (jlptMode === 'mix') {
+    return Math.random() < 0.5 ? genVocabQuestion() : genGrammarQuestion();
+  }
   return jlptMode === 'vocab' ? genVocabQuestion() : genGrammarQuestion();
 }
 
@@ -536,18 +549,19 @@ function renderQuestion() {
   current = q;
   answered = false;
 
-  const prioBadge = q.prio ? '<span class="badge prio">⭐</span>' : '';
+  const prioBadge  = q.prio   ? '<span class="badge prio">⭐</span>'    : '';
+  const retryBadge = q._retry ? '<span class="badge retry">↩ retry</span>' : '';
   if (q.type === 'vocab') {
     const rc = hideReading ? 'reading hidden-reading' : 'reading';
     card.innerHTML = `
-      <div class="badges"><span class="badge ${q.lv}">${q.lv.toUpperCase()}</span>${prioBadge}</div>
+      <div class="badges"><span class="badge ${q.lv}">${q.lv.toUpperCase()}</span>${prioBadge}${retryBadge}</div>
       <div class="word">${q.word}</div>
       <div class="${rc}" id="reading-display">${q.reading}</div>`;
   } else if (q.type === 'grammar') {
     card.innerHTML = `
       <div class="badges">
         <span class="badge ${q.lv}">${q.lv.toUpperCase()}</span>
-        ${prioBadge}
+        ${prioBadge}${retryBadge}
         <span class="badge pat">${q.pattern}</span>
       </div>
       <div class="sentence">${q.sentence}</div>`;
@@ -589,7 +603,16 @@ function choose(choice) {
   total++;
 
   const correct = choice === current.answer;
-  if (correct) { score++; streak++; } else { streak = 0; }
+  if (correct) {
+    score++; streak++;
+  } else {
+    streak = 0;
+    // queue wrong item for retry (cap at 8, no duplicates)
+    const key = current.word || current.pattern || current.sentence;
+    if (key && retryQueue.length < 8 && !retryQueue.some(q => (q.word || q.pattern || q.sentence) === key)) {
+      retryQueue.push({...current});
+    }
+  }
 
   if (hideReading && current.type === 'vocab') {
     document.getElementById('reading-display')?.classList.remove('hidden-reading');
@@ -633,6 +656,7 @@ function syncUI() {
     b.classList.toggle('active', activeLevels.has(b.dataset.lv)));
   document.getElementById('tab-vocab').classList.toggle('active', jlptMode === 'vocab');
   document.getElementById('tab-grammar').classList.toggle('active', jlptMode === 'grammar');
+  document.getElementById('tab-mix').classList.toggle('active', jlptMode === 'mix');
   document.getElementById('prio-btn').classList.toggle('active', priorityOnly);
   document.getElementById('reading-btn').classList.toggle('active', hideReading);
 
@@ -672,6 +696,7 @@ function applyUiLang() {
   document.getElementById('tab-game').textContent    = l.tabGame;
   document.getElementById('tab-vocab').textContent   = l.tabVocab;
   document.getElementById('tab-grammar').textContent = l.tabGrammar;
+  document.getElementById('tab-mix').textContent     = l.tabMix;
   document.getElementById('prio-btn').textContent    = l.prio;
   document.getElementById('reading-btn').textContent = l.furigana;
   document.getElementById('save-btn').textContent    = l.save;
@@ -733,13 +758,16 @@ document.querySelectorAll('.lvl-btn').forEach(b => {
   });
 });
 document.getElementById('tab-vocab').addEventListener('click', () => {
-  jlptMode = 'vocab'; recentKeys = []; syncUI(); renderQuestion();
+  jlptMode = 'vocab'; recentKeys = []; retryQueue = []; syncUI(); renderQuestion();
 });
 document.getElementById('tab-grammar').addEventListener('click', () => {
-  jlptMode = 'grammar'; recentKeys = []; syncUI(); renderQuestion();
+  jlptMode = 'grammar'; recentKeys = []; retryQueue = []; syncUI(); renderQuestion();
+});
+document.getElementById('tab-mix').addEventListener('click', () => {
+  jlptMode = 'mix'; recentKeys = []; retryQueue = []; syncUI(); renderQuestion();
 });
 document.getElementById('prio-btn').addEventListener('click', () => {
-  priorityOnly = !priorityOnly; recentKeys = []; syncUI(); renderQuestion();
+  priorityOnly = !priorityOnly; recentKeys = []; retryQueue = []; syncUI(); renderQuestion();
 });
 document.getElementById('reading-btn').addEventListener('click', () => {
   hideReading = !hideReading;
