@@ -499,7 +499,7 @@ function genGrammarQuestion() {
   if (pool.length < 4) return null;
   const item = pickRandom(pool, g => g.p);
   const choices = item.c.slice().sort(() => Math.random() - 0.5);
-  return { type: 'grammar', sentence: item.s, answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv, prio: !!item.pr };
+  return { type: 'grammar', sentence: item.s, reading: item.r || '', translation: item.t || '', answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv, prio: !!item.pr };
 }
 function genGameQuestion() {
   if (gameCategory === 'セリフ') {
@@ -558,13 +558,15 @@ function renderQuestion() {
       <div class="word">${q.word}</div>
       <div class="${rc}" id="reading-display">${q.reading}</div>`;
   } else if (q.type === 'grammar') {
+    const rc2 = hideReading ? 'reading hidden-reading' : 'reading';
     card.innerHTML = `
       <div class="badges">
         <span class="badge ${q.lv}">${q.lv.toUpperCase()}</span>
         ${prioBadge}${retryBadge}
         <span class="badge pat">${q.pattern}</span>
       </div>
-      <div class="sentence">${q.sentence}</div>`;
+      <div class="sentence">${q.sentence}</div>
+      ${q.reading ? `<div class="${rc2}" id="reading-display">${q.reading}</div>` : ''}`;
   } else if (q.type === 'dialogue') {
     card.innerHTML = `
       <div class="badges">
@@ -631,7 +633,7 @@ function choose(choice) {
   } else if (current.type === 'grammar') {
     const filled = current.sentence.replace('（　）', `「${current.answer}」`);
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
-    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br>${filled}<br><small>${current.explanation}</small>`;
+    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br>${filled}<br><small>${current.explanation}</small>${current.translation ? `<br><small style="opacity:0.7">${current.translation}</small>` : ''}`;
   } else if (current.type === 'dialogue') {
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
     fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.explanation}</small>`;
