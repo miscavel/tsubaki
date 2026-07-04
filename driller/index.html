@@ -712,8 +712,14 @@ function applyUiLang() {
 }
 
 // ── Persistence ───────────────────────────────────────────────────────────────
+function toB64(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))));
+}
+function fromB64(b64) {
+  return decodeURIComponent(atob(b64).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
+}
 function encodeState() {
-  return btoa(JSON.stringify({
+  return toB64(JSON.stringify({
     s: score, t: total, x: streak,
     am: appMode, jm: jlptMode,
     lv: [...activeLevels],
@@ -738,7 +744,7 @@ function saveProgress() {
 function loadProgress() {
   try {
     const raw = localStorage.getItem('tsubaki_driller') || localStorage.getItem('tsubaki_progress');
-    if (raw) applyState(JSON.parse(atob(raw)));
+    if (raw) applyState(JSON.parse(fromB64(raw)));
   } catch(e) {}
 }
 
@@ -811,7 +817,7 @@ document.getElementById('load-btn').addEventListener('click', () => {
   const raw = document.getElementById('load-input').value.trim();
   if (!raw) return;
   try {
-    applyState(JSON.parse(atob(raw)));
+    applyState(JSON.parse(fromB64(raw)));
     recentKeys = [];
     document.getElementById('save-area').style.display = 'none';
     document.getElementById('load-input').value = '';
