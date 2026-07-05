@@ -290,6 +290,7 @@ const gameData = {
       // ── やどや・まちのNPC ────────────────────────────────────────────
       {
         s:'ゆっくりお休みください。旅の疲れをいやしていってくださいね。',
+        r:'ゆっくりおやすみください。たびのつかれをいやしていってくださいね。',
         sp:'やどや',
         a:'Please rest well. Let yourself recover from the fatigue of your journey.',
         c:[
@@ -302,6 +303,7 @@ const gameData = {
       },
       {
         s:'このあたりでは魔物が増えていて、夜は外に出られないんですよ。本当に困っています。',
+        r:'このあたりではまものがふえていて、よるはそとにでられないんですよ。ほんとうにこまっています。',
         sp:'村人',
         a:'Monsters have been increasing around here, so we can\'t go outside at night. We\'re really struggling.',
         c:[
@@ -314,6 +316,7 @@ const gameData = {
       },
       {
         s:'西に進むと、デルカダール王国があります。国王様にご用がおありなのですか？',
+        r:'にしにすすむと、デルカダールおうこくがあります。こくおうさまにごようがおありなのですか？',
         sp:'村人',
         a:'If you go west, you\'ll find the Kingdom of Heliodor. Do you have business with the king?',
         c:[
@@ -326,6 +329,7 @@ const gameData = {
       },
       {
         s:'道具屋でやくそうをたくさん買っておくといいですよ。この先の洞窟は手強いらしいので。',
+        r:'どうぐやでやくそうをたくさんかっておくといいですよ。このさきのどうくつはてごわいらしいので。',
         sp:'村人',
         a:'You should stock up on medicinal herbs at the item shop. Apparently the cave ahead is tough.',
         c:[
@@ -338,6 +342,7 @@ const gameData = {
       },
       {
         s:'まおうが現れてから、世界はずっと暗くなる一方だ。誰かが何とかしてくれないと…。',
+        r:'まおうがあらわれてから、せかいはずっとくらくなるいっぽうだ。だれかがなんとかしてくれないと…。',
         sp:'村人',
         a:'Ever since the Dark Lord appeared, the world has only been getting darker. If someone doesn\'t do something…',
         c:[
@@ -350,6 +355,7 @@ const gameData = {
       },
       {
         s:'勇者のしるしを持つ者が、いつかこの地に現れると言い伝えられておる。',
+        r:'ゆうしゃのしるしをもつものが、いつかこのちにあらわれるといいつたえられておる。',
         sp:'長老',
         a:'It is passed down in legend that one who bears the mark of the hero will one day appear in this land.',
         c:[
@@ -363,6 +369,7 @@ const gameData = {
       // ── ロウ（老人口調：〜じゃ）───────────────────────────────────
       {
         s:'そうじゃ、お主が本当の勇者なのじゃ。ワシはずっと信じておったぞ。',
+        r:'そうじゃ、おぬしがほんとうのゆうしゃなのじゃ。わしはずっとしんじておったぞ。',
         sp:'ロウ',
         a:'That\'s right — you are the true Luminary. I always believed in you.',
         c:[
@@ -375,6 +382,7 @@ const gameData = {
       },
       {
         s:'この先の道は険しいのじゃ。じゃが、お主ならきっと乗り越えられるじゃろう。',
+        r:'このさきのみちはけわしいのじゃ。じゃが、おぬしならきっとのりこえられるじゃろう。',
         sp:'ロウ',
         a:'The road ahead is steep and harsh. But knowing you, you will surely overcome it.',
         c:[
@@ -387,6 +395,7 @@ const gameData = {
       },
       {
         s:'無茶だけはしないでくれよ。お主のことが心配なんじゃ。',
+        r:'むちゃだけはしないでくれよ。おぬしのことがしんぱいなんじゃ。',
         sp:'ロウ',
         a:'Just please don\'t do anything reckless. I\'m worried about you.',
         c:[
@@ -397,9 +406,23 @@ const gameData = {
         ],
         e:'無茶をする = to be reckless / overdo it. 〜ないでくれ = please don\'t ~. 心配 = worried / concerned',
       },
+      {
+        s:'あの山の向こうに、古い神殿があるのじゃ。そこに伝説の武器が眠っておるらしい。',
+        r:'あのやまのむこうに、ふるいしんでんがあるのじゃ。そこにでんせつのぶきがねむっておるらしい。',
+        sp:'ロウ',
+        a:'Beyond that mountain, there is an ancient temple. A legendary weapon is said to sleep there.',
+        c:[
+          'Beyond that mountain, there is an ancient temple. A legendary weapon is said to sleep there.',
+          'There\'s nothing beyond that mountain — I\'ve checked. Don\'t waste your time.',
+          'The temple beyond the mountain is cursed. No one who entered has ever returned.',
+          'The mountain ahead has no temple. The legend you heard is just a rumour.',
+        ],
+        e:'向こう = beyond / the other side. 古い = old / ancient. 〜が眠っている = ~ lies dormant / sleeps. 〜らしい = apparently / I hear',
+      },
       // ── エリック（タメ口・若者言葉）──────────────────────────────────
       {
         s:'おいおい、マジかよ。あんな数の魔物、どうやって倒すんだよ。',
+        r:'おいおい、まじかよ。あんなかずのまもの、どうやってたおすんだよ。',
         sp:'エリック',
         a:'Whoa whoa, are you serious? How are we supposed to beat that many monsters?',
         c:[
@@ -412,6 +435,7 @@ const gameData = {
       },
       {
         s:'まあ、なんとかなるって。俺たちがいるんだから、心配すんなよ。',
+        r:'まあ、なんとかなるって。おれたちがいるんだから、しんぱいすんなよ。',
         sp:'エリック',
         a:'Eh, it\'ll work out. We\'re here with you, so don\'t worry.',
         c:[
@@ -424,6 +448,7 @@ const gameData = {
       },
       {
         s:'この戦いが終わったら、みんなでゆっくり旅をしようじゃないか。',
+        r:'このたたかいがおわったら、みんなでゆっくりたびをしようじゃないか。',
         sp:'エリック',
         a:'When this battle is over, let\'s all travel together at our own pace.',
         c:[
@@ -434,9 +459,23 @@ const gameData = {
         ],
         e:'〜たら = when/after ~ (conditional on completion). 〜ようじゃないか = "let\'s ~, shall we?" (casual suggestion)',
       },
+      {
+        s:'ちょっと待ってくれ。なんか嫌な予感がするんだよな…。',
+        r:'ちょっとまってくれ。なんかいやなよかんがするんだよな…。',
+        sp:'エリック',
+        a:'Hold on. I\'ve got a bad feeling about this somehow…',
+        c:[
+          'Hold on. I\'ve got a bad feeling about this somehow…',
+          'All good — I checked ahead and it\'s clear. Let\'s keep moving.',
+          'Don\'t pay attention to feelings. Just keep going.',
+          'I actually feel great about this. Best odds we\'ve had in a while.',
+        ],
+        e:'ちょっと待ってくれ = "hold on / wait a sec" (casual). 嫌な予感 = bad feeling / ominous premonition. 〜がするんだよな = "I\'ve got a feeling that ~" (casual, seeking agreement)',
+      },
       // ── ベロニカ（お嬢様口調：〜ですわ）─────────────────────────────
       {
         s:'わたくしの魔法の腕前、とくとごらんなさいですわ！',
+        r:'わたくしのまほうのうでまえ、とくとごらんなさいですわ！',
         sp:'ベロニカ',
         a:'Take a good, close look at my magical skills!',
         c:[
@@ -449,6 +488,7 @@ const gameData = {
       },
       {
         s:'べ、別にあなたのことを心配してたわけじゃないんだからね！',
+        r:'べ、べつにあなたのことをしんぱいしてたわけじゃないんだからね！',
         sp:'ベロニカ',
         a:'I-It\'s not like I was worried about you or anything!',
         c:[
@@ -462,6 +502,7 @@ const gameData = {
       // ── セーニャ（丁寧・やさしい口調）──────────────────────────────
       {
         s:'あなたの力を信じています。どうか、無事でいてください。',
+        r:'あなたのちからをしんじています。どうか、ぶじでいてください。',
         sp:'セーニャ',
         a:'I believe in your strength. Please, stay safe.',
         c:[
@@ -474,6 +515,7 @@ const gameData = {
       },
       {
         s:'みんなで力を合わせれば、きっと乗り越えられます。あきらめないでください。',
+        r:'みんなでちからをあわせれば、きっとのりこえられます。あきらめないでください。',
         sp:'セーニャ',
         a:'If we all combine our strength, we can surely overcome this. Please don\'t give up.',
         c:[
@@ -484,9 +526,23 @@ const gameData = {
         ],
         e:'力を合わせる = to combine strength / join forces. 〜ば = if ~ (conditional). 乗り越えられる = can overcome. あきらめないで = don\'t give up',
       },
+      {
+        s:'神様、どうかみんなを守ってください。この祈りが届きますように。',
+        r:'かみさま、どうかみんなをまもってください。このいのりがとどきますように。',
+        sp:'セーニャ',
+        a:'O gods, please protect everyone. May this prayer reach you.',
+        c:[
+          'O gods, please protect everyone. May this prayer reach you.',
+          'The gods haven\'t answered our prayers. We need to act ourselves.',
+          'I\'ve given up on praying. We need action, not words.',
+          'Prayers are just words. Focus on what we can actually do.',
+        ],
+        e:'どうか = please (earnest). 〜ますように = "may ~ happen; I pray that ~" (wish/prayer). 届く = to reach / to be heard',
+      },
       // ── グレイグ（武人口調：〜ぬ / 〜だ）────────────────────────────
       {
         s:'お前が勇者だというなら、その力を見せてみろ。言葉だけでは信じられぬ。',
+        r:'おまえがゆうしゃだというなら、そのちからをみせてみろ。ことばだけではしんじられぬ。',
         sp:'グレイグ',
         a:'If you claim to be the hero, show me your strength. I cannot believe words alone.',
         c:[
@@ -499,6 +555,7 @@ const gameData = {
       },
       {
         s:'国を守るのが我らの使命だ。たとえ命を賭けることになろうとも。',
+        r:'くにをまもるのがわれらのしめいだ。たとえいのちをかけることになろうとも。',
         sp:'グレイグ',
         a:'Protecting the kingdom is our duty. Even if it means risking our lives.',
         c:[
@@ -509,9 +566,37 @@ const gameData = {
         ],
         e:'我ら = archaic "we / us" (soldier speech). 使命 = duty / mission. たとえ〜とも = even if ~. 命を賭ける = to risk one\'s life',
       },
+      // ── シルビア（明るい・陽気な口調）──────────────────────────────
+      {
+        s:'ダーリン、諦めちゃダメよ！あたしたちはあなたのそばにいるんだから！',
+        r:'ダーリン、あきらめちゃダメよ！あたしたちはあなたのそばにいるんだから！',
+        sp:'シルビア',
+        a:'Darling, don\'t you dare give up! We\'re right here beside you!',
+        c:[
+          'Darling, don\'t you dare give up! We\'re right here beside you!',
+          'Darling, I think we should give up this time. It\'s too much for us.',
+          'Darling, I\'ll be right back. Just hold on without me for now.',
+          'Darling, this is too dangerous. We should run while we still can.',
+        ],
+        e:'ダーリン = Sylvando\'s affectionate address. 諦めちゃダメ = "you absolutely mustn\'t give up" (〜ちゃダメ = mustn\'t ~). そばにいる = to be by one\'s side',
+      },
+      {
+        s:'このシルビアさまが盛り上げてあげますわよ！元気を出して！',
+        r:'このシルビアさまがもりあげてあげますわよ！げんきをだして！',
+        sp:'シルビア',
+        a:'The great Sylvando will liven things up for you! Cheer up!',
+        c:[
+          'The great Sylvando will liven things up for you! Cheer up!',
+          'Sylvando will calm things down. Everyone needs to focus right now.',
+          'I can\'t help today — I\'m not feeling my best.',
+          'Don\'t look at me. I\'m really not the cheerful type.',
+        ],
+        e:'〜さま after own name = theatrical self-address (grandiose). 盛り上げる = to liven up / hype up. 元気を出す = to cheer up / summon energy',
+      },
       // ── ストーリー・感情的な場面 ──────────────────────────────────────
       {
         s:'まさか…。あの人が敵だったとは、信じたくないが、現実を受け入れるしかない。',
+        r:'まさか…。あのひとがてきだったとは、しんじたくないが、げんじつをうけいれるしかない。',
         sp:'パーティー',
         a:'No way…. I don\'t want to believe that person was our enemy, but we have no choice but to accept reality.',
         c:[
@@ -524,6 +609,7 @@ const gameData = {
       },
       {
         s:'いったい、何が起きているんだ…？こんなはずじゃなかったのに。',
+        r:'いったい、なにがおきているんだ…？こんなはずじゃなかったのに。',
         sp:'エリック',
         a:'What on earth is going on…? This isn\'t how it was supposed to be.',
         c:[
@@ -536,6 +622,7 @@ const gameData = {
       },
       {
         s:'世界を救うのに、ひとりの力では足りない。仲間を信じて、共に戦うしかないんだ。',
+        r:'せかいをすくうのに、ひとりのちからではたりない。なかまをしんじて、ともにたたかうしかないんだ。',
         sp:'ナレーション',
         a:'To save the world, the power of one person is not enough. All you can do is believe in your companions and fight together.',
         c:[
@@ -548,6 +635,7 @@ const gameData = {
       },
       {
         s:'たとえ何度倒されても、また立ち上がる。それが勇者というものだ。',
+        r:'たとえなんどたおされても、またたちあがる。それがゆうしゃというものだ。',
         sp:'ロウ',
         a:'No matter how many times you are knocked down, you rise again. That is what it means to be a hero.',
         c:[
@@ -560,6 +648,7 @@ const gameData = {
       },
       {
         s:'この呪いを解くには、せかいじゅの雫が必要じゃ。じゃが、あれを手に入れるのは容易ではないぞ。',
+        r:'こののろいをとくには、せかいじゅのしずくがひつようじゃ。じゃが、あれをてにいれるのはよういではないぞ。',
         sp:'ロウ',
         a:'To break this curse, the Yggdrasil Dew is needed. However, obtaining it is no easy matter.',
         c:[
@@ -572,6 +661,7 @@ const gameData = {
       },
       {
         s:'あなたに出会えてよかった。これからも、ずっと一緒にいてください。',
+        r:'あなたにであえてよかった。これからも、ずっといっしょにいてください。',
         sp:'セーニャ',
         a:'I\'m so glad I met you. Please stay with us — always.',
         c:[
@@ -581,6 +671,32 @@ const gameData = {
           'I\'m glad to have met you. I hope our paths cross again someday.',
         ],
         e:'〜に出会えてよかった = I\'m glad I was able to meet ~. これからも = from now on too / going forward. ずっと = always / the whole time',
+      },
+      {
+        s:'勇者よ、世界の命運はお前の肩にかかっている。',
+        r:'ゆうしゃよ、せかいのめいうんはおまえのかたにかかっている。',
+        sp:'長老',
+        a:'O hero, the fate of the world rests on your shoulders.',
+        c:[
+          'O hero, the fate of the world rests on your shoulders.',
+          'O hero, the fate of the world is in good hands. We\'re not worried.',
+          'The world\'s fate has been decided — there\'s nothing left to do.',
+          'The world doesn\'t need a single hero. We just need everyone to work together.',
+        ],
+        e:'〜よ = vocative particle (direct address). 命運 = fate / destiny (formal, weighty). 肩にかかっている = rests on one\'s shoulders (idiom)',
+      },
+      {
+        s:'こんな所で…終わりたくない。もっと強くならなければ。',
+        r:'こんなところで…おわりたくない。もっとつよくならなければ。',
+        sp:'パーティー',
+        a:'I don\'t want it to end here…. I have to get stronger.',
+        c:[
+          'I don\'t want it to end here…. I have to get stronger.',
+          'This is actually a fine place to stop. I\'m happy to end here.',
+          'It ends here for me. The others should carry on without me.',
+          'Ending here is fine. We\'ve already done more than enough.',
+        ],
+        e:'こんな所で = "in a place like this / here of all places". 〜たくない = don\'t want to ~. 〜なければ = must; have to (〜なければならない contracted)',
       },
     ],
     vocab: [
@@ -759,6 +875,29 @@ const gameData = {
       {w:'おまえにはまだ早い',r:'おまえにはまだはやい',m:'It\'s still too early for you; you\'re not ready yet',cat:'かいわ'},
       {w:'ご無事で',r:'ごぶじで',m:'Please be safe; I hope you\'re alright',cat:'かいわ'},
       {w:'お体に気をつけて',r:'おからだにきをつけて',m:'Please take care of yourself',cat:'かいわ'},
+      {w:'いらっしゃいませ',r:'いらっしゃいませ',m:'Welcome! (shop/inn greeting)',cat:'かいわ'},
+      {w:'どうぞごゆっくり',r:'どうぞごゆっくり',m:'Please take your time; make yourself at home',cat:'かいわ'},
+      {w:'〜でよろしいですか',r:'〜でよろしいですか',m:'Will ~ be alright? (shop confirmation before purchase)',cat:'かいわ'},
+      {w:'おめざめですか',r:'おめざめですか',m:'Are you awake? Good morning (inn, after resting)',cat:'かいわ'},
+      {w:'おつかれさまでした',r:'おつかれさまでした',m:'Good work; you must be tired (said after an ordeal)',cat:'かいわ'},
+      {w:'うわさに聞いた',r:'うわさにきいた',m:'I\'ve heard the rumour; word has reached me',cat:'かいわ'},
+      {w:'お気の毒に',r:'おきのどくに',m:'How unfortunate; I\'m sorry to hear that (sympathy)',cat:'かいわ'},
+      {w:'ご無事でなによりです',r:'ごぶじでなによりです',m:'I\'m so glad you\'re safe (relief)',cat:'かいわ'},
+      {w:'嫌な予感',r:'いやなよかん',m:'bad feeling; ominous premonition',cat:'かいわ'},
+      {w:'向こう',r:'むこう',m:'beyond; the other side; over there',cat:'かいわ'},
+      // ── ストーリー追加 ───────────────────────────────────────────────
+      {w:'めいうん',r:'めいうん',m:'fate; destiny (of a nation or world)',cat:'ストーリー'},
+      {w:'ゆうき',r:'ゆうき',m:'courage; bravery',cat:'ストーリー'},
+      {w:'きぼう',r:'きぼう',m:'hope',cat:'ストーリー'},
+      {w:'ぜつぼう',r:'ぜつぼう',m:'despair',cat:'ストーリー'},
+      {w:'けっしん',r:'けっしん',m:'resolve; determination',cat:'ストーリー'},
+      {w:'ちかい',r:'ちかい',m:'vow; oath; promise',cat:'ストーリー'},
+      {w:'わかれ',r:'わかれ',m:'parting; farewell; separation',cat:'ストーリー'},
+      {w:'さいかい',r:'さいかい',m:'reunion; meeting again',cat:'ストーリー'},
+      {w:'なみだ',r:'なみだ',m:'tears',cat:'ストーリー'},
+      {w:'いのる',r:'いのる',m:'to pray; to wish',cat:'ストーリー'},
+      {w:'しんじる',r:'しんじる',m:'to believe; to trust',cat:'ストーリー'},
+      {w:'よげん',r:'よげん',m:'prophecy; prediction',cat:'ストーリー'},
     ]
   }
 };

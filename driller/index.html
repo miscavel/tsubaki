@@ -507,7 +507,7 @@ function genGameQuestion() {
     if (!pool || pool.length < 4) return null;
     const item = pickRandom(pool, d => d.s);
     const choices = item.c.slice().sort(() => Math.random() - 0.5);
-    return { type: 'dialogue', sentence: item.s, speaker: item.sp, answer: item.a, choices, explanation: item.e };
+    return { type: 'dialogue', sentence: item.s, reading: item.r || '', speaker: item.sp, answer: item.a, choices, explanation: item.e };
   }
   const pool = gamePool();
   if (pool.length < 4) return null;
@@ -568,21 +568,24 @@ function renderQuestion() {
       <div class="sentence">${q.sentence}</div>
       ${q.reading ? `<div class="${rc2}" id="reading-display">${q.reading}</div>` : ''}`;
   } else if (q.type === 'dialogue') {
+    const rcDlg = hideReading ? 'reading hidden-reading' : 'reading';
     card.innerHTML = `
       <div class="badges">
         <span class="badge game-lbl">${gameData[gameId].label}</span>
         <span class="badge cat">${q.speaker}</span>
       </div>
-      <div class="sentence">${q.sentence}</div>`;
+      <div class="sentence">${q.sentence}</div>
+      ${q.reading ? `<div class="${rcDlg}" id="reading-display">${q.reading}</div>` : ''}`;
   } else {
     const showR = q.word !== q.reading;
+    const rcGame = hideReading ? 'reading hidden-reading' : 'reading';
     card.innerHTML = `
       <div class="badges">
         <span class="badge game-lbl">${gameData[gameId].label}</span>
         <span class="badge cat">${q.cat}</span>
       </div>
       <div class="word">${q.word}</div>
-      ${showR ? `<div class="reading">${q.reading}</div>` : ''}`;
+      ${showR ? `<div class="${rcGame}" id="reading-display">${q.reading}</div>` : ''}`;
   }
 
   const choicesDiv = document.getElementById('choices');
@@ -616,7 +619,7 @@ function choose(choice) {
     }
   }
 
-  if (hideReading && current.type === 'vocab') {
+  if (hideReading) {
     document.getElementById('reading-display')?.classList.remove('hidden-reading');
   }
 
