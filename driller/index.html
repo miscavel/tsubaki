@@ -210,6 +210,9 @@ body.light .badge.game-lbl { background: #c9b0e8; color: #2a1a4a; }
 }
 
 .hidden-reading { visibility: hidden; }
+ruby.hidden-reading { visibility: visible; }
+ruby.hidden-reading rt { visibility: hidden; }
+ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
 
 .sentence {
   font-size: 1.3rem;
@@ -577,15 +580,20 @@ function renderQuestion() {
       <div class="sentence">${q.sentence}</div>
       ${q.reading ? `<div class="${rcDlg}" id="reading-display">${q.reading}</div>` : ''}`;
   } else {
-    const showR = q.word !== q.reading;
+    const hasKanji = /[一-鿿]/.test(q.word);
+    const useRuby = hasKanji && q.word !== q.reading;
+    const showFallbackR = !useRuby && q.word !== q.reading;
     const rcGame = hideReading ? 'reading hidden-reading' : 'reading';
+    const wordHtml = useRuby
+      ? `<ruby id="reading-display"${hideReading ? ' class="hidden-reading"' : ''}>${q.word}<rt>${q.reading}</rt></ruby>`
+      : q.word;
     card.innerHTML = `
       <div class="badges">
         <span class="badge game-lbl">${gameData[gameId].label}</span>
         <span class="badge cat">${q.cat}</span>
       </div>
-      <div class="word">${q.word}</div>
-      ${showR ? `<div class="${rcGame}" id="reading-display">${q.reading}</div>` : ''}`;
+      <div class="word">${wordHtml}</div>
+      ${showFallbackR ? `<div class="${rcGame}" id="reading-display">${q.reading}</div>` : ''}`;
   }
 
   const choicesDiv = document.getElementById('choices');
