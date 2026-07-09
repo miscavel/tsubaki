@@ -393,6 +393,8 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
       <button class="ctrl-btn active" data-game="pokemon">ポケモン</button>
       <button class="ctrl-btn" data-game="acnh">どうぶつの森</button>
       <button class="ctrl-btn" data-game="dq11">DQ XI</button>
+      <div class="spacer"></div>
+      <button class="ctrl-btn" id="reading-btn-game">ふり</button>
     </div>
     <div class="btn-row" id="cat-btns"></div>
   </div>
@@ -672,6 +674,7 @@ function syncUI() {
   document.getElementById('tab-mix').classList.toggle('active', jlptMode === 'mix');
   document.getElementById('prio-btn').classList.toggle('active', priorityOnly);
   document.getElementById('reading-btn').classList.toggle('active', hideReading);
+  document.getElementById('reading-btn-game').classList.toggle('active', hideReading);
 
   document.querySelectorAll('#game-selector .ctrl-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.game === gameId));
@@ -712,6 +715,7 @@ function applyUiLang() {
   document.getElementById('tab-mix').textContent     = l.tabMix;
   document.getElementById('prio-btn').textContent    = l.prio;
   document.getElementById('reading-btn').textContent = l.furigana;
+  document.getElementById('reading-btn-game').textContent = l.furigana;
   document.getElementById('save-btn').textContent    = l.save;
   document.getElementById('next-btn').textContent    = l.next;
   document.getElementById('load-btn').textContent    = l.load;
@@ -788,15 +792,16 @@ document.getElementById('tab-mix').addEventListener('click', () => {
 document.getElementById('prio-btn').addEventListener('click', () => {
   priorityOnly = !priorityOnly; recentKeys = []; retryQueue = []; syncUI(); renderQuestion();
 });
-document.getElementById('reading-btn').addEventListener('click', () => {
+function toggleReading() {
   hideReading = !hideReading;
   syncUI();
   const readingEl = document.getElementById('reading-display');
   if (readingEl) {
-    // hide only if not yet answered; if answered, reading was already revealed by choose()
     readingEl.classList.toggle('hidden-reading', hideReading && !answered);
   }
-});
+}
+document.getElementById('reading-btn').addEventListener('click', toggleReading);
+document.getElementById('reading-btn-game').addEventListener('click', toggleReading);
 document.querySelectorAll('#game-selector .ctrl-btn').forEach(b => {
   b.addEventListener('click', () => {
     gameId = b.dataset.game; gameCategory = 'すべて'; recentKeys = []; syncUI(); renderQuestion();
