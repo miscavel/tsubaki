@@ -348,6 +348,192 @@ const gameData = {
     ],
   },
 
+  hgss: {
+    label: 'HGSS',
+    diff: 'N4',
+    cats: ['すべて', 'ポケモン', 'まち', 'キャラ', 'セリフ'],
+    dialogues: [
+      // ── ウツギ博士 ─────────────────────────────────────────────────────
+      {
+        s:'やあ、ちょうどよかった！ポケモンのことで、きみに頼みたいことがあるんだが…まず、この中から1匹選んでくれないか？',
+        r:'やあ、ちょうどよかった！ポケモンのことで、きみにたのみたいことがあるんだが…まず、このなかから1ぴきえらんでくれないか？',
+        sp:'ウツギ博士',
+        a:'Ah, perfect timing! I have a favour to ask regarding Pokémon… first, would you choose one of these?',
+        c:[
+          'Ah, perfect timing! I have a favour to ask regarding Pokémon… first, would you choose one of these?',
+          'Come back tomorrow — the Pokémon aren\'t ready yet.',
+          'I\'m afraid I can\'t give you a Pokémon today. My research is at a critical stage.',
+          'The Pokémon you ordered is ready — please come to the lab to pick it up.',
+        ],
+        e:'ちょうどよかった = "perfect timing" (set phrase). 〜に頼みたいことがある = "I have a favour to ask of ~". 〜から1匹選んでくれないか = "wouldn\'t you choose one from ~?" (polite request with くれないか)',
+      },
+      {
+        s:'ポケモンはすごいよ。どんな環境でも一生懸命生きて、トレーナーを信頼してくれる。わたしはそこに感動するんだ。',
+        r:'ポケモンはすごいよ。どんなかんきょうでもいっしょうけんめいいきて、トレーナーをしんらいしてくれる。わたしはそこにかんどうするんだ。',
+        sp:'ウツギ博士',
+        a:'Pokémon are amazing. They live with all their effort in any environment and trust their trainer. That\'s what moves me.',
+        c:[
+          'Pokémon are amazing. They live with all their effort in any environment and trust their trainer. That\'s what moves me.',
+          'Pokémon are just tools for battle. Their feelings don\'t matter to my research.',
+          'Pokémon are mysterious, but I\'ve already figured out everything about them.',
+          'I used to love Pokémon, but after years of research it\'s just a job now.',
+        ],
+        e:'どんな〜でも = no matter what ~; in any ~. 一生懸命 = with all one\'s effort. 信頼してくれる = trust you (くれる = do ~ for me/us). 感動する = to be moved / touched emotionally',
+      },
+      // ── シルバー（ライバル）────────────────────────────────────────────
+      {
+        s:'フン、弱いポケモンなんか必要ない。強くなければポケモンじゃないんだよ！',
+        r:'フン、よわいポケモンなんかひつようない。つよくなければポケモンじゃないんだよ！',
+        sp:'シルバー',
+        a:'Hmph. I don\'t need weak Pokémon. If you\'re not strong, you\'re not worth calling a Pokémon!',
+        c:[
+          'Hmph. I don\'t need weak Pokémon. If you\'re not strong, you\'re not worth calling a Pokémon!',
+          'Weak Pokémon are the most interesting. Their potential is limitless.',
+          'Strong or weak doesn\'t matter — what matters is the bond between trainer and Pokémon.',
+          'I\'ve been collecting only the rarest Pokémon. Strength isn\'t everything.',
+        ],
+        e:'フン = "hmph" (dismissive snort). 〜なんか = ~ (dismissive particle, belittling something). 〜なければ〜じゃない = double negative for emphasis. This is Silver\'s defining character line.',
+      },
+      {
+        s:'なぜ負けた…。おれのポケモンたちは最強のはずだったのに。おれには…まだ足りないものがあるのか。',
+        r:'なぜまけた…。おれのポケモンたちはさいきょうのはずだったのに。おれには…まだたりないものがあるのか。',
+        sp:'シルバー',
+        a:'Why did I lose…. My Pokémon were supposed to be the strongest. Is there still… something I\'m lacking?',
+        c:[
+          'Why did I lose…. My Pokémon were supposed to be the strongest. Is there still… something I\'m lacking?',
+          'I lost on purpose. I was testing your strength — you passed.',
+          'I admit defeat. You\'re clearly stronger. I\'ll find better Pokémon.',
+          'That doesn\'t count. My Pokémon weren\'t at full strength today.',
+        ],
+        e:'〜のはずだったのに = "was supposed to be ~, but…" (expectation unmet; のに = disappointment). 足りない = not enough; lacking. Silver\'s rare moment of self-doubt — key to his character arc.',
+      },
+      // ── ランス ────────────────────────────────────────────────────────
+      {
+        s:'悪事を見逃すことはできない。ポケモンを傷つける者は、このランスが許さない！',
+        r:'あくじをみのがすことはできない。ポケモンをきずつけるものは、このランスがゆるさない！',
+        sp:'ランス',
+        a:'I cannot overlook evil. Anyone who harms Pokémon — I, Lance, will not forgive them!',
+        c:[
+          'I cannot overlook evil. Anyone who harms Pokémon — I, Lance, will not forgive them!',
+          'I try not to get involved in other people\'s battles. It\'s not my place.',
+          'Evil is a relative concept. What seems harmful may serve a greater purpose.',
+          'I forgive those who harm Pokémon, as long as they promise to change.',
+        ],
+        e:'見逃す = to overlook / let pass (見+逃す = look then let escape). 〜者 = person who ~ (formal/literary). この〜が = "I, ~" (speaker names themselves dramatically). 許さない = will not forgive',
+      },
+      {
+        s:'ポケモンと心が通じ合えれば、どんな壁も乗り越えられる。それがチャンピオンの信念だ。',
+        r:'ポケモンとこころがつうじあえれば、どんなかべものりこえられる。それがチャンピオンのしんねんだ。',
+        sp:'ランス',
+        a:'If your heart can connect with your Pokémon\'s, any wall can be overcome. That is a Champion\'s conviction.',
+        c:[
+          'If your heart can connect with your Pokémon\'s, any wall can be overcome. That is a Champion\'s conviction.',
+          'Champions rely on strategy alone. Feelings for Pokémon can cloud your judgement.',
+          'The strongest trainer doesn\'t need a bond — just the strongest Pokémon.',
+          'A Champion\'s secret is training 20 hours a day, every day.',
+        ],
+        e:'心が通じ合う = hearts connect / understand each other (通じ合う = mutually communicate). どんな〜も = any ~ at all. 信念 = conviction; belief; creed',
+      },
+      // ── キモノガール ──────────────────────────────────────────────────
+      {
+        s:'ポケモンと旅をする者だけが、伝説の扉を開くことができる。あなたはその資格があると、わたしたちは信じています。',
+        r:'ポケモンとたびをするものだけが、でんせつのとびらをひらくことができる。あなたはそのしかくがあると、わたしたちはしんじています。',
+        sp:'キモノガール',
+        a:'Only those who journey with Pokémon can open the door to legend. We believe you have that right.',
+        c:[
+          'Only those who journey with Pokémon can open the door to legend. We believe you have that right.',
+          'The door to legend is sealed forever. No trainer has ever managed to open it.',
+          'Anyone can open the legendary door — you just need the right item.',
+          'The legendary Pokémon left long ago. There is no door left to open.',
+        ],
+        e:'〜者だけが = only those who ~. 扉を開く = to open a door (扉 = door, literary). 〜ことができる = can ~. 資格がある = to have the qualification / right to ~',
+      },
+      // ── ロケット団 ────────────────────────────────────────────────────
+      {
+        s:'じゃまをするな！おれたちロケット団に逆らう気か？今すぐ後悔させてやる！',
+        r:'じゃまをするな！おれたちロケットだんにさからうきか？いますぐこうかいさせてやる！',
+        sp:'ロケット団',
+        a:'Stay out of our way! Are you planning to defy Team Rocket? We\'ll make you regret it right now!',
+        c:[
+          'Stay out of our way! Are you planning to defy Team Rocket? We\'ll make you regret it right now!',
+          'We\'re Team Rocket, and we\'re actually the good guys. Please don\'t interfere.',
+          'We\'re not here to cause trouble — we\'re just borrowing this building for a moment.',
+          'Team Rocket disbanded years ago. We\'re just wearing the uniforms for fun.',
+        ],
+        e:'じゃまをするな = "don\'t get in the way!" (な = negative command, rough). 〜に逆らう = to defy / go against ~. 〜気か = "are you intending to ~?" (threatening). 後悔させてやる = "I\'ll make you regret it" (させる causative + やる rough)',
+      },
+      // ── 伝説のポケモン ────────────────────────────────────────────────
+      {
+        s:'伝説のポケモン、ホウオウがすがたをあらわした！虹色の羽が空を染める。',
+        r:'でんせつのポケモン、ホウオウがすがたをあらわした！にじいろのはねがそらをそめる。',
+        sp:'ナレーション',
+        a:'The legendary Pokémon Ho-Oh appeared! Its rainbow-coloured wings dye the sky.',
+        c:[
+          'The legendary Pokémon Ho-Oh appeared! Its rainbow-coloured wings dye the sky.',
+          'A strange bird flew overhead. It was probably just a Pidgey.',
+          'The legendary Ho-Oh has already been caught by another trainer.',
+          'Ho-Oh appeared, but fled before anyone could see it clearly.',
+        ],
+        e:'姿をあらわす = to appear; show oneself (姿 = figure/form). 虹色 = rainbow-coloured (虹 = rainbow). 〜が空を染める = ~ dyes the sky (染める = to dye/colour)',
+      },
+      // ── 白銀山の伝説 ──────────────────────────────────────────────────
+      {
+        s:'白銀山の頂上に、すべてのトレーナーを退けてきた伝説の少年がいる。彼は何も語らず、ただ戦うだけだ。',
+        r:'しろがねやまのちょうじょうに、すべてのトレーナーをしりぞけてきたでんせつのしょうねんがいる。かれはなにもかたらず、ただたたかうだけだ。',
+        sp:'ひとつわたし',
+        a:'At the summit of Mt. Silver, there is a legendary boy who has turned away every trainer. He says nothing — he only battles.',
+        c:[
+          'At the summit of Mt. Silver, there is a legendary boy who has turned away every trainer. He says nothing — he only battles.',
+          'A young boy lives on Mt. Silver studying Pokémon. He\'s friendly and will answer your questions.',
+          'Mt. Silver\'s summit is empty. The legend of the trainer there is just a rumour.',
+          'The trainer on Mt. Silver is a disguised Gym Leader doing secret training.',
+        ],
+        e:'頂上 = summit; peak. 退ける = to turn away; repel (退 = retreat/back). 何も語らず = without saying anything (語る = to speak; ず = classical negative). ただ〜だけだ = nothing but ~',
+      },
+    ],
+    vocab: [
+      // ── ポケモン ─────────────────────────────────────────────────────
+      {w:'チコリータ',r:'チコリータ',m:'Chikorita — Grass starter',cat:'ポケモン'},
+      {w:'ベイリーフ',r:'ベイリーフ',m:'Bayleef',cat:'ポケモン'},
+      {w:'メガニウム',r:'メガニウム',m:'Meganium — final Grass evolution',cat:'ポケモン'},
+      {w:'ヒノアラシ',r:'ヒノアラシ',m:'Cyndaquil — Fire starter',cat:'ポケモン'},
+      {w:'マグマラシ',r:'マグマラシ',m:'Quilava',cat:'ポケモン'},
+      {w:'バクフーン',r:'バクフーン',m:'Typhlosion — final Fire evolution',cat:'ポケモン'},
+      {w:'ワニノコ',r:'ワニノコ',m:'Totodile — Water starter',cat:'ポケモン'},
+      {w:'アリゲイツ',r:'アリゲイツ',m:'Croconaw',cat:'ポケモン'},
+      {w:'オーダイル',r:'オーダイル',m:'Feraligatr — final Water evolution',cat:'ポケモン'},
+      {w:'ホウオウ',r:'ホウオウ',m:'Ho-Oh — legendary rainbow Pokémon (HeartGold)',cat:'ポケモン'},
+      {w:'ルギア',r:'ルギア',m:'Lugia — legendary diving Pokémon (SoulSilver)',cat:'ポケモン'},
+      {w:'スイクン',r:'スイクン',m:'Suicune — legendary Water beast',cat:'ポケモン'},
+      {w:'ライコウ',r:'ライコウ',m:'Raikou — legendary Electric beast',cat:'ポケモン'},
+      {w:'エンテイ',r:'エンテイ',m:'Entei — legendary Fire beast',cat:'ポケモン'},
+      {w:'セレビィ',r:'セレビィ',m:'Celebi — mythical time-travel Pokémon',cat:'ポケモン'},
+      // ── まち（ジョウト地方）──────────────────────────────────────────
+      // Japanese town names differ entirely from English — the kanji roots are worth knowing
+      {w:'ワカバタウン',r:'ワカバタウン',m:'New Bark Town (若葉 = young leaf)',cat:'まち'},
+      {w:'ウバメシティ',r:'ウバメシティ',m:'Cherrygrove City (ウバメガシ = ubame oak)',cat:'まち'},
+      {w:'キキョウシティ',r:'キキョウシティ',m:'Violet City (桔梗 = bellflower)',cat:'まち'},
+      {w:'ヒワダタウン',r:'ヒワダタウン',m:'Azalea Town (檜皮 = hinoki bark)',cat:'まち'},
+      {w:'コガネシティ',r:'コガネシティ',m:'Goldenrod City (黄金 = gold)',cat:'まち'},
+      {w:'エンジュシティ',r:'エンジュシティ',m:'Ecruteak City (槐 = pagoda tree)',cat:'まち'},
+      {w:'アサギシティ',r:'アサギシティ',m:'Olivine City (浅葱 = pale blue-green)',cat:'まち'},
+      {w:'タンバシティ',r:'タンバシティ',m:'Cianwood City (丹波 = old region name)',cat:'まち'},
+      {w:'チョウジタウン',r:'チョウジタウン',m:'Mahogany Town (丁子 = clove)',cat:'まち'},
+      {w:'フスベシティ',r:'フスベシティ',m:'Blackthorn City (燻 = to smoke)',cat:'まち'},
+      {w:'白銀山',r:'しろがねやま',m:'Mt. Silver (白銀 = silver/white gold) — Red waits at the summit',cat:'まち'},
+      {w:'チャンピオンロード',r:'チャンピオンロード',m:'Victory Road — final route before the Pokémon League',cat:'まち'},
+      // ── キャラ ───────────────────────────────────────────────────────
+      {w:'ウツギ博士',r:'ウツギはかせ',m:'Professor Elm — Johto\'s Pokémon researcher',cat:'キャラ'},
+      {w:'シルバー',r:'シルバー',m:'Silver — the rival; cold and obsessed with strength',cat:'キャラ'},
+      {w:'ランス',r:'ランス',m:'Lance — Dragon Master and Johto Champion',cat:'キャラ'},
+      {w:'カリン',r:'カリン',m:'Karen — Dark-type Elite Four member',cat:'キャラ'},
+      {w:'レッド',r:'レッド',m:'Red — the legendary silent trainer at Mt. Silver\'s summit',cat:'キャラ'},
+      {w:'ブルー',r:'ブルー',m:'Blue (Gary) — Viridian City Gym Leader',cat:'キャラ'},
+      {w:'キモノガール',r:'キモノガール',m:'Kimono Girls — five dancers who guard the path to the legendaries',cat:'キャラ'},
+      {w:'ロケット団',r:'ロケットだん',m:'Team Rocket — villain organisation',cat:'キャラ'},
+    ],
+  },
+
   acnh: {
     label: 'どうぶつの森',
     diff: 'N5–N4',
