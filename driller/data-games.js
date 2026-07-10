@@ -5,7 +5,7 @@ const gameData = {
   pokemon: {
     label: 'ポケモン',
     diff: 'N5',
-    cats: ['すべて', 'ポケモン', 'わざ', 'アイテム', 'バトル', 'じょうたい'],
+    cats: ['すべて', 'ポケモン', 'わざ', 'アイテム', 'バトル', 'じょうたい', 'セリフ'],
     vocab: [
       // ── ポケモン ────────────────────────────────────────────────────────
       {w:'フシギダネ',r:'フシギダネ',m:'Bulbasaur',cat:'ポケモン'},
@@ -207,7 +207,145 @@ const gameData = {
       {w:'こんらん',r:'こんらん',m:'Confusion',cat:'じょうたい'},
       {w:'ひるみ',r:'ひるみ',m:'Flinch',cat:'じょうたい'},
       {w:'メロメロ',r:'メロメロ',m:'Infatuation (Attract)',cat:'じょうたい'},
-    ]
+    ],
+    dialogues: [
+      // ── オーキド博士 ──────────────────────────────────────────────────
+      {
+        s:'この世界には、ポケモンと呼ばれる生き物が住んでいる！ある者はペットとして、ある者はたたかいの道具として…わしにとっては研究の対象じゃ！',
+        r:'このせかいには、ポケモンとよばれるいきものがすんでいる！あるものはペットとして、あるものはたたかいのどうぐとして…わしにとってはけんきゅうのたいしょうじゃ！',
+        sp:'オーキド博士',
+        a:'In this world, there are creatures called Pokémon! For some they are pets, for others tools for battle… to me they are subjects of research!',
+        c:[
+          'In this world, there are creatures called Pokémon! For some they are pets, for others tools for battle… to me they are subjects of research!',
+          'In this world, Pokémon are rare. Most people have never encountered one in the wild.',
+          'Pokémon are dangerous creatures. Only trained researchers should approach them.',
+          'This world is divided between those who love Pokémon and those who fear them.',
+        ],
+        e:'〜と呼ばれる = called ~ (passive of 呼ぶ). ある者は〜として = "for some, ~ is used as ~". 〜にとっては = "as far as ~ is concerned; to ~"',
+      },
+      {
+        s:'わしの夢はすべてのポケモンを図鑑に記録することじゃ。おぬしに、わしの夢の続きをたくしたいのじゃ。',
+        r:'わしのゆめはすべてのポケモンをずかんにきろくすることじゃ。おぬしに、わしのゆめのつづきをたくしたいのじゃ。',
+        sp:'オーキド博士',
+        a:'My dream is to record all Pokémon in the Pokédex. I want to entrust the continuation of my dream to you.',
+        c:[
+          'My dream is to record all Pokémon in the Pokédex. I want to entrust the continuation of my dream to you.',
+          'I once dreamed of catching all Pokémon, but the task proved impossible.',
+          'My dream is for trainers and Pokémon to live in peace. That is all I ask of you.',
+          'The Pokédex project is complete. Every Pokémon has been recorded already.',
+        ],
+        e:'夢は〜することじゃ = "My dream is to ~" (こと nominalises the verb). 続き = continuation. たくしたい = want to entrust / leave in someone\'s care',
+      },
+      // ── ポケモンセンター ──────────────────────────────────────────────
+      {
+        s:'いらっしゃいませ！ポケモンセンターへようこそ。ポケモンをお預かりして、回復させていただきますね。',
+        r:'いらっしゃいませ！ポケモンセンターへようこそ。ポケモンをおあずかりして、かいふくさせていただきますね。',
+        sp:'ジョーイ',
+        a:'Welcome! Welcome to the Pokémon Center. We will take care of your Pokémon and restore them to full health.',
+        c:[
+          'Welcome! Welcome to the Pokémon Center. We will take care of your Pokémon and restore them to full health.',
+          'The Pokémon Center is full today. Please come back tomorrow.',
+          'We only treat injured Pokémon here. Healthy Pokémon must go to the lab.',
+          'You need a membership card to use this Pokémon Center.',
+        ],
+        e:'いらっしゃいませ = polite "welcome" (shop/service greeting). お預かりする = to take care of / hold for someone (humble 預かる). 〜させていただく = humble "allow me to ~"',
+      },
+      {
+        s:'お待たせしました！ポケモンたちは完全に元気になりましたよ！またお越しくださいね。',
+        r:'おまたせしました！ポケモンたちはかんぜんにげんきになりましたよ！またおこしくださいね。',
+        sp:'ジョーイ',
+        a:'Sorry to keep you waiting! Your Pokémon are all back to full health! Please come again.',
+        c:[
+          'Sorry to keep you waiting! Your Pokémon are all back to full health! Please come again.',
+          'Treatment was only partial. Some of your Pokémon still need rest.',
+          'Your Pokémon recovered, but one seems unhappy. Please check on it.',
+          'We ran out of medicine. Your Pokémon\'s HP is only partially restored.',
+        ],
+        e:'お待たせしました = "Sorry to keep you waiting" (set service phrase). 完全に元気になる = to fully recover. またお越しください = "please come again" (polite invitation)',
+      },
+      // ── 道ばたのNPC ───────────────────────────────────────────────────
+      {
+        s:'草むらには野生のポケモンが住んでいるよ。ポケモンなしで入ると危ないから気をつけてね！',
+        r:'くさむらにはやせいのポケモンがすんでいるよ。ポケモンなしではいるとあぶないからきをつけてね！',
+        sp:'村人',
+        a:'Wild Pokémon live in the tall grass. It\'s dangerous to enter without Pokémon, so be careful!',
+        c:[
+          'Wild Pokémon live in the tall grass. It\'s dangerous to enter without Pokémon, so be careful!',
+          'The tall grass is perfectly safe. Wild Pokémon are very friendly.',
+          'Wild Pokémon avoid humans. You can walk through the grass without worries.',
+          'There are no Pokémon in this area — the grass is just overgrown.',
+        ],
+        e:'野生の = wild (野生 = wild/untamed). 〜なしで = without ~. 〜と危ない = if ~ it\'s dangerous (と = inevitable result conditional). 気をつけて = be careful (set phrase)',
+      },
+      {
+        s:'このバッジを持っていれば、交換で手に入れたポケモンも言うことをきくようになるよ。',
+        r:'このバッジをもっていれば、こうかんでてにいれたポケモンもいうことをきくようになるよ。',
+        sp:'ジムの関係者',
+        a:'If you have this Badge, even Pokémon you obtained through trading will obey you.',
+        c:[
+          'If you have this Badge, even Pokémon you obtained through trading will obey you.',
+          'This Badge makes your Pokémon stronger, but traded Pokémon still won\'t listen.',
+          'With enough Badges, you can make wild Pokémon obey you without catching them.',
+          'Badges do nothing for obedience — only training builds trust.',
+        ],
+        e:'持っていれば = if you have / are carrying (ていれば = conditional of ている). 手に入れた = obtained. 言うことをきく = to obey / do as told (set phrase). 〜ようになる = come to ~; start to ~',
+      },
+      // ── ライバル ──────────────────────────────────────────────────────
+      {
+        s:'負けるもんか！ぼくのほうがずっと強いはずなんだ！',
+        r:'まけるもんか！ぼくのほうがずっとつよいはずなんだ！',
+        sp:'ライバル',
+        a:'As if I\'d lose! I\'m supposed to be way stronger than you!',
+        c:[
+          'As if I\'d lose! I\'m supposed to be way stronger than you!',
+          'I admit it — you\'re stronger. I\'ll work harder and challenge you again.',
+          'This battle is pointless. I\'m going to win easily anyway.',
+          'I\'m not interested in battling. Go away.',
+        ],
+        e:'〜もんか = "as if ~!" (strong masculine refusal, indignant). 〜のほうがずっと〜 = "~ is way more ~ than ~". 〜はずだ = "supposed to be ~; it should be that ~"',
+      },
+      // ── ジムリーダー ──────────────────────────────────────────────────
+      {
+        s:'おめでとう！きみは本当に強いトレーナーだ。これからも、ポケモンと一緒にがんばってね。',
+        r:'おめでとう！きみはほんとうにつよいトレーナーだ。これからも、ポケモンといっしょにがんばってね。',
+        sp:'ジムリーダー',
+        a:'Congratulations! You are a truly strong trainer. Keep doing your best together with your Pokémon.',
+        c:[
+          'Congratulations! You are a truly strong trainer. Keep doing your best together with your Pokémon.',
+          'You got lucky this time. Don\'t think you\'ve actually beaten me.',
+          'I\'m impressed you got this far, but the Elite Four won\'t be so easy.',
+          'Take this Badge. But don\'t celebrate — the next Gym is much harder.',
+        ],
+        e:'おめでとう = Congratulations (set phrase). 〜と一緒に = together with ~. これからも = from now on too. がんばる = to do one\'s best; keep at it',
+      },
+      // ── バトル・ゲームシステム ─────────────────────────────────────────
+      {
+        s:'〇〇は進化しようとしている！',
+        r:'〇〇はしんかしようとしている！',
+        sp:'ナレーション',
+        a:'〇〇 is trying to evolve!',
+        c:[
+          '〇〇 is trying to evolve!',
+          '〇〇 refused to evolve.',
+          '〇〇 has already evolved once and cannot evolve again.',
+          '〇〇 reached max level but is not able to evolve.',
+        ],
+        e:'進化する = to evolve (進化 = evolution). 〜しようとしている = is trying to ~; is about to ~ (volitional form + としている = in the process of attempting)',
+      },
+      {
+        s:'〇〇をゲットした！ポケモン図鑑に登録した。',
+        r:'〇〇をゲットした！ポケモンずかんにとうろくした。',
+        sp:'ナレーション',
+        a:'Caught 〇〇! Registered to the Pokédex.',
+        c:[
+          'Caught 〇〇! Registered to the Pokédex.',
+          '〇〇 escaped! The Poké Ball was no match for it.',
+          '〇〇 was already in the Pokédex. No new data recorded.',
+          '〇〇 fainted before it could be caught.',
+        ],
+        e:'ゲットした = caught / got (ゲット is the Pokémon-specific term for catching). 図鑑 = illustrated reference / Pokédex. 登録した = registered / recorded (登録する = to register)',
+      },
+    ],
   },
 
   acnh: {

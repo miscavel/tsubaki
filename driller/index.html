@@ -676,7 +676,7 @@ function syncUI() {
   document.getElementById('reading-btn').classList.toggle('active', hideReading);
   document.getElementById('reading-btn-game').classList.toggle('active', hideReading);
 
-  document.querySelectorAll('#game-selector .ctrl-btn').forEach(b =>
+  document.querySelectorAll('#game-selector .ctrl-btn[data-game]').forEach(b =>
     b.classList.toggle('active', b.dataset.game === gameId));
   renderCatButtons();
 }
@@ -802,7 +802,7 @@ function toggleReading() {
 }
 document.getElementById('reading-btn').addEventListener('click', toggleReading);
 document.getElementById('reading-btn-game').addEventListener('click', toggleReading);
-document.querySelectorAll('#game-selector .ctrl-btn').forEach(b => {
+document.querySelectorAll('#game-selector .ctrl-btn[data-game]').forEach(b => {
   b.addEventListener('click', () => {
     gameId = b.dataset.game; gameCategory = 'すべて'; recentKeys = []; syncUI(); renderQuestion();
   });
