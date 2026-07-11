@@ -534,6 +534,38 @@ const gameData = {
     ],
   },
 
+  bw: {
+    label: 'ぼうけん日誌',
+    diff: 'N5–N4',
+    cats: ['すべて', 'フィールド', 'わざ'],
+    // Personal word log — add new words as you encounter them in Pokémon White
+    vocab: [
+      // ── フィールド ───────────────────────────────────────────────────
+      {w:'届く',r:'とどく',m:'to reach; to arrive; to be delivered (e.g. a letter)',cat:'フィールド'},
+      {w:'一歩踏み出す',r:'いっぽふみだす',m:'to take a step forward; to set out on a journey',cat:'フィールド'},
+      {w:'博士',r:'はかせ',m:'professor; doctor (here: the Pokémon professor of Unova)',cat:'フィールド'},
+      {w:'調べる',r:'しらべる',m:'to investigate; to look into; to check on something',cat:'フィールド'},
+      {w:'開ける',r:'あける',m:'to open (a box, a door, a present)',cat:'フィールド'},
+      {w:'手紙',r:'てがみ',m:'letter (written message — e.g. from mom at the start)',cat:'フィールド'},
+      {w:'三匹',r:'さんびき',m:'three small animals / Pokémon (counter: 匹 for small creatures)',cat:'フィールド'},
+      {w:'仲良く',r:'なかよく',m:'on good terms; getting along well; in a friendly way',cat:'フィールド'},
+      {w:'決める',r:'きめる',m:'to decide; to choose; to make up one\'s mind',cat:'フィールド'},
+      {w:'最初',r:'さいしょ',m:'the first; the beginning; the very start',cat:'フィールド'},
+      {w:'勝負',r:'しょうぶ',m:'match; contest; showdown; putting it to the test',cat:'フィールド'},
+      {w:'弱い',r:'よわい',m:'weak; frail; not strong',cat:'フィールド'},
+      {w:'戦う',r:'たたかう',m:'to fight; to battle; to struggle against',cat:'フィールド'},
+      {w:'育てる',r:'そだてる',m:'to raise; to bring up; to nurture (a Pokémon)',cat:'フィールド'},
+      {w:'周り',r:'まわり',m:'surroundings; around; nearby',cat:'フィールド'},
+      {w:'回復',r:'かいふく',m:'recovery; restoration; healing',cat:'フィールド'},
+      {w:'詳しい',r:'くわしい',m:'detailed; familiar with; well-versed in',cat:'フィールド'},
+      {w:'知識',r:'ちしき',m:'knowledge; expertise; know-how',cat:'フィールド'},
+      {w:'ツタージャ',r:'ツタージャ',m:'Snivy — Grass starter (蔦=ivy + 蛇=snake → ツタージャ)',cat:'フィールド'},
+      // ── わざ ─────────────────────────────────────────────────────────
+      {w:'体当たり',r:'たいあたり',m:'Tackle — throw oneself bodily at the target',cat:'わざ'},
+      {w:'睨みつける',r:'にらみつける',m:'Leer — glare hard at the target to lower its Defense',cat:'わざ'},
+    ],
+  },
+
   acnh: {
     label: 'どうぶつの森',
     diff: 'N5–N4',
