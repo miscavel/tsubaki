@@ -399,6 +399,11 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
       <button class="ctrl-btn" id="reading-btn-game">ふり</button>
     </div>
     <div class="btn-row" id="cat-btns"></div>
+    <div class="btn-row" id="known-row" style="font-size:0.8em;opacity:0.7;display:none">
+      <span id="known-count"></span>
+      <div class="spacer"></div>
+      <button class="ctrl-btn" id="known-reset-btn">習得リセット</button>
+    </div>
   </div>
 
   <!-- Card -->
@@ -444,6 +449,7 @@ let answered = false;
 let current = null;
 let recentKeys = [];
 let retryQueue = []; // wrong answers come back here
+let knownWords = new Set(); // 'gameId:word' keys for mastered vocab
 let theme = 'dark';
 let uiLang = 'ja';
 
@@ -476,7 +482,8 @@ function jlptGrammarPool() {
 }
 function gamePool() {
   const g = gameData[gameId];
-  return gameCategory === 'すべて' ? g.vocab : g.vocab.filter(v => v.cat === gameCategory);
+  const base = gameCategory === 'すべて' ? g.vocab : g.vocab.filter(v => v.cat === gameCategory);
+  return base.filter(v => !knownWords.has(`${gameId}:${v.w}`));
 }
 function pickRandom(pool, keyFn) {
   if (!pool.length) return null;
@@ -517,7 +524,7 @@ function genGameQuestion() {
     return { type: 'dialogue', sentence: item.s, reading: item.r || '', speaker: item.sp, answer: item.a, choices, explanation: item.e };
   }
   const pool = gamePool();
-  if (pool.length < 4) return null;
+  if (pool.length < 2) return null;
   const item = pickRandom(pool, v => v.w);
   const sameCat = gameData[gameId].vocab.filter(v => v.w !== item.w && v.cat === item.cat);
   const wrongSrc = sameCat.length >= 3 ? sameCat : gameData[gameId].vocab.filter(v => v.w !== item.w);
@@ -654,8 +661,16 @@ function choose(choice) {
     fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.explanation}</small>`;
   } else {
     const detail = `${current.word} = ${current.answer}`;
+    const key = `${gameId}:${current.word}`;
+    const isKnown = knownWords.has(key);
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
-    fb.textContent = correct ? `✓ Correct! ${detail}` : `✗ Wrong. ${detail}`;
+    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'} ${detail}<br><button class="ctrl-btn" id="mastered-btn" style="margin-top:6px;font-size:0.8em">${isKnown ? '✓ 習得済み（取消）' : '習得'}</button>`;
+    document.getElementById('mastered-btn').addEventListener('click', () => {
+      if (knownWords.has(key)) { knownWords.delete(key); } else { knownWords.add(key); }
+      const btn = document.getElementById('mastered-btn');
+      if (btn) btn.textContent = knownWords.has(key) ? '✓ 習得済み（取消）' : '習得';
+      syncUI(); saveProgress();
+    });
   }
 
   updateScore();
@@ -681,6 +696,9 @@ function syncUI() {
   document.querySelectorAll('#game-selector .ctrl-btn[data-game]').forEach(b =>
     b.classList.toggle('active', b.dataset.game === gameId));
   renderCatButtons();
+  const gameKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`)).length;
+  document.getElementById('known-count').textContent = `習得: ${gameKnown}語`;
+  document.getElementById('known-row').style.display = gameKnown > 0 ? '' : 'none';
 }
 
 function renderCatButtons() {
@@ -743,6 +761,7 @@ function encodeState() {
     p: priorityOnly ? 1 : 0,
     hr: hideReading ? 1 : 0,
     gi: gameId, gc: gameCategory,
+    kw: [...knownWords],
   }));
 }
 function applyState(st) {
@@ -753,6 +772,7 @@ function applyState(st) {
   priorityOnly = !!st.p; hideReading = !!st.hr;
   gameId = st.gi || 'pokemon';
   gameCategory = st.gc || 'すべて';
+  knownWords = new Set(st.kw || []);
   syncUI(); updateScore();
 }
 function saveProgress() {
@@ -810,6 +830,11 @@ document.querySelectorAll('#game-selector .ctrl-btn[data-game]').forEach(b => {
   });
 });
 document.getElementById('next-btn').addEventListener('click', renderQuestion);
+document.getElementById('known-reset-btn').addEventListener('click', () => {
+  const gameKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`));
+  gameKnown.forEach(k => knownWords.delete(k));
+  syncUI(); saveProgress(); renderQuestion();
+});
 
 document.getElementById('theme-btn').addEventListener('click', () => {
   theme = theme === 'dark' ? 'light' : 'dark';
