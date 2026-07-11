@@ -459,18 +459,6 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
     </div>
   </div>
 
-  <!-- Known-words modal -->
-  <div id="known-modal-backdrop">
-    <div id="known-modal">
-      <h3 id="known-modal-title">習得済み</h3>
-      <div id="known-modal-list"></div>
-      <div id="known-modal-footer">
-        <button class="ctrl-btn" id="known-modal-reset">全リセット</button>
-        <button class="ctrl-btn active" id="known-modal-close">閉じる</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Card -->
   <div class="card" id="card"></div>
 
@@ -498,6 +486,18 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
     </div>
   </div>
 
+</div>
+
+<!-- Known-words modal (outside #app so position:fixed is unambiguous) -->
+<div id="known-modal-backdrop">
+  <div id="known-modal">
+    <h3 id="known-modal-title">習得済み</h3>
+    <div id="known-modal-list"></div>
+    <div id="known-modal-footer">
+      <button class="ctrl-btn" id="known-modal-reset">全リセット</button>
+      <button class="ctrl-btn active" id="known-modal-close">閉じる</button>
+    </div>
+  </div>
 </div>
 
 <script>
