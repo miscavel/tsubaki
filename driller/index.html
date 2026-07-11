@@ -312,6 +312,59 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
   gap: 8px;
 }
 
+/* ── Known-words modal ─────────────────────────────────────── */
+#known-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+#known-modal-backdrop.open { display: flex; }
+#known-modal {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  width: min(420px, 94vw);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#known-modal h3 { font-size: 1rem; color: var(--text); }
+#known-modal-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.known-word-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--surface2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.known-word-row span { flex: 1; color: var(--text); }
+.known-word-row small { color: var(--text-muted); font-size: 0.78rem; }
+.known-word-row button {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.known-word-row button:hover { border-color: var(--accent); color: var(--accent); }
+#known-modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
+
 #save-code {
   width: 100%;
   height: 60px;
@@ -400,9 +453,21 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
     </div>
     <div class="btn-row" id="cat-btns"></div>
     <div class="btn-row" id="known-row" style="font-size:0.8em;opacity:0.7;display:none">
-      <span id="known-count"></span>
+      <button class="ctrl-btn" id="known-count" style="font-size:0.8em"></button>
       <div class="spacer"></div>
-      <button class="ctrl-btn" id="known-reset-btn">習得リセット</button>
+      <button class="ctrl-btn" id="known-reset-btn">全リセット</button>
+    </div>
+  </div>
+
+  <!-- Known-words modal -->
+  <div id="known-modal-backdrop">
+    <div id="known-modal">
+      <h3 id="known-modal-title">習得済み</h3>
+      <div id="known-modal-list"></div>
+      <div id="known-modal-footer">
+        <button class="ctrl-btn" id="known-modal-reset">全リセット</button>
+        <button class="ctrl-btn active" id="known-modal-close">閉じる</button>
+      </div>
     </div>
   </div>
 
@@ -830,6 +895,46 @@ document.querySelectorAll('#game-selector .ctrl-btn[data-game]').forEach(b => {
   });
 });
 document.getElementById('next-btn').addEventListener('click', renderQuestion);
+function openKnownModal() {
+  const list = document.getElementById('known-modal-list');
+  const title = document.getElementById('known-modal-title');
+  const gameLabel = gameData[gameId].label || gameId;
+  title.textContent = `習得済み — ${gameLabel}`;
+  list.innerHTML = '';
+  const keys = [...knownWords].filter(k => k.startsWith(`${gameId}:`));
+  if (keys.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:8px 0">まだありません</div>';
+  } else {
+    const allVocab = gameData[gameId].vocab;
+    keys.forEach(key => {
+      const word = key.slice(gameId.length + 1);
+      const entry = allVocab.find(v => v.w === word);
+      const row = document.createElement('div');
+      row.className = 'known-word-row';
+      row.innerHTML = `<span>${word}</span><small>${entry ? entry.m : ''}</small><button data-key="${key}">✕</button>`;
+      row.querySelector('button').addEventListener('click', () => {
+        knownWords.delete(key);
+        saveProgress(); syncUI(); openKnownModal();
+      });
+      list.appendChild(row);
+    });
+  }
+  document.getElementById('known-modal-backdrop').classList.add('open');
+}
+document.getElementById('known-count').addEventListener('click', openKnownModal);
+document.getElementById('known-modal-close').addEventListener('click', () => {
+  document.getElementById('known-modal-backdrop').classList.remove('open');
+});
+document.getElementById('known-modal-backdrop').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('known-modal-backdrop'))
+    document.getElementById('known-modal-backdrop').classList.remove('open');
+});
+document.getElementById('known-modal-reset').addEventListener('click', () => {
+  const gameKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`));
+  gameKnown.forEach(k => knownWords.delete(k));
+  syncUI(); saveProgress(); renderQuestion();
+  document.getElementById('known-modal-backdrop').classList.remove('open');
+});
 document.getElementById('known-reset-btn').addEventListener('click', () => {
   const gameKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`));
   gameKnown.forEach(k => knownWords.delete(k));
