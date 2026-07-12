@@ -573,7 +573,7 @@ const gameData = {
       {w:'大切',r:'たいせつ',m:'important; precious; valued; dear',cat:'フィールド'},
       {w:'活躍',r:'かつやく',m:'being active; playing an active role; making great efforts',cat:'フィールド'},
       {w:'書き込みます',r:'かきこみます',m:'to write in; to fill in an entry (e.g. a Pokédex record)',cat:'フィールド'},
-      {w:'鹿の子',r:'かのこ',m:'Nuvema Town (カノコタウン) — starting town in Pokémon White',cat:'フィールド'},
+      {w:'鹿の子',r:'かのこ',m:'fawn; little deer (鹿=deer, 子=child) — used as カノコタウン, the starting town in Pokémon White',cat:'フィールド'},
       {w:'様々な',r:'さまざまな',m:'various; diverse; all kinds of',cat:'フィールド'},
       {w:'点',r:'てん',m:'point; aspect; mark; dot',cat:'フィールド'},
       {w:'集う',r:'つどう',m:'to gather; to assemble; to come together',cat:'フィールド'},
