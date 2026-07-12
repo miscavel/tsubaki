@@ -312,8 +312,8 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
   gap: 8px;
 }
 
-/* ── Known-words modal ─────────────────────────────────────── */
-#known-modal-backdrop {
+/* ── Word-list modal ───────────────────────────────────────── */
+#wl-backdrop {
   display: none;
   position: fixed;
   inset: 0;
@@ -322,48 +322,47 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
   align-items: center;
   justify-content: center;
 }
-#known-modal-backdrop.open { display: flex; }
-#known-modal {
+#wl-backdrop.open { display: flex; }
+#wl-modal {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 14px;
-  padding: 20px;
-  width: min(420px, 94vw);
-  max-height: 70vh;
+  padding: 18px;
+  width: min(480px, 96vw);
+  max-height: 82vh;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
-#known-modal h3 { font-size: 1rem; color: var(--text); }
-#known-modal-list {
+#wl-modal h3 { font-size: 1rem; color: var(--text); }
+#wl-items {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex: 1;
+  min-height: 0;
 }
-.known-word-row {
+.wl-row {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
   background: var(--surface2);
   border-radius: 8px;
-  font-size: 0.9rem;
 }
-.known-word-row span { flex: 1; color: var(--text); }
-.known-word-row small { color: var(--text-muted); font-size: 0.78rem; }
-.known-word-row button {
-  padding: 2px 8px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 0.8rem;
-}
-.known-word-row button:hover { border-color: var(--accent); color: var(--accent); }
-#known-modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
+.wl-row.wl-known { opacity: 0.45; }
+.wl-word { font-weight: 600; font-size: 0.9rem; color: var(--text); flex-shrink: 0; }
+.wl-read { color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
+.wl-dot { font-size: 0.65rem; flex-shrink: 0; }
+.wl-dot.hard { color: #e57373; }
+.wl-dot.easy { color: #81c784; }
+.wl-mean { flex: 1; color: var(--text-muted); font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.wl-btn { flex-shrink: 0; font-size: 0.72rem; padding: 3px 7px; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.wl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.wl-btn.known { background: var(--accent); border-color: var(--accent); color: #fff; }
+#wl-footer { display: flex; align-items: center; gap: 8px; }
+#wl-count { flex: 1; font-size: 0.8rem; color: var(--text-muted); }
 
 #save-code {
   width: 100%;
@@ -452,10 +451,8 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
       <button class="ctrl-btn" id="reading-btn-game">ふり</button>
     </div>
     <div class="btn-row" id="cat-btns"></div>
-    <div class="btn-row" id="known-row" style="font-size:0.8em;opacity:0.7;display:none">
-      <button class="ctrl-btn" id="known-count" style="font-size:0.8em"></button>
-      <div class="spacer"></div>
-      <button class="ctrl-btn" id="known-reset-btn">全リセット</button>
+    <div class="btn-row">
+      <button class="ctrl-btn" id="word-list-btn" style="font-size:0.8em">単語リスト</button>
     </div>
   </div>
 
@@ -494,14 +491,24 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
 
 </div>
 
-<!-- Known-words modal (outside #app so position:fixed is unambiguous) -->
-<div id="known-modal-backdrop">
-  <div id="known-modal">
-    <h3 id="known-modal-title">習得済み</h3>
-    <div id="known-modal-list"></div>
-    <div id="known-modal-footer">
-      <button class="ctrl-btn" id="known-modal-reset">全リセット</button>
-      <button class="ctrl-btn active" id="known-modal-close">閉じる</button>
+<!-- Word-list modal (outside #app so position:fixed is unambiguous) -->
+<div id="wl-backdrop">
+  <div id="wl-modal">
+    <div style="display:flex;align-items:center;gap:8px">
+      <h3 id="wl-title">単語リスト</h3>
+      <div class="spacer"></div>
+      <button class="ctrl-btn active" id="wl-close">閉じる</button>
+    </div>
+    <div class="btn-row" id="wl-filters">
+      <button class="ctrl-btn active" data-wlf="all">全部</button>
+      <button class="ctrl-btn" data-wlf="active">学習中</button>
+      <button class="ctrl-btn" data-wlf="known">習得済み</button>
+    </div>
+    <div id="wl-items"></div>
+    <div id="wl-footer">
+      <span id="wl-count"></span>
+      <button class="ctrl-btn" id="wl-reset">習得リセット</button>
+      <button class="ctrl-btn active" id="wl-close2">閉じる</button>
     </div>
   </div>
 </div>
@@ -521,6 +528,7 @@ let current = null;
 let recentKeys = [];
 let retryQueue = []; // wrong answers come back here
 let knownWords = new Set(); // 'gameId:word' keys for mastered vocab
+let wordWeights = new Map(); // 'gameId:word' → weight 0.2–3.0, default 1.0
 let theme = 'dark';
 let uiLang = 'ja';
 
@@ -569,6 +577,23 @@ function pickRandom(pool, keyFn) {
   return item;
 }
 
+function pickWeightedGame(pool) {
+  const available = pool.filter(v => !recentKeys.includes(v.w));
+  const src = available.length > 0 ? available : pool;
+  const weights = src.map(v => wordWeights.get(`${gameId}:${v.w}`) ?? 1.0);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  let chosen = src[src.length - 1];
+  for (let i = 0; i < src.length; i++) {
+    r -= weights[i];
+    if (r <= 0) { chosen = src[i]; break; }
+  }
+  recentKeys.push(chosen.w);
+  const cap = Math.max(4, Math.floor(pool.length / 2));
+  if (recentKeys.length > cap) recentKeys.shift();
+  return chosen;
+}
+
 // ── Question generators ───────────────────────────────────────────────────────
 function genVocabQuestion() {
   const pool = jlptVocabPool();
@@ -596,7 +621,7 @@ function genGameQuestion() {
   }
   const pool = gamePool();
   if (pool.length < 2) return null;
-  const item = pickRandom(pool, v => v.w);
+  const item = pickWeightedGame(pool);
   const sameCat = gameData[gameId].vocab.filter(v => v.w !== item.w && v.cat === item.cat);
   const wrongSrc = sameCat.length >= 3 ? sameCat : gameData[gameId].vocab.filter(v => v.w !== item.w);
   const wrong = wrongSrc.sort(() => Math.random() - 0.5).slice(0, 3).map(v => v.m);
@@ -733,6 +758,9 @@ function choose(choice) {
   } else {
     const detail = `${current.word} = ${current.answer}`;
     const key = `${gameId}:${current.word}`;
+    // Update weight: correct → reduce (min 0.2), wrong → boost (max 3.0)
+    const w = wordWeights.get(key) ?? 1.0;
+    wordWeights.set(key, correct ? Math.max(0.2, w * 0.75) : Math.min(3.0, w * 1.5));
     const isKnown = knownWords.has(key);
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
     fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'} ${detail}<br><button class="ctrl-btn" id="mastered-btn" style="margin-top:6px;font-size:0.8em">${isKnown ? '✓ 習得済み（取消）' : '習得'}</button>`;
@@ -767,9 +795,9 @@ function syncUI() {
   document.querySelectorAll('#game-selector .ctrl-btn[data-game]').forEach(b =>
     b.classList.toggle('active', b.dataset.game === gameId));
   renderCatButtons();
-  const gameKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`)).length;
-  document.getElementById('known-count').textContent = `習得: ${gameKnown}語`;
-  document.getElementById('known-row').style.display = gameKnown > 0 ? '' : 'none';
+  const _gTotal = (gameData[gameId]?.vocab || []).length;
+  const _gKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`)).length;
+  document.getElementById('word-list-btn').textContent = `単語リスト (${_gTotal - _gKnown}/${_gTotal})`;
 }
 
 function renderCatButtons() {
@@ -833,6 +861,7 @@ function encodeState() {
     hr: hideReading ? 1 : 0,
     gi: gameId, gc: gameCategory,
     kw: [...knownWords],
+    ww: [...wordWeights],
   }));
 }
 function applyState(st) {
@@ -844,6 +873,7 @@ function applyState(st) {
   gameId = st.gi || 'pokemon';
   gameCategory = st.gc || 'すべて';
   knownWords = new Set(st.kw || []);
+  wordWeights = new Map(st.ww || []);
   syncUI(); updateScore();
 }
 function saveProgress() {
@@ -901,50 +931,71 @@ document.querySelectorAll('#game-selector .ctrl-btn[data-game]').forEach(b => {
   });
 });
 document.getElementById('next-btn').addEventListener('click', renderQuestion);
-function openKnownModal() {
-  const list = document.getElementById('known-modal-list');
-  const title = document.getElementById('known-modal-title');
-  const gameLabel = gameData[gameId].label || gameId;
-  title.textContent = `習得済み — ${gameLabel}`;
-  list.innerHTML = '';
-  const keys = [...knownWords].filter(k => k.startsWith(`${gameId}:`));
-  if (keys.length === 0) {
-    list.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:8px 0">まだありません</div>';
+
+// ── Word-list modal ───────────────────────────────────────────────────────────
+let wlFilter = 'all';
+function weightDot(key) {
+  const w = wordWeights.get(key);
+  if (!w || (w >= 0.7 && w <= 1.3)) return '';
+  if (w > 1.3) return `<span class="wl-dot hard" title="weight ${w.toFixed(2)}">▲</span>`;
+  return `<span class="wl-dot easy" title="weight ${w.toFixed(2)}">▼</span>`;
+}
+function renderWordList() {
+  const allVocab = gameData[gameId].vocab;
+  const items = document.getElementById('wl-items');
+  items.innerHTML = '';
+  const filtered = allVocab.filter(v => {
+    const known = knownWords.has(`${gameId}:${v.w}`);
+    if (wlFilter === 'known') return known;
+    if (wlFilter === 'active') return !known;
+    return true;
+  });
+  if (filtered.length === 0) {
+    items.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:8px 0">なし</div>';
   } else {
-    const allVocab = gameData[gameId].vocab;
-    keys.forEach(key => {
-      const word = key.slice(gameId.length + 1);
-      const entry = allVocab.find(v => v.w === word);
+    filtered.forEach(v => {
+      const key = `${gameId}:${v.w}`;
+      const known = knownWords.has(key);
       const row = document.createElement('div');
-      row.className = 'known-word-row';
-      row.innerHTML = `<span>${word}</span><small>${entry ? entry.m : ''}</small><button data-key="${key}">✕</button>`;
-      row.querySelector('button').addEventListener('click', () => {
-        knownWords.delete(key);
-        saveProgress(); syncUI(); openKnownModal();
+      row.className = 'wl-row' + (known ? ' wl-known' : '');
+      const readingPart = v.w !== v.r ? `<span class="wl-read">${v.r}</span>` : '';
+      row.innerHTML = `<span class="wl-word">${v.w}</span>${readingPart}${weightDot(key)}<span class="wl-mean">${v.m}</span><button class="wl-btn${known ? ' known' : ''}">${known ? '習得済み' : '習得'}</button>`;
+      row.querySelector('.wl-btn').addEventListener('click', () => {
+        if (knownWords.has(key)) { knownWords.delete(key); } else { knownWords.add(key); }
+        saveProgress(); syncUI(); renderWordList();
       });
-      list.appendChild(row);
+      items.appendChild(row);
     });
   }
-  document.getElementById('known-modal-backdrop').classList.add('open');
+  const total = allVocab.length;
+  const knownCount = [...knownWords].filter(k => k.startsWith(`${gameId}:`)).length;
+  document.getElementById('wl-count').textContent = `学習中 ${total - knownCount} / 習得済み ${knownCount}`;
+  document.getElementById('wl-title').textContent = `単語リスト — ${gameData[gameId].label || gameId}`;
 }
-document.getElementById('known-count').addEventListener('click', openKnownModal);
-document.getElementById('known-modal-close').addEventListener('click', () => {
-  document.getElementById('known-modal-backdrop').classList.remove('open');
+function openWordListModal() {
+  renderWordList();
+  document.getElementById('wl-backdrop').classList.add('open');
+}
+function closeWordListModal() {
+  document.getElementById('wl-backdrop').classList.remove('open');
+}
+document.getElementById('word-list-btn').addEventListener('click', openWordListModal);
+document.getElementById('wl-close').addEventListener('click', closeWordListModal);
+document.getElementById('wl-close2').addEventListener('click', closeWordListModal);
+document.getElementById('wl-backdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('wl-backdrop')) closeWordListModal();
 });
-document.getElementById('known-modal-backdrop').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('known-modal-backdrop'))
-    document.getElementById('known-modal-backdrop').classList.remove('open');
+document.getElementById('wl-reset').addEventListener('click', () => {
+  [...knownWords].filter(k => k.startsWith(`${gameId}:`)).forEach(k => knownWords.delete(k));
+  saveProgress(); syncUI(); renderWordList(); renderQuestion();
 });
-document.getElementById('known-modal-reset').addEventListener('click', () => {
-  const gameKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`));
-  gameKnown.forEach(k => knownWords.delete(k));
-  syncUI(); saveProgress(); renderQuestion();
-  document.getElementById('known-modal-backdrop').classList.remove('open');
-});
-document.getElementById('known-reset-btn').addEventListener('click', () => {
-  const gameKnown = [...knownWords].filter(k => k.startsWith(`${gameId}:`));
-  gameKnown.forEach(k => knownWords.delete(k));
-  syncUI(); saveProgress(); renderQuestion();
+document.querySelectorAll('#wl-filters .ctrl-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    wlFilter = b.dataset.wlf;
+    document.querySelectorAll('#wl-filters .ctrl-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderWordList();
+  });
 });
 
 document.getElementById('theme-btn').addEventListener('click', () => {
