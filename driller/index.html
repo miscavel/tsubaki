@@ -847,12 +847,27 @@ function applyUiLang() {
 
 // ── Persistence ───────────────────────────────────────────────────────────────
 function toB64(str) {
-  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))));
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 function fromB64(b64) {
-  return decodeURIComponent(atob(b64).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
+  const std = b64.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = std + '==='.slice((std.length % 4) || 4);
+  return decodeURIComponent(atob(padded).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
 }
 function encodeState() {
+  // Compact v2: group kw/ww by gameId, integer weights (×10), skip known in ww
+  const kwG = {}, wwG = {};
+  for (const key of knownWords) {
+    const i = key.indexOf(':'); const gid = key.slice(0, i); const w = key.slice(i + 1);
+    (kwG[gid] = kwG[gid] || []).push(w);
+  }
+  for (const [key, weight] of wordWeights) {
+    if (knownWords.has(key)) continue;
+    const i = key.indexOf(':'); const gid = key.slice(0, i); const w = key.slice(i + 1);
+    if (!wwG[gid]) wwG[gid] = {};
+    wwG[gid][w] = Math.round(weight * 10);
+  }
   return toB64(JSON.stringify({
     s: score, t: total, x: streak,
     am: appMode, jm: jlptMode,
@@ -860,8 +875,7 @@ function encodeState() {
     p: priorityOnly ? 1 : 0,
     hr: hideReading ? 1 : 0,
     gi: gameId, gc: gameCategory,
-    kw: [...knownWords],
-    ww: [...wordWeights],
+    kw: kwG, ww: wwG, v: 2,
   }));
 }
 function applyState(st) {
@@ -872,8 +886,18 @@ function applyState(st) {
   priorityOnly = !!st.p; hideReading = !!st.hr;
   gameId = st.gi || 'pokemon';
   gameCategory = st.gc || 'すべて';
-  knownWords = new Set(st.kw || []);
-  wordWeights = new Map(st.ww || []);
+  if (st.v === 2) {
+    knownWords = new Set();
+    for (const [gid, words] of Object.entries(st.kw || {}))
+      words.forEach(w => knownWords.add(`${gid}:${w}`));
+    wordWeights = new Map();
+    for (const [gid, entries] of Object.entries(st.ww || {}))
+      for (const [w, iw] of Object.entries(entries))
+        wordWeights.set(`${gid}:${w}`, iw / 10);
+  } else {
+    knownWords = new Set(st.kw || []);
+    wordWeights = new Map(st.ww || []);
+  }
   syncUI(); updateScore();
 }
 function saveProgress() {
