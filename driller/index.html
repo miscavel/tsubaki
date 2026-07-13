@@ -852,7 +852,7 @@ function toB64(str) {
 }
 function fromB64(b64) {
   const std = b64.replace(/-/g, '+').replace(/_/g, '/');
-  const padded = std + '==='.slice((std.length % 4) || 4);
+  const padded = std + '='.repeat((4 - std.length % 4) % 4);
   return decodeURIComponent(atob(padded).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
 }
 function encodeState() {
