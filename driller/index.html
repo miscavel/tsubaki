@@ -902,7 +902,7 @@ function fromB64(b64) {
   return decodeURIComponent(atob(padded).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
 }
 function encodeState() {
-  // v3: index-based kw/ww — store positions in vocab array instead of kanji strings (~70% smaller)
+  // v4: category-relative indices — adding words in one category never shifts indices in another
   const kwG = {}, wwG = {};
   const eids = new Set();
   for (const k of knownWords) eids.add(k.slice(0, k.indexOf(':')));
@@ -910,21 +910,33 @@ function encodeState() {
   for (const eid of eids) {
     const baseGid = eid.replace(/_imi$|_yomi$/, '');
     const vocabArr = gameData[baseGid]?.vocab || [];
-    const idxMap = new Map(vocabArr.map((v, i) => [v.w, i]));
-    const kwIdxs = [];
+    const wordCat = new Map(vocabArr.map(v => [v.w, v.cat]));
+    const catIdxMap = {}; // cat → Map(word → cat-relative-idx)
+    for (const v of vocabArr) {
+      if (!catIdxMap[v.cat]) catIdxMap[v.cat] = new Map();
+      const m = catIdxMap[v.cat]; m.set(v.w, m.size);
+    }
+    const kwCats = {};
     for (const key of knownWords) {
       if (!key.startsWith(`${eid}:`)) continue;
-      const idx = idxMap.get(key.slice(eid.length + 1));
-      if (idx !== undefined) kwIdxs.push(idx);
+      const w = key.slice(eid.length + 1);
+      const cat = wordCat.get(w); if (!cat) continue;
+      const idx = catIdxMap[cat]?.get(w); if (idx === undefined) continue;
+      (kwCats[cat] = kwCats[cat] || []).push(idx);
     }
-    if (kwIdxs.length) kwG[eid] = kwIdxs.sort((a, b) => a - b);
-    const wwPairs = [];
+    if (Object.keys(kwCats).length) {
+      for (const arr of Object.values(kwCats)) arr.sort((a, b) => a - b);
+      kwG[eid] = kwCats;
+    }
+    const wwCats = {};
     for (const [key, weight] of wordWeights) {
       if (!key.startsWith(`${eid}:`) || knownWords.has(key)) continue;
-      const idx = idxMap.get(key.slice(eid.length + 1));
-      if (idx !== undefined) wwPairs.push([idx, Math.round(weight * 10)]);
+      const w = key.slice(eid.length + 1);
+      const cat = wordCat.get(w); if (!cat) continue;
+      const idx = catIdxMap[cat]?.get(w); if (idx === undefined) continue;
+      (wwCats[cat] = wwCats[cat] || []).push([idx, Math.round(weight * 10)]);
     }
-    if (wwPairs.length) wwG[eid] = wwPairs;
+    if (Object.keys(wwCats).length) wwG[eid] = wwCats;
   }
   return toB64(JSON.stringify({
     s: score, t: total, x: streak,
@@ -934,8 +946,13 @@ function encodeState() {
     hr: hideReading ? 1 : 0,
     gi: gameId, gc: gameCategory,
     gm: gameMode,
-    kw: kwG, ww: wwG, v: 3,
+    kw: kwG, ww: wwG, v: 4,
   }));
+}
+function _buildCatWordArrays(vocabArr) {
+  const m = {};
+  for (const v of vocabArr) (m[v.cat] = m[v.cat] || []).push(v.w);
+  return m;
 }
 function applyState(st) {
   score = st.s || 0; total = st.t || 0; streak = st.x || 0;
@@ -946,22 +963,28 @@ function applyState(st) {
   gameId = st.gi || 'pokemon';
   gameCategory = st.gc || 'すべて';
   gameMode = st.gm || 'vocab';
-  if (st.v === 3) {
-    knownWords = new Set();
-    wordWeights = new Map();
+  if (st.v === 4) {
+    knownWords = new Set(); wordWeights = new Map();
+    for (const [eid, kwCats] of Object.entries(st.kw || {})) {
+      const cwa = _buildCatWordArrays(gameData[eid.replace(/_imi$|_yomi$/, '')]?.vocab || []);
+      for (const [cat, idxArr] of Object.entries(kwCats))
+        for (const idx of idxArr) { const w = cwa[cat]?.[idx]; if (w) knownWords.add(`${eid}:${w}`); }
+    }
+    for (const [eid, wwCats] of Object.entries(st.ww || {})) {
+      const cwa = _buildCatWordArrays(gameData[eid.replace(/_imi$|_yomi$/, '')]?.vocab || []);
+      for (const [cat, pairs] of Object.entries(wwCats))
+        for (const [idx, iw] of pairs) { const w = cwa[cat]?.[idx]; if (w) wordWeights.set(`${eid}:${w}`, iw / 10); }
+    }
+  } else if (st.v === 3) {
+    // v3 used absolute indices — kept for backward compat but fragile (see v4)
+    knownWords = new Set(); wordWeights = new Map();
     for (const [eid, idxArr] of Object.entries(st.kw || {})) {
-      const baseGid = eid.replace(/_imi$|_yomi$/, '');
-      const vocabArr = gameData[baseGid]?.vocab || [];
-      for (const idx of idxArr) {
-        if (vocabArr[idx]) knownWords.add(`${eid}:${vocabArr[idx].w}`);
-      }
+      const va = gameData[eid.replace(/_imi$|_yomi$/, '')]?.vocab || [];
+      for (const idx of idxArr) { if (va[idx]) knownWords.add(`${eid}:${va[idx].w}`); }
     }
     for (const [eid, pairs] of Object.entries(st.ww || {})) {
-      const baseGid = eid.replace(/_imi$|_yomi$/, '');
-      const vocabArr = gameData[baseGid]?.vocab || [];
-      for (const [idx, iw] of pairs) {
-        if (vocabArr[idx]) wordWeights.set(`${eid}:${vocabArr[idx].w}`, iw / 10);
-      }
+      const va = gameData[eid.replace(/_imi$|_yomi$/, '')]?.vocab || [];
+      for (const [idx, iw] of pairs) { if (va[idx]) wordWeights.set(`${eid}:${va[idx].w}`, iw / 10); }
     }
   } else if (st.v === 2) {
     knownWords = new Set();
