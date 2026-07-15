@@ -361,6 +361,12 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
 .wl-btn { flex-shrink: 0; font-size: 0.72rem; padding: 3px 7px; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--text-muted); cursor: pointer; }
 .wl-btn:hover { border-color: var(--accent); color: var(--accent); }
 .wl-btn.known { background: var(--accent); border-color: var(--accent); color: #fff; }
+#wl-search {
+  width: 100%; padding: 7px 10px; border-radius: 7px;
+  border: 1.5px solid var(--border); background: var(--bg);
+  color: var(--text); font-size: 0.85rem; outline: none;
+}
+#wl-search:focus { border-color: var(--accent); }
 #wl-footer { display: flex; align-items: center; gap: 8px; }
 #wl-count { flex: 1; font-size: 0.8rem; color: var(--text-muted); }
 
@@ -509,6 +515,7 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
       <button class="ctrl-btn" data-wlf="active">学習中</button>
       <button class="ctrl-btn" data-wlf="known">習得済み</button>
     </div>
+    <input id="wl-search" type="text" placeholder="検索… 漢字・読み・意味" autocomplete="off">
     <div id="wl-items"></div>
     <div id="wl-footer">
       <span id="wl-count"></span>
@@ -1064,6 +1071,7 @@ document.querySelectorAll('[data-gm]').forEach(b => {
 
 // ── Word-list modal ───────────────────────────────────────────────────────────
 let wlFilter = 'all';
+let wlSearch = '';
 function weightDot(key) {
   const w = wordWeights.get(key);
   if (!w || (w >= 0.7 && w <= 1.3)) return '';
@@ -1075,10 +1083,12 @@ function renderWordList() {
   const allVocab = gameData[gameId].vocab;
   const items = document.getElementById('wl-items');
   items.innerHTML = '';
+  const q = wlSearch.trim().toLowerCase();
   const filtered = allVocab.filter(v => {
     const known = knownWords.has(`${eid}:${v.w}`);
-    if (wlFilter === 'known') return known;
-    if (wlFilter === 'active') return !known;
+    if (wlFilter === 'known' && !known) return false;
+    if (wlFilter === 'active' && known) return false;
+    if (q) return v.w.includes(q) || v.r.includes(q) || v.m.toLowerCase().includes(q);
     return true;
   });
   if (filtered.length === 0) {
@@ -1105,8 +1115,11 @@ function renderWordList() {
   document.getElementById('wl-title').textContent = `単語リスト — ${gameData[gameId].label} (${modeName})`;
 }
 function openWordListModal() {
+  wlSearch = '';
+  document.getElementById('wl-search').value = '';
   renderWordList();
   document.getElementById('wl-backdrop').classList.add('open');
+  document.getElementById('wl-search').focus();
 }
 function closeWordListModal() {
   document.getElementById('wl-backdrop').classList.remove('open');
@@ -1121,6 +1134,10 @@ document.getElementById('wl-reset').addEventListener('click', () => {
   const eid = effectiveGid();
   [...knownWords].filter(k => k.startsWith(`${eid}:`)).forEach(k => knownWords.delete(k));
   saveProgress(); syncUI(); renderWordList(); renderQuestion();
+});
+document.getElementById('wl-search').addEventListener('input', e => {
+  wlSearch = e.target.value;
+  renderWordList();
 });
 document.querySelectorAll('#wl-filters .ctrl-btn').forEach(b => {
   b.addEventListener('click', () => {
