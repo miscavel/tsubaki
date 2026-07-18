@@ -226,6 +226,16 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
   font-size: 0.9rem;
   padding: 20px;
 }
+.example-block {
+  margin-top: 10px;
+  padding: 7px 11px;
+  background: var(--surface2);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+}
+.example-block .ex-lbl { font-size: 0.68rem; color: var(--accent); font-weight: 700; letter-spacing: 0.05em; }
+.example-block .ex-s { color: var(--text); font-size: 0.88rem; margin-top: 2px; line-height: 1.5; }
+.example-block .ex-r { color: var(--text-muted); font-size: 0.75rem; }
 
 /* ── Choices ───────────────────────────────────────────────── */
 .choices {
@@ -634,6 +644,12 @@ function genGrammarQuestion() {
   const choices = item.c.slice().sort(() => Math.random() - 0.5);
   return { type: 'grammar', sentence: item.s, reading: item.r || '', translation: item.t || '', answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv, prio: !!item.pr };
 }
+function getSentencesForWord(word) {
+  return (gameData[gameId]?.sentences || []).filter(s => s.s.includes(word));
+}
+function getWordsInSentence(sentence) {
+  return (gameData[gameId]?.vocab || []).filter(v => sentence.includes(v.w));
+}
 function genGameQuestion() {
   if (gameMode === 'sentence') {
     const pool = gameData[gameId].sentences;
@@ -666,7 +682,10 @@ function genGameQuestion() {
   }
   const wrong = wrongSrc.sort(() => Math.random() - 0.5).slice(0, 3).map(v => v.m);
   const choices = [item.m, ...wrong].sort(() => Math.random() - 0.5);
-  return { type: 'game', word: item.w, reading: item.r, answer: item.m, choices, cat: item.cat };
+  const wordSents = getSentencesForWord(item.w);
+  const exampleSent = (wordSents.length > 0 && Math.random() < 0.6)
+    ? wordSents[Math.floor(Math.random() * wordSents.length)] : null;
+  return { type: 'game', word: item.w, reading: item.r, answer: item.m, choices, cat: item.cat, exampleSent };
 }
 function genQuestion() {
   if (appMode === 'game') return genGameQuestion();
@@ -752,13 +771,20 @@ function renderQuestion() {
     const wordHtml = useRuby
       ? `<ruby id="reading-display"${hideReading ? ' class="hidden-reading"' : ''}>${q.word}<rt>${q.reading}</rt></ruby>`
       : q.word;
+    const exHtml = q.exampleSent ? `
+      <div class="example-block">
+        <div class="ex-lbl">例文</div>
+        <div class="ex-s">${q.exampleSent.s}</div>
+        <div class="ex-r ${hideReading ? 'hidden-reading' : ''}">${q.exampleSent.r}</div>
+      </div>` : '';
     card.innerHTML = `
       <div class="badges">
         <span class="badge game-lbl">${gameData[gameId].label}</span>
         <span class="badge cat">${q.cat}</span>
       </div>
       <div class="word">${wordHtml}</div>
-      ${showFallbackR ? `<div class="${rcGame}" id="reading-display">${q.reading}</div>` : ''}`;
+      ${showFallbackR ? `<div class="${rcGame}" id="reading-display">${q.reading}</div>` : ''}
+      ${exHtml}`;
   }
 
   const choicesDiv = document.getElementById('choices');
@@ -793,7 +819,7 @@ function choose(choice) {
   }
 
   if (hideReading) {
-    document.getElementById('reading-display')?.classList.remove('hidden-reading');
+    document.querySelectorAll('.hidden-reading').forEach(el => el.classList.remove('hidden-reading'));
   }
 
   document.querySelectorAll('.choice').forEach(btn => {
@@ -805,7 +831,8 @@ function choose(choice) {
   if (current.type === 'vocab') {
     const detail = `${current.word}【${current.reading}】= ${current.answer}`;
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
-    fb.textContent = correct ? `✓ Correct! ${detail}` : `✗ Wrong. ${detail}`;
+    const sentFb = current.exampleSent ? `<br><small style="opacity:0.7">${current.exampleSent.a}</small>` : '';
+    fb.innerHTML = `${correct ? '✓ Correct! ' : '✗ Wrong. '}${detail}${sentFb}`;
   } else if (current.type === 'grammar') {
     const filled = current.sentence.replace('（　）', `「${current.answer}」`);
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
@@ -815,7 +842,28 @@ function choose(choice) {
     fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.explanation}</small>`;
   } else if (current.type === 'game-sentence') {
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
-    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.reading}</small>`;
+    const assocWords = getWordsInSentence(current.sentence);
+    const eids = [gameId, `${gameId}_imi`, `${gameId}_yomi`];
+    const wordBtns = assocWords.map(v => {
+      const known = eids.some(eid => knownWords.has(`${eid}:${v.w}`));
+      return `<button class="ctrl-btn sent-word-btn${known ? ' active' : ''}" data-word="${v.w}" style="font-size:0.75em;padding:3px 7px">${v.w}${known ? ' ✓' : ''}</button>`;
+    }).join('');
+    const wordsRow = assocWords.length ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><span style="font-size:0.72rem;color:var(--text-muted)">習得:</span>${wordBtns}</div>` : '';
+    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.reading}</small>${wordsRow}`;
+    fb.querySelectorAll('.sent-word-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const w = btn.dataset.word;
+        const anyKnown = eids.some(eid => knownWords.has(`${eid}:${w}`));
+        eids.forEach(eid => {
+          const k = `${eid}:${w}`;
+          if (anyKnown) knownWords.delete(k); else knownWords.add(k);
+        });
+        const nowKnown = eids.some(eid => knownWords.has(`${eid}:${w}`));
+        btn.textContent = w + (nowKnown ? ' ✓' : '');
+        btn.classList.toggle('active', nowKnown);
+        saveProgress(); syncUI();
+      });
+    });
   } else {
     // handles 'game', 'game-imi', 'game-yomi'
     const eid = effectiveGid();
@@ -835,7 +883,8 @@ function choose(choice) {
     }
     const isKnown = knownWords.has(key);
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
-    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'} ${detail}<br><button class="ctrl-btn" id="mastered-btn" style="margin-top:6px;font-size:0.8em">${isKnown ? '✓ 習得済み（取消）' : '習得'}</button>`;
+    const exFb = (current.type === 'game' && current.exampleSent) ? `<br><small style="opacity:0.7">${current.exampleSent.a}</small>` : '';
+    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'} ${detail}${exFb}<br><button class="ctrl-btn" id="mastered-btn" style="margin-top:6px;font-size:0.8em">${isKnown ? '✓ 習得済み（取消）' : '習得'}</button>`;
     document.getElementById('mastered-btn').addEventListener('click', () => {
       if (knownWords.has(key)) { knownWords.delete(key); } else { knownWords.add(key); }
       const btn = document.getElementById('mastered-btn');
