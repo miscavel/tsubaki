@@ -480,6 +480,7 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
       <button class="app-tab active" id="tab-jlpt">JLPT</button>
       <button class="app-tab" id="tab-game">ゲーム</button>
     </div>
+    <button class="util-btn" id="reward-toggle-btn" title="アート報酬のオン/オフ">🎨</button>
     <button class="util-btn" id="theme-btn">☀</button>
     <button class="util-btn" id="lang-btn">EN</button>
   </div>
@@ -538,6 +539,7 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
   <div class="status-bar">
     <span id="score-display">0 / 0</span>
     <span id="streak-display"></span>
+    <span id="reward-counter" style="font-size:0.8rem;opacity:0.7"></span>
     <div class="spacer"></div>
     <button class="icon-btn" id="save-btn">💾 セーブ</button>
     <button class="icon-btn" id="next-btn">→ 次へ</button>
@@ -977,10 +979,12 @@ function choose(choice) {
   updateScore();
   saveProgress();
 
-  if (correct) {
+  if (correct && rewardEnabled) {
     rewardCorrectCount++;
+    updateScore();
     if (rewardCorrectCount >= REWARD_THRESHOLD) {
       rewardCorrectCount = 0;
+      updateScore();
       setTimeout(showReward, 400);
     }
   }
@@ -1000,41 +1004,47 @@ async function showReward() {
   link.textContent = 'Pixiv で見る →';
   backdrop.classList.add('open');
 
-  const tags = 'pokemon rating:g -comic -monochrome';
-  const page = Math.floor(Math.random() * 10) + 1;
+  // Gelbooru via corsproxy.io — bypasses CORS for local file:// origins
+  const tags = 'pokemon rating:safe -comic -monochrome -text_focus';
+  const page = Math.floor(Math.random() * 15) + 1;
 
-  // Try Gelbooru first (same art as Pixiv, public CDN)
   try {
-    const gbUrl = `https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20&tags=${encodeURIComponent(tags)}&pid=${page}`;
-    const r = await fetch(gbUrl);
+    const gbApiUrl = `https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=30&tags=${encodeURIComponent(tags)}&pid=${page}`;
+    const r = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(gbApiUrl)}`);
     const data = await r.json();
-    const posts = data?.post || data;
-    const post = Array.isArray(posts) && posts.length ? posts[Math.floor(Math.random() * posts.length)] : null;
-    if (post?.file_url) {
+    const posts = Array.isArray(data) ? data : (data?.post ?? []);
+    const valid = posts.filter(p => p.file_url && /\.(jpg|jpeg|png|webp)$/i.test(p.file_url));
+    const post = valid.length ? valid[Math.floor(Math.random() * valid.length)] : null;
+    if (post) {
       img.src = post.file_url;
       img.className = '';
       img.alt = 'Artwork';
       const srcUrl = post.source || '';
-      const pxMatch = srcUrl.match(/pixiv\.net\/.*?(\d{6,})/);
+      const pxMatch = srcUrl.match(/pixiv\.net\/(?:artworks\/|.*?illust_id=)(\d{6,})/);
       if (pxMatch) {
         link.href = `https://www.pixiv.net/artworks/${pxMatch[1]}`;
         link.textContent = 'Pixiv で見る →';
+      } else if (srcUrl.startsWith('http')) {
+        link.href = srcUrl;
+        link.textContent = 'ソースを見る →';
       } else {
         link.href = `https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`;
         link.textContent = 'Gelbooru で見る →';
       }
-      meta.textContent = post.tags ? post.tags.split(' ').slice(0, 6).join(' · ') : '';
+      const tagPeek = (post.tags || '').split(' ').filter(t => !t.match(/^(rating|score|user|md5|source|id):/)).slice(0, 5).join(' · ');
+      meta.textContent = tagPeek;
       return;
     }
-  } catch (_) { /* fall through */ }
+  } catch (_) { /* fall through to Danbooru */ }
 
-  // Fallback: Danbooru (CORS-enabled, high quality, often links Pixiv)
+  // Danbooru fallback (has real CORS headers)
   try {
-    const dbUrl = `https://danbooru.donmai.us/posts.json?tags=${encodeURIComponent(tags)}&limit=20&page=${page}`;
+    const dbUrl = `https://danbooru.donmai.us/posts.json?tags=${encodeURIComponent('pokemon rating:g -comic -monochrome')}&limit=20&page=${page}`;
     const r = await fetch(dbUrl);
     const posts = await r.json();
-    const post = Array.isArray(posts) && posts.length ? posts[Math.floor(Math.random() * posts.length)] : null;
-    if (post && (post.large_file_url || post.file_url)) {
+    const valid = Array.isArray(posts) ? posts.filter(p => p.large_file_url || p.file_url) : [];
+    const post = valid.length ? valid[Math.floor(Math.random() * valid.length)] : null;
+    if (post) {
       img.src = post.large_file_url || post.file_url;
       img.className = '';
       img.alt = 'Artwork';
@@ -1045,12 +1055,11 @@ async function showReward() {
         link.href = `https://danbooru.donmai.us/posts/${post.id}`;
         link.textContent = 'Danbooru で見る →';
       }
-      meta.textContent = (post.tag_string_copyright || '') + (post.tag_string_character ? ' · ' + post.tag_string_character : '');
+      meta.textContent = [post.tag_string_copyright, post.tag_string_character].filter(Boolean).join(' · ');
       return;
     }
   } catch (_) { /* fall through */ }
 
-  // Final fallback: just link to Pixiv search
   img.alt = 'アートを読み込めませんでした';
   img.className = '';
   meta.textContent = 'ネット接続を確認してください';
@@ -1107,6 +1116,16 @@ function renderCatButtons() {
 function updateScore() {
   document.getElementById('score-display').textContent = `${score} / ${total}`;
   document.getElementById('streak-display').textContent = streak >= 3 ? `🔥 ${streak}` : '';
+  const rc = document.getElementById('reward-counter');
+  rc.textContent = rewardEnabled ? `🎨 ${rewardCorrectCount}/${REWARD_THRESHOLD}` : '';
+}
+
+function syncRewardUI() {
+  const btn = document.getElementById('reward-toggle-btn');
+  btn.style.opacity = rewardEnabled ? '1' : '0.35';
+  btn.title = rewardEnabled ? 'アート報酬 ON（クリックでOFF）' : 'アート報酬 OFF（クリックでON）';
+  const rc = document.getElementById('reward-counter');
+  rc.textContent = rewardEnabled ? `🎨 ${rewardCorrectCount}/${REWARD_THRESHOLD}` : '';
 }
 
 // ── Theme & language ──────────────────────────────────────────────────────────
@@ -1312,6 +1331,7 @@ let wlSearch = '';
 let wlListMode = 'vocab'; // 'vocab' | 'sentence'
 let rewardCorrectCount = 0;
 const REWARD_THRESHOLD = 5;
+let rewardEnabled = true;
 function weightDot(key) {
   const w = wordWeights.get(key);
   if (!w || (w >= 0.7 && w <= 1.3)) return '';
@@ -1456,6 +1476,12 @@ document.getElementById('reward-backdrop').addEventListener('click', e => {
   if (e.target === document.getElementById('reward-backdrop'))
     document.getElementById('reward-backdrop').classList.remove('open');
 });
+document.getElementById('reward-toggle-btn').addEventListener('click', () => {
+  rewardEnabled = !rewardEnabled;
+  if (!rewardEnabled) rewardCorrectCount = 0;
+  try { localStorage.setItem('tsubaki_reward', rewardEnabled ? '1' : '0'); } catch(e) {}
+  syncRewardUI();
+});
 
 document.getElementById('theme-btn').addEventListener('click', () => {
   theme = theme === 'dark' ? 'light' : 'dark';
@@ -1513,7 +1539,10 @@ document.addEventListener('keydown', e => {
 // ── Init ──────────────────────────────────────────────────────────────────────
 try { theme  = localStorage.getItem('tsubaki_theme') || 'dark'; } catch(e) {}
 try { uiLang = localStorage.getItem('tsubaki_lang')  || 'ja';   } catch(e) {}
+try { rewardEnabled = localStorage.getItem('tsubaki_reward') !== '0'; } catch(e) {}
+
 applyTheme();
+syncRewardUI();
 loadProgress();
 const _urlS = new URLSearchParams(location.search).get('s');
 if (_urlS) {
