@@ -674,16 +674,23 @@ function genGameQuestion() {
   if (gameMode === 'imi' || gameMode === 'yomi') {
     const distractors = wrongSrc.sort(() => Math.random() - 0.5).slice(0, 3);
     const choices = [...distractors.map(v => v.w), item.w].sort(() => Math.random() - 0.5);
+    const imiSents = getSentencesForWord(item.w);
+    const rawSent = imiSents.length > 0 ? imiSents[Math.floor(Math.random() * imiSents.length)] : null;
+    const exampleSent = rawSent ? {
+      ...rawSent,
+      masked:  rawSent.s.split(item.w).join('＿＿＿'),
+      maskedR: rawSent.r.split(item.r).join('＿＿＿'),
+    } : null;
     return {
       type: gameMode === 'imi' ? 'game-imi' : 'game-yomi',
       question: gameMode === 'imi' ? item.m : item.r,
-      choices, word: item.w, reading: item.r, answer: item.w, meaning: item.m, cat: item.cat,
+      choices, word: item.w, reading: item.r, answer: item.w, meaning: item.m, cat: item.cat, exampleSent,
     };
   }
   const wrong = wrongSrc.sort(() => Math.random() - 0.5).slice(0, 3).map(v => v.m);
   const choices = [item.m, ...wrong].sort(() => Math.random() - 0.5);
   const wordSents = getSentencesForWord(item.w);
-  const exampleSent = (wordSents.length > 0 && Math.random() < 0.6)
+  const exampleSent = wordSents.length > 0
     ? wordSents[Math.floor(Math.random() * wordSents.length)] : null;
   return { type: 'game', word: item.w, reading: item.r, answer: item.m, choices, cat: item.cat, exampleSent };
 }
@@ -748,12 +755,19 @@ function renderQuestion() {
   } else if (q.type === 'game-imi' || q.type === 'game-yomi') {
     const modeLabel = q.type === 'game-imi' ? '意味→漢字' : '読み→漢字';
     const qClass = q.type === 'game-imi' ? 'sentence' : 'word';
+    const exHtmlIM = q.exampleSent ? `
+      <div class="example-block">
+        <div class="ex-lbl">例文</div>
+        <div class="ex-s">${q.exampleSent.masked}</div>
+        <div class="ex-r ${hideReading ? 'hidden-reading' : ''}">${q.exampleSent.maskedR}</div>
+      </div>` : '';
     card.innerHTML = `
       <div class="badges">
         <span class="badge game-lbl">${gameData[gameId].label}</span>
         <span class="badge cat">${modeLabel}</span>
       </div>
-      <div class="${qClass}">${q.question}</div>`;
+      <div class="${qClass}">${q.question}</div>
+      ${exHtmlIM}`;
   } else if (q.type === 'game-sentence') {
     const rcSent = hideReading ? 'reading hidden-reading' : 'reading';
     card.innerHTML = `
@@ -883,7 +897,7 @@ function choose(choice) {
     }
     const isKnown = knownWords.has(key);
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
-    const exFb = (current.type === 'game' && current.exampleSent) ? `<br><small style="opacity:0.7">${current.exampleSent.a}</small>` : '';
+    const exFb = current.exampleSent ? `<br><small style="opacity:0.7">${current.exampleSent.a}</small>` : '';
     fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'} ${detail}${exFb}<br><button class="ctrl-btn" id="mastered-btn" style="margin-top:6px;font-size:0.8em">${isKnown ? '✓ 習得済み（取消）' : '習得'}</button>`;
     document.getElementById('mastered-btn').addEventListener('click', () => {
       if (knownWords.has(key)) { knownWords.delete(key); } else { knownWords.add(key); }
@@ -1186,17 +1200,18 @@ function renderWordList() {
   }
 
   // vocab list
-  const readOnly = gameMode === 'sentence';
-  filtersEl.style.display = readOnly ? 'none' : '';
-  resetEl.style.display = readOnly ? 'none' : '';
+  const sentMode = gameMode === 'sentence';
+  const allEids = [gameId, `${gameId}_imi`, `${gameId}_yomi`];
+  filtersEl.style.display = '';
+  resetEl.style.display = sentMode ? 'none' : '';
   const eid = effectiveGid();
   const allVocab = gameData[gameId].vocab;
   const filtered = allVocab.filter(v => {
-    const known = knownWords.has(`${eid}:${v.w}`);
-    if (!readOnly) {
-      if (wlFilter === 'known' && !known) return false;
-      if (wlFilter === 'active' && known) return false;
-    }
+    const known = sentMode
+      ? allEids.some(e => knownWords.has(`${e}:${v.w}`))
+      : knownWords.has(`${eid}:${v.w}`);
+    if (wlFilter === 'known' && !known) return false;
+    if (wlFilter === 'active' && known) return false;
     if (q) return v.w.includes(q) || v.r.includes(q) || v.m.toLowerCase().includes(q);
     return true;
   });
@@ -1205,12 +1220,22 @@ function renderWordList() {
   } else {
     filtered.forEach(v => {
       const key = `${eid}:${v.w}`;
-      const known = knownWords.has(key);
+      const known = sentMode
+        ? allEids.some(e => knownWords.has(`${e}:${v.w}`))
+        : knownWords.has(key);
       const row = document.createElement('div');
-      row.className = 'wl-row' + (known && !readOnly ? ' wl-known' : '');
+      row.className = 'wl-row' + (known ? ' wl-known' : '');
       const readingPart = v.w !== v.r ? `<span class="wl-read">${v.r}</span>` : '';
-      if (readOnly) {
-        row.innerHTML = `<span class="wl-word">${v.w}</span>${readingPart}<span class="wl-mean">${v.m}</span>`;
+      if (sentMode) {
+        row.innerHTML = `<span class="wl-word">${v.w}</span>${readingPart}<span class="wl-mean">${v.m}</span><button class="wl-btn${known ? ' known' : ''}">${known ? '習得済み' : '習得'}</button>`;
+        row.querySelector('.wl-btn').addEventListener('click', () => {
+          const anyKnown = allEids.some(e => knownWords.has(`${e}:${v.w}`));
+          allEids.forEach(e => {
+            const k = `${e}:${v.w}`;
+            if (anyKnown) knownWords.delete(k); else knownWords.add(k);
+          });
+          saveProgress(); syncUI(); renderWordList();
+        });
       } else {
         row.innerHTML = `<span class="wl-word">${v.w}</span>${readingPart}${weightDot(key)}<span class="wl-mean">${v.m}</span><button class="wl-btn${known ? ' known' : ''}">${known ? '習得済み' : '習得'}</button>`;
         row.querySelector('.wl-btn').addEventListener('click', () => {
@@ -1222,9 +1247,10 @@ function renderWordList() {
     });
   }
   const total = allVocab.length;
-  if (readOnly) {
-    document.getElementById('wl-title').textContent = `単語リスト — ${gameData[gameId].label}`;
-    document.getElementById('wl-count').textContent = `${total} 単語`;
+  if (sentMode) {
+    const knownCount = allVocab.filter(v => allEids.some(e => knownWords.has(`${e}:${v.w}`))).length;
+    document.getElementById('wl-count').textContent = `学習中 ${total - knownCount} / 習得済み ${knownCount}`;
+    document.getElementById('wl-title').textContent = `単語リスト — ${gameData[gameId].label} (全モード)`;
   } else {
     const knownCount = [...knownWords].filter(k => k.startsWith(`${eid}:`)).length;
     document.getElementById('wl-count').textContent = `学習中 ${total - knownCount} / 習得済み ${knownCount}`;
