@@ -877,7 +877,7 @@ function syncUI() {
     : `単語リスト (${_gTotal - _gKnown}/${_gTotal})`;
   const _sentences = gameData[gameId]?.sentences || [];
   const sentBtn = document.getElementById('sentence-list-btn');
-  sentBtn.style.display = _sentences.length > 0 ? '' : 'none';
+  sentBtn.style.display = (_sentences.length > 0 && gameMode === 'sentence') ? '' : 'none';
   sentBtn.textContent = `文章 (${_sentences.length})`;
 }
 
