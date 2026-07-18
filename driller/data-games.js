@@ -811,7 +811,7 @@ const gameData = {
       {w:'体当たり',r:'たいあたり',m:'Tackle — throw oneself bodily at the target',cat:'わざ'},
       {w:'睨みつける',r:'にらみつける',m:'Leer — glare hard at the target to lower its Defense',cat:'わざ'},
       {w:'蔓の鞭',r:'つるのむち',m:'Vine Whip — whip the target with slender vines',cat:'わざ'},
-      {w:'引っかく',r:'ひっかく',m:'Scratch — scratch the target with sharp claws',cat:'わざ'},
+      {w:'引っ掻く',r:'ひっかく',m:'Scratch — scratch the target with sharp claws',cat:'わざ'},
       {w:'巻きつく',r:'まきつく',m:'Wrap — coil around and squeeze the target for multiple turns',cat:'わざ'},
     ],
   },
