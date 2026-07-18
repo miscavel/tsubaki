@@ -1331,7 +1331,7 @@ let wlSearch = '';
 let wlListMode = 'vocab'; // 'vocab' | 'sentence'
 let rewardCorrectCount = 0;
 const REWARD_THRESHOLD = 5;
-let rewardEnabled = true;
+let rewardEnabled = false;
 function weightDot(key) {
   const w = wordWeights.get(key);
   if (!w || (w >= 0.7 && w <= 1.3)) return '';
@@ -1539,7 +1539,7 @@ document.addEventListener('keydown', e => {
 // ── Init ──────────────────────────────────────────────────────────────────────
 try { theme  = localStorage.getItem('tsubaki_theme') || 'dark'; } catch(e) {}
 try { uiLang = localStorage.getItem('tsubaki_lang')  || 'ja';   } catch(e) {}
-try { rewardEnabled = localStorage.getItem('tsubaki_reward') !== '0'; } catch(e) {}
+try { rewardEnabled = localStorage.getItem('tsubaki_reward') === '1'; } catch(e) {}
 
 applyTheme();
 syncRewardUI();
