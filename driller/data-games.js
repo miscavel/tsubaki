@@ -974,6 +974,13 @@ const gameData = {
       {s:'勝手に人の物を荒らしてはいけない。',r:'かってにひとのものをあらしてはいけない。',a:'You must not recklessly mess with other people\'s things.'},
       {s:'異常な状態のポケモンは効果が発揮できない。',r:'いじょうなじょうたいのポケモンはこうかがはっきできない。',a:'A Pokémon in an abnormal status cannot demonstrate its full effectiveness.'},
       {s:'従うことと信じることは違う。',r:'したがうこととしんじることはちがう。',a:'Following and believing are different things.'},
+      {s:'この道を通ると洞窟への近道になる。',r:'このみちをとおるとどうくつへのちかみちになる。',a:'If you take this road, it becomes a shortcut to the cave.'},
+      {s:'前に進むと野生のポケモンが現れる。',r:'まえにすすむとやせいのポケモンがあらわれる。',a:'If you advance forward, wild Pokémon will appear.'},
+      {s:'ポケモンが動くと相手の注意を引ける。',r:'ポケモンがうごくとあいてのちゅういをひける。',a:'When a Pokémon moves, it can draw the opponent\'s attention.'},
+      {s:'実際に試すと効果がよく分かる。',r:'じっさいにためすとこうかがよくわかる。',a:'When you actually try it, you can clearly understand the effect.'},
+      {s:'直接話すことで誤解が解ける。',r:'ちょくせつはなすことでごかいがとける。',a:'By speaking directly, misunderstandings can be resolved.'},
+      {s:'ダメージを受けると体力が減る。',r:'ダメージをうけるとたいりょくがへる。',a:'When you receive damage, your HP decreases.'},
+      {s:'新しいアイデアを取り入れると上手くいくことがある。',r:'あたらしいアイデアをとりいれるとうまくいくことがある。',a:'When you incorporate new ideas, things sometimes go well.'},
     ],
   },
 

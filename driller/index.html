@@ -423,6 +423,52 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
   .word { font-size: 1.9rem; }
   .choices { grid-template-columns: 1fr; }
 }
+
+/* ── Reward modal ─────────────────────────────────────────────────────────── */
+#reward-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 300;
+  align-items: center; justify-content: center;
+}
+#reward-backdrop.open { display: flex; }
+#reward-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  max-width: min(420px, 94vw);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 90vh;
+}
+#reward-art {
+  width: 100%; border-radius: 8px;
+  object-fit: contain;
+  max-height: 55vh;
+  background: var(--surface2);
+  display: block;
+}
+#reward-art.loading { min-height: 160px; }
+#reward-header {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 1rem; font-weight: 700; color: var(--accent);
+}
+#reward-meta {
+  font-size: 0.75rem; color: var(--text-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#reward-footer { display: flex; gap: 8px; justify-content: flex-end; }
+#reward-source-link {
+  font-size: 0.8rem; color: var(--accent);
+  text-decoration: none; padding: 5px 10px;
+  border: 1px solid var(--accent); border-radius: 6px;
+  white-space: nowrap;
+}
+#reward-source-link:hover { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -512,6 +558,19 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
     </div>
   </div>
 
+</div>
+
+<!-- Reward modal -->
+<div id="reward-backdrop">
+  <div id="reward-modal">
+    <div id="reward-header">🎨 5問正解！お疲れ様！</div>
+    <img id="reward-art" class="loading" alt="Loading artwork…">
+    <div id="reward-meta"></div>
+    <div id="reward-footer">
+      <a id="reward-source-link" href="#" target="_blank" rel="noopener">Pixiv で見る →</a>
+      <button class="ctrl-btn active" id="reward-close">続ける</button>
+    </div>
+  </div>
 </div>
 
 <!-- Word-list modal (outside #app so position:fixed is unambiguous) -->
@@ -645,7 +704,15 @@ function genGrammarQuestion() {
   return { type: 'grammar', sentence: item.s, reading: item.r || '', translation: item.t || '', answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv, prio: !!item.pr };
 }
 function getSentencesForWord(word) {
-  return (gameData[gameId]?.sentences || []).filter(s => s.s.includes(word));
+  const pool = gameData[gameId]?.sentences || [];
+  const exact = pool.filter(s => s.s.includes(word));
+  if (exact.length > 0) return exact;
+  // Fallback: match on stem (word minus trailing hiragana) if stem is ≥2 chars and contains kanji
+  if (/[ぁ-ん]$/.test(word)) {
+    const stem = word.slice(0, -1);
+    if (stem.length >= 2 && /[一-鿿]/.test(stem)) return pool.filter(s => s.s.includes(stem));
+  }
+  return [];
 }
 function getWordsInSentence(sentence) {
   return (gameData[gameId]?.vocab || []).filter(v => sentence.includes(v.w));
@@ -909,6 +976,84 @@ function choose(choice) {
 
   updateScore();
   saveProgress();
+
+  if (correct) {
+    rewardCorrectCount++;
+    if (rewardCorrectCount >= REWARD_THRESHOLD) {
+      rewardCorrectCount = 0;
+      setTimeout(showReward, 400);
+    }
+  }
+}
+
+async function showReward() {
+  const backdrop = document.getElementById('reward-backdrop');
+  const img = document.getElementById('reward-art');
+  const meta = document.getElementById('reward-meta');
+  const link = document.getElementById('reward-source-link');
+
+  img.src = '';
+  img.className = 'loading';
+  img.alt = '読み込み中…';
+  meta.textContent = '';
+  link.href = 'https://www.pixiv.net/tags/ポケモン/artworks?order=popular_d';
+  link.textContent = 'Pixiv で見る →';
+  backdrop.classList.add('open');
+
+  const tags = 'pokemon rating:g -comic -monochrome';
+  const page = Math.floor(Math.random() * 10) + 1;
+
+  // Try Gelbooru first (same art as Pixiv, public CDN)
+  try {
+    const gbUrl = `https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20&tags=${encodeURIComponent(tags)}&pid=${page}`;
+    const r = await fetch(gbUrl);
+    const data = await r.json();
+    const posts = data?.post || data;
+    const post = Array.isArray(posts) && posts.length ? posts[Math.floor(Math.random() * posts.length)] : null;
+    if (post?.file_url) {
+      img.src = post.file_url;
+      img.className = '';
+      img.alt = 'Artwork';
+      const srcUrl = post.source || '';
+      const pxMatch = srcUrl.match(/pixiv\.net\/.*?(\d{6,})/);
+      if (pxMatch) {
+        link.href = `https://www.pixiv.net/artworks/${pxMatch[1]}`;
+        link.textContent = 'Pixiv で見る →';
+      } else {
+        link.href = `https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`;
+        link.textContent = 'Gelbooru で見る →';
+      }
+      meta.textContent = post.tags ? post.tags.split(' ').slice(0, 6).join(' · ') : '';
+      return;
+    }
+  } catch (_) { /* fall through */ }
+
+  // Fallback: Danbooru (CORS-enabled, high quality, often links Pixiv)
+  try {
+    const dbUrl = `https://danbooru.donmai.us/posts.json?tags=${encodeURIComponent(tags)}&limit=20&page=${page}`;
+    const r = await fetch(dbUrl);
+    const posts = await r.json();
+    const post = Array.isArray(posts) && posts.length ? posts[Math.floor(Math.random() * posts.length)] : null;
+    if (post && (post.large_file_url || post.file_url)) {
+      img.src = post.large_file_url || post.file_url;
+      img.className = '';
+      img.alt = 'Artwork';
+      if (post.pixiv_id) {
+        link.href = `https://www.pixiv.net/artworks/${post.pixiv_id}`;
+        link.textContent = 'Pixiv で見る →';
+      } else {
+        link.href = `https://danbooru.donmai.us/posts/${post.id}`;
+        link.textContent = 'Danbooru で見る →';
+      }
+      meta.textContent = (post.tag_string_copyright || '') + (post.tag_string_character ? ' · ' + post.tag_string_character : '');
+      return;
+    }
+  } catch (_) { /* fall through */ }
+
+  // Final fallback: just link to Pixiv search
+  img.alt = 'アートを読み込めませんでした';
+  img.className = '';
+  meta.textContent = 'ネット接続を確認してください';
 }
 
 // ── UI sync ───────────────────────────────────────────────────────────────────
@@ -1165,6 +1310,8 @@ document.querySelectorAll('[data-gm]').forEach(b => {
 let wlFilter = 'all';
 let wlSearch = '';
 let wlListMode = 'vocab'; // 'vocab' | 'sentence'
+let rewardCorrectCount = 0;
+const REWARD_THRESHOLD = 5;
 function weightDot(key) {
   const w = wordWeights.get(key);
   if (!w || (w >= 0.7 && w <= 1.3)) return '';
@@ -1300,6 +1447,14 @@ document.querySelectorAll('#wl-filters .ctrl-btn').forEach(b => {
     b.classList.add('active');
     renderWordList();
   });
+});
+
+document.getElementById('reward-close').addEventListener('click', () => {
+  document.getElementById('reward-backdrop').classList.remove('open');
+});
+document.getElementById('reward-backdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('reward-backdrop'))
+    document.getElementById('reward-backdrop').classList.remove('open');
 });
 
 document.getElementById('theme-btn').addEventListener('click', () => {
