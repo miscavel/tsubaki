@@ -465,6 +465,7 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
     </div>
     <div class="btn-row">
       <button class="ctrl-btn" id="word-list-btn" style="font-size:0.8em">単語リスト</button>
+      <button class="ctrl-btn" id="sentence-list-btn" style="font-size:0.8em;display:none">文章</button>
     </div>
   </div>
 
@@ -868,15 +869,16 @@ function syncUI() {
   document.querySelectorAll('[data-gm]').forEach(b =>
     b.classList.toggle('active', b.dataset.gm === gameMode));
   renderCatButtons();
-  if (gameMode === 'sentence') {
-    const _sTotal = (gameData[gameId]?.sentences || []).length;
-    document.getElementById('word-list-btn').textContent = `文章 (${_sTotal})`;
-  } else {
-    const _gTotal = (gameData[gameId]?.vocab || []).length;
-    const _eid = effectiveGid();
-    const _gKnown = [...knownWords].filter(k => k.startsWith(`${_eid}:`)).length;
-    document.getElementById('word-list-btn').textContent = `単語リスト (${_gTotal - _gKnown}/${_gTotal})`;
-  }
+  const _gTotal = (gameData[gameId]?.vocab || []).length;
+  const _eid = effectiveGid();
+  const _gKnown = gameMode === 'sentence' ? 0 : [...knownWords].filter(k => k.startsWith(`${_eid}:`)).length;
+  document.getElementById('word-list-btn').textContent = gameMode === 'sentence'
+    ? `単語リスト (${_gTotal})`
+    : `単語リスト (${_gTotal - _gKnown}/${_gTotal})`;
+  const _sentences = gameData[gameId]?.sentences || [];
+  const sentBtn = document.getElementById('sentence-list-btn');
+  sentBtn.style.display = _sentences.length > 0 ? '' : 'none';
+  sentBtn.textContent = `文章 (${_sentences.length})`;
 }
 
 function renderCatButtons() {
@@ -1099,6 +1101,7 @@ document.querySelectorAll('[data-gm]').forEach(b => {
 // ── Word-list modal ───────────────────────────────────────────────────────────
 let wlFilter = 'all';
 let wlSearch = '';
+let wlListMode = 'vocab'; // 'vocab' | 'sentence'
 function weightDot(key) {
   const w = wordWeights.get(key);
   if (!w || (w >= 0.7 && w <= 1.3)) return '';
@@ -1106,15 +1109,45 @@ function weightDot(key) {
   return `<span class="wl-dot easy" title="weight ${w.toFixed(2)}">▼</span>`;
 }
 function renderWordList() {
-  const eid = effectiveGid();
-  const allVocab = gameData[gameId].vocab;
   const items = document.getElementById('wl-items');
   items.innerHTML = '';
   const q = wlSearch.trim().toLowerCase();
+  const filtersEl = document.getElementById('wl-filters');
+  const resetEl = document.getElementById('wl-reset');
+
+  if (wlListMode === 'sentence') {
+    filtersEl.style.display = 'none';
+    resetEl.style.display = 'none';
+    const pool = gameData[gameId].sentences || [];
+    const filtered = q ? pool.filter(s => s.s.includes(q) || s.r.includes(q) || s.a.toLowerCase().includes(q)) : pool;
+    document.getElementById('wl-title').textContent = `文章リスト — ${gameData[gameId].label}`;
+    document.getElementById('wl-count').textContent = `${pool.length} 文章`;
+    if (filtered.length === 0) {
+      items.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:8px 0">なし</div>';
+    } else {
+      filtered.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'wl-row';
+        row.style.cssText = 'flex-direction:column;align-items:flex-start;gap:2px';
+        row.innerHTML = `<span style="font-weight:600;font-size:0.88rem">${s.s}</span><span style="color:var(--text-muted);font-size:0.75rem">${s.r}</span><span style="color:var(--text-muted);font-size:0.78rem">${s.a}</span>`;
+        items.appendChild(row);
+      });
+    }
+    return;
+  }
+
+  // vocab list
+  const readOnly = gameMode === 'sentence';
+  filtersEl.style.display = readOnly ? 'none' : '';
+  resetEl.style.display = readOnly ? 'none' : '';
+  const eid = effectiveGid();
+  const allVocab = gameData[gameId].vocab;
   const filtered = allVocab.filter(v => {
     const known = knownWords.has(`${eid}:${v.w}`);
-    if (wlFilter === 'known' && !known) return false;
-    if (wlFilter === 'active' && known) return false;
+    if (!readOnly) {
+      if (wlFilter === 'known' && !known) return false;
+      if (wlFilter === 'active' && known) return false;
+    }
     if (q) return v.w.includes(q) || v.r.includes(q) || v.m.toLowerCase().includes(q);
     return true;
   });
@@ -1125,23 +1158,41 @@ function renderWordList() {
       const key = `${eid}:${v.w}`;
       const known = knownWords.has(key);
       const row = document.createElement('div');
-      row.className = 'wl-row' + (known ? ' wl-known' : '');
+      row.className = 'wl-row' + (known && !readOnly ? ' wl-known' : '');
       const readingPart = v.w !== v.r ? `<span class="wl-read">${v.r}</span>` : '';
-      row.innerHTML = `<span class="wl-word">${v.w}</span>${readingPart}${weightDot(key)}<span class="wl-mean">${v.m}</span><button class="wl-btn${known ? ' known' : ''}">${known ? '習得済み' : '習得'}</button>`;
-      row.querySelector('.wl-btn').addEventListener('click', () => {
-        if (knownWords.has(key)) { knownWords.delete(key); } else { knownWords.add(key); }
-        saveProgress(); syncUI(); renderWordList();
-      });
+      if (readOnly) {
+        row.innerHTML = `<span class="wl-word">${v.w}</span>${readingPart}<span class="wl-mean">${v.m}</span>`;
+      } else {
+        row.innerHTML = `<span class="wl-word">${v.w}</span>${readingPart}${weightDot(key)}<span class="wl-mean">${v.m}</span><button class="wl-btn${known ? ' known' : ''}">${known ? '習得済み' : '習得'}</button>`;
+        row.querySelector('.wl-btn').addEventListener('click', () => {
+          if (knownWords.has(key)) { knownWords.delete(key); } else { knownWords.add(key); }
+          saveProgress(); syncUI(); renderWordList();
+        });
+      }
       items.appendChild(row);
     });
   }
   const total = allVocab.length;
-  const knownCount = [...knownWords].filter(k => k.startsWith(`${eid}:`)).length;
-  document.getElementById('wl-count').textContent = `学習中 ${total - knownCount} / 習得済み ${knownCount}`;
-  const modeName = gameMode === 'imi' ? '意味→漢字' : gameMode === 'yomi' ? '読み→漢字' : '漢字→意味';
-  document.getElementById('wl-title').textContent = `単語リスト — ${gameData[gameId].label} (${modeName})`;
+  if (readOnly) {
+    document.getElementById('wl-title').textContent = `単語リスト — ${gameData[gameId].label}`;
+    document.getElementById('wl-count').textContent = `${total} 単語`;
+  } else {
+    const knownCount = [...knownWords].filter(k => k.startsWith(`${eid}:`)).length;
+    document.getElementById('wl-count').textContent = `学習中 ${total - knownCount} / 習得済み ${knownCount}`;
+    const modeName = gameMode === 'imi' ? '意味→漢字' : gameMode === 'yomi' ? '読み→漢字' : '漢字→意味';
+    document.getElementById('wl-title').textContent = `単語リスト — ${gameData[gameId].label} (${modeName})`;
+  }
 }
 function openWordListModal() {
+  wlListMode = 'vocab';
+  wlSearch = '';
+  document.getElementById('wl-search').value = '';
+  renderWordList();
+  document.getElementById('wl-backdrop').classList.add('open');
+  document.getElementById('wl-search').focus();
+}
+function openSentenceListModal() {
+  wlListMode = 'sentence';
   wlSearch = '';
   document.getElementById('wl-search').value = '';
   renderWordList();
@@ -1152,6 +1203,7 @@ function closeWordListModal() {
   document.getElementById('wl-backdrop').classList.remove('open');
 }
 document.getElementById('word-list-btn').addEventListener('click', openWordListModal);
+document.getElementById('sentence-list-btn').addEventListener('click', openSentenceListModal);
 document.getElementById('wl-close').addEventListener('click', closeWordListModal);
 document.getElementById('wl-close2').addEventListener('click', closeWordListModal);
 document.getElementById('wl-backdrop').addEventListener('click', e => {
