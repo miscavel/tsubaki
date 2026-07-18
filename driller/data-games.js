@@ -956,6 +956,7 @@ const gameData = {
       {s:'付き合う人によって視野が変わる。',r:'つきあうひとによってしやがかわる。',a:'Your perspective changes depending on who you spend time with.'},
       {s:'たまに休みながら長い道を歩いた。',r:'たまにやすみながらながいみちをあるいた。',a:'I walked the long road, resting occasionally.'},
       {s:'洞窟の中は暗くて進みにくかった。',r:'どうくつのなかはくらくてすすみにくかった。',a:'Inside the cave it was dark and hard to advance.'},
+      {s:'暗い洞窟の中で道を探した。',r:'くらいどうくつのなかでみちをさがした。',a:'I searched for a path inside the dark cave.'},
       {s:'毒を受けてポケモンの状態が異常になった。',r:'どくをうけてポケモンのじょうたいがいじょうになった。',a:'After receiving poison, the Pokémon fell into an abnormal status.'},
       {s:'空っぽの箱を開けてみた。',r:'からっぽのはこをあけてみた。',a:'I tried opening the empty box.'},
       {s:'状況を判断して直接向かった。',r:'じょうきょうをはんだんしてちょくせつむかった。',a:'I assessed the situation and headed there directly.'},
