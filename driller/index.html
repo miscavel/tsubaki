@@ -461,6 +461,7 @@ ruby rt { font-size: 0.45em; color: var(--text-muted); letter-spacing: 0.05em; }
       <button class="ctrl-btn active" data-gm="vocab">漢字→意味</button>
       <button class="ctrl-btn" data-gm="imi">意味→漢字</button>
       <button class="ctrl-btn" data-gm="yomi">読み→漢字</button>
+      <button class="ctrl-btn" data-gm="sentence">文章</button>
     </div>
     <div class="btn-row">
       <button class="ctrl-btn" id="word-list-btn" style="font-size:0.8em">単語リスト</button>
@@ -633,6 +634,14 @@ function genGrammarQuestion() {
   return { type: 'grammar', sentence: item.s, reading: item.r || '', translation: item.t || '', answer: item.a, choices, pattern: item.p, explanation: item.e || '', lv: item.lv, prio: !!item.pr };
 }
 function genGameQuestion() {
+  if (gameMode === 'sentence') {
+    const pool = gameData[gameId].sentences;
+    if (!pool || pool.length < 4) return null;
+    const item = pickRandom(pool, s => s.s);
+    const others = pool.filter(s => s.s !== item.s).sort(() => Math.random() - 0.5).slice(0, 3);
+    const choices = [item.a, ...others.map(o => o.a)].sort(() => Math.random() - 0.5);
+    return { type: 'game-sentence', sentence: item.s, reading: item.r, answer: item.a, choices };
+  }
   if (gameCategory === 'セリフ') {
     const pool = gameData[gameId].dialogues;
     if (!pool || pool.length < 4) return null;
@@ -725,6 +734,15 @@ function renderQuestion() {
         <span class="badge cat">${modeLabel}</span>
       </div>
       <div class="${qClass}">${q.question}</div>`;
+  } else if (q.type === 'game-sentence') {
+    const rcSent = hideReading ? 'reading hidden-reading' : 'reading';
+    card.innerHTML = `
+      <div class="badges">
+        <span class="badge game-lbl">${gameData[gameId].label}</span>
+        <span class="badge cat">文章</span>
+      </div>
+      <div class="sentence">${q.sentence}</div>
+      <div class="${rcSent}" id="reading-display" style="font-size:0.85rem">${q.reading}</div>`;
   } else {
     const hasKanji = /[一-鿿]/.test(q.word);
     const useRuby = hasKanji && q.word !== q.reading;
@@ -743,7 +761,7 @@ function renderQuestion() {
   }
 
   const choicesDiv = document.getElementById('choices');
-  choicesDiv.style.gridTemplateColumns = q.type === 'dialogue' ? '1fr' : '';
+  choicesDiv.style.gridTemplateColumns = (q.type === 'dialogue' || q.type === 'game-sentence') ? '1fr' : '';
   q.choices.forEach((ch, i) => {
     const btn = document.createElement('button');
     btn.className = 'choice';
@@ -794,6 +812,9 @@ function choose(choice) {
   } else if (current.type === 'dialogue') {
     fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
     fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.explanation}</small>`;
+  } else if (current.type === 'game-sentence') {
+    fb.className = correct ? 'feedback correct show' : 'feedback wrong show';
+    fb.innerHTML = `${correct ? '✓ Correct!' : '✗ Wrong.'}<br><small>${current.answer}</small><br><small style="opacity:0.7">${current.reading}</small>`;
   } else {
     // handles 'game', 'game-imi', 'game-yomi'
     const eid = effectiveGid();
@@ -847,15 +868,21 @@ function syncUI() {
   document.querySelectorAll('[data-gm]').forEach(b =>
     b.classList.toggle('active', b.dataset.gm === gameMode));
   renderCatButtons();
-  const _gTotal = (gameData[gameId]?.vocab || []).length;
-  const _eid = effectiveGid();
-  const _gKnown = [...knownWords].filter(k => k.startsWith(`${_eid}:`)).length;
-  document.getElementById('word-list-btn').textContent = `単語リスト (${_gTotal - _gKnown}/${_gTotal})`;
+  if (gameMode === 'sentence') {
+    const _sTotal = (gameData[gameId]?.sentences || []).length;
+    document.getElementById('word-list-btn').textContent = `文章 (${_sTotal})`;
+  } else {
+    const _gTotal = (gameData[gameId]?.vocab || []).length;
+    const _eid = effectiveGid();
+    const _gKnown = [...knownWords].filter(k => k.startsWith(`${_eid}:`)).length;
+    document.getElementById('word-list-btn').textContent = `単語リスト (${_gTotal - _gKnown}/${_gTotal})`;
+  }
 }
 
 function renderCatButtons() {
   const container = document.getElementById('cat-btns');
   container.innerHTML = '';
+  if (gameMode === 'sentence') return;
   gameData[gameId].cats.forEach(cat => {
     const btn = document.createElement('button');
     btn.className = 'ctrl-btn' + (cat === gameCategory ? ' active' : '');
