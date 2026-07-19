@@ -707,11 +707,13 @@ function genGrammarQuestion() {
 }
 function getSentencesForWord(word) {
   const pool = gameData[gameId]?.sentences || [];
-  const exact = pool.filter(s => s.s.includes(word));
+  // Strip leading ～ used in suffix notation (e.g. ～合う → 合う)
+  const searchWord = word.startsWith('～') ? word.slice(1) : word;
+  const exact = pool.filter(s => s.s.includes(searchWord));
   if (exact.length > 0) return exact;
   // Fallback: match on stem (word minus trailing hiragana) if stem is ≥2 chars and contains kanji
-  if (/[ぁ-ん]$/.test(word)) {
-    const stem = word.slice(0, -1);
+  if (/[ぁ-ん]$/.test(searchWord)) {
+    const stem = searchWord.slice(0, -1);
     if (stem.length >= 2 && /[一-鿿]/.test(stem)) return pool.filter(s => s.s.includes(stem));
   }
   return [];
