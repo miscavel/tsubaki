@@ -1092,7 +1092,7 @@ const gameData = {
       {s:'広場で友達と擦れ違った。',r:'ひろばでともだちとすれちがった。',a:'I crossed paths with my friend at the plaza.'},
       {s:'旅に出るために一歩踏み出す。',r:'たびにでるためにいっぽふみだす。',a:'I take a step forward to set out on my journey.'},
       {s:'鹿の子のような街から旅が始まる。',r:'かのこのようなまちからたびがはじまる。',a:'A journey begins from a small fawn-like town.'},
-      {s:'唐草のような道を通った。',r:'からくさのようなみちをとおった。',a:'I passed along a winding, arabesque-like road.'},
+      {s:'唐草模様の箱を開けた。',r:'からくさもようのはこをあけた。',a:'I opened a box with an arabesque pattern.'},
       {s:'お互いに信頼し合うことが大切だ。',r:'おたがいにしんらいしあうことがたいせつだ。',a:'It is important to trust each other mutually.'},
       {s:'友達に手助けを頼むことにした。',r:'ともだちにてだすけをたのむことにした。',a:'I decided to ask my friend for help.'},
     ],
