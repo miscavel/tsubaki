@@ -327,7 +327,7 @@
       <div class="code-row">
         <input id="codeInput" class="code-input" type="text" placeholder="..."
                autocomplete="off" spellcheck="false">
-        <button class="code-btn" onclick="submitCode()">Reveal</button>
+        <button class="code-btn" onclick="submitCode()">Enter</button>
       </div>
       <div id="codeMsg" class="code-msg"></div>
     </div>
@@ -397,8 +397,6 @@
     const CODES = {
       '342555289c792d3ce36ef04c1162d54b8c9f6f41eaa24d870e38e7f2e76e4d9d': {
         theme: 'kaguya',
-        content: `<p>The bamboo remembers a night that hasn't come yet.</p>
-                   <p>Something is folded shut inside it, waiting for the moon to grow round again.</p>`,
       },
     };
 
@@ -441,7 +439,7 @@
     // ── render unlocked entries ──────────────────────────────────────────
     function renderEntries() {
       const container = document.getElementById('entries');
-      const active    = [...unlocked].filter(h => CODES[h]);
+      const active    = [...unlocked].filter(h => CODES[h]?.content);
 
       if (active.length === 0) {
         container.innerHTML = '';
