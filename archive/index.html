@@ -85,6 +85,53 @@
     }
     .bamboo-wrap svg { width: 100%; height: 100%; }
 
+    /* the segment where something is folded shut, glowing softly */
+    .glow-segment { cursor: pointer; pointer-events: auto; }
+    .glow-halo {
+      fill: #ffe9ac;
+      filter: blur(5px);
+      opacity: .45;
+      animation: bambooGlow 3.4s ease-in-out infinite;
+    }
+    .glow-core {
+      fill: #fff8e2;
+      opacity: .75;
+      animation: bambooGlow 3.4s ease-in-out infinite;
+    }
+    @keyframes bambooGlow {
+      0%, 100% { opacity: .30; }
+      50%      { opacity: .80; }
+    }
+
+    /* rustle bubble */
+    .bamboo-bubble {
+      position: fixed;
+      z-index: 5;
+      transform: translate(-50%, -100%);
+      background: rgba(18, 24, 18, 0.92);
+      border: 1px solid #3a4a3a;
+      color: #e8e0c5;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .bamboo-bubble::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -6px;
+      transform: translateX(-50%);
+      border-width: 6px 6px 0 6px;
+      border-style: solid;
+      border-color: rgba(18, 24, 18, 0.92) transparent transparent transparent;
+    }
+    .bamboo-bubble.show { opacity: 1; transform: translate(-50%, -114%); }
+
     /* leaf sway */
     .la { animation: swayA 5.2s ease-in-out infinite;       transform-origin: 50% 100%; }
     .lb { animation: swayB 4.1s ease-in-out infinite;       transform-origin: 50% 100%; }
@@ -252,10 +299,19 @@
           <path d="M130 432 Q98 416  78 392  Q112 428 136 442 Z"  fill="#1a4a26" opacity=".54"/>
           <path d="M140 432 Q172 414  194 390 Q158 426 136 442 Z" fill="#1a4a26" opacity=".49"/>
         </g>
+
+        <!-- something folded shut, glowing at the heart of the grove -->
+        <g class="glow-segment" onclick="onBambooGlowClick(event)">
+          <rect x="64" y="328" width="30" height="138" fill="transparent"/>
+          <rect class="glow-halo" x="72" y="336" width="13" height="122" rx="5.5"/>
+          <rect class="glow-core" x="72" y="336" width="13" height="122" rx="5.5"/>
+        </g>
       </svg>
     </div>
     <div class="mist"></div>
   </div>
+
+  <div class="bamboo-bubble" id="bambooBubble">*rustle* *rustle*</div>
 
   <div class="header">
     <h1>つ<span>ば</span>き / archive</h1>
@@ -309,6 +365,18 @@
       window.addEventListener('resize', draw);
       draw();
     })();
+
+    // ── glowing bamboo segment ────────────────────────────────────────────
+    let bambooBubbleTimer = null;
+    function onBambooGlowClick(e) {
+      const bubble = document.getElementById('bambooBubble');
+      const rect = e.currentTarget.getBoundingClientRect();
+      bubble.style.left = (rect.left + rect.width / 2) + 'px';
+      bubble.style.top  = rect.top + 'px';
+      bubble.classList.add('show');
+      clearTimeout(bambooBubbleTimer);
+      bambooBubbleTimer = setTimeout(() => bubble.classList.remove('show'), 2200);
+    }
 
     // ── sha-256 via Web Crypto ───────────────────────────────────────────
     async function sha256(str) {
