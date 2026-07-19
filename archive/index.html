@@ -88,7 +88,6 @@
     .bamboo-wrap svg { width: 100%; height: 100%; }
 
     /* the segment where something is folded shut, glowing softly */
-    .glow-segment { cursor: pointer; pointer-events: auto; }
     .glow-halo {
       fill: #ffe9ac;
       filter: blur(5px);
@@ -133,6 +132,18 @@
       border-color: rgba(18, 24, 18, 0.92) transparent transparent transparent;
     }
     .bamboo-bubble.show { opacity: 1; transform: translate(-50%, -114%); }
+
+    /* invisible plain-HTML button overlaid on the glow via JS, sidesteps
+       filter+pointer-events-none-ancestor SVG hit-testing bugs on mobile */
+    .bamboo-hotspot {
+      position: fixed;
+      background: transparent;
+      border: none;
+      padding: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    body.theme-kaguya .bamboo-hotspot { pointer-events: auto; cursor: pointer; }
 
     /* leaf sway */
     .la { animation: swayA 5.2s ease-in-out infinite;       transform-origin: 50% 100%; }
@@ -306,8 +317,8 @@
         </g>
 
         <!-- something folded shut, glowing at the heart of the grove -->
-        <g class="glow-segment" onclick="onBambooGlowClick(event)">
-          <rect x="64" y="328" width="30" height="138" fill="transparent"/>
+        <g class="glow-segment">
+          <rect class="glow-hit" x="64" y="328" width="30" height="138" fill="transparent"/>
           <rect class="glow-halo" x="72" y="336" width="13" height="122" rx="5.5"/>
           <rect class="glow-core" x="72" y="336" width="13" height="122" rx="5.5"/>
         </g>
@@ -317,6 +328,7 @@
   </div>
 
   <div class="bamboo-bubble" id="bambooBubble">*rustle* *rustle*</div>
+  <button class="bamboo-hotspot" id="bambooHotspot" onclick="onBambooGlowClick(event)" aria-label="something rustles"></button>
 
   <div class="page">
     <div class="header">
@@ -373,6 +385,23 @@
     })();
 
     // ── glowing bamboo segment ────────────────────────────────────────────
+    // The hotspot is a plain <button>, positioned via JS to exactly cover
+    // the SVG glow segment. Filtered ancestors (.bamboo-wrap's drop-shadow)
+    // combined with pointer-events:none can break click hit-testing on
+    // nested SVG in some mobile browsers, so we avoid relying on that path.
+    function positionBambooHotspot() {
+      const target  = document.querySelector('.glow-hit');
+      const hotspot = document.getElementById('bambooHotspot');
+      if (!target || !hotspot) return;
+      const rect = target.getBoundingClientRect();
+      hotspot.style.left   = rect.left + 'px';
+      hotspot.style.top    = rect.top + 'px';
+      hotspot.style.width  = rect.width + 'px';
+      hotspot.style.height = rect.height + 'px';
+    }
+    window.addEventListener('resize', positionBambooHotspot);
+    positionBambooHotspot();
+
     let bambooBubbleTimer = null;
     function onBambooGlowClick(e) {
       const bubble = document.getElementById('bambooBubble');
