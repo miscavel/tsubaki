@@ -13,121 +13,233 @@
       color: #d4d4cc;
       min-height: 100vh;
       padding: 48px 24px 80px;
+      position: relative;
     }
 
-    .header {
-      max-width: 560px;
-      margin: 0 auto 48px;
+    /* ── night scene ───────────────────────────────────────────────────── */
+    .night-scene {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      transition: opacity 2.5s ease;
+      background: linear-gradient(to bottom,
+        #03030e 0%, #07071e 35%, #0c1226 65%, #101820 100%);
     }
+    body.theme-kaguya .night-scene { opacity: 1; }
+
+    /* stars */
+    #starCanvas { position: absolute; inset: 0; }
+
+    /* moon */
+    .moon {
+      position: absolute;
+      top: 7vh;
+      right: 12vw;
+      width: 148px;
+      height: 148px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%,
+        #fffef8, #f7e87a 52%, #e2c848);
+      box-shadow:
+        0 0 24px 9px  rgba(255, 244, 155, 0.50),
+        0 0 65px 30px rgba(255, 235, 120, 0.24),
+        0 0 140px 70px rgba(255, 222, 80, 0.09);
+      animation: moonPulse 7s ease-in-out infinite;
+    }
+    .moon::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 62% 28%, rgba(255,255,255,0.18) 0%, transparent 35%),
+        radial-gradient(circle at 28% 68%, rgba(200,185,140,0.22) 0%, transparent 28%);
+    }
+    @keyframes moonPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 24px 9px  rgba(255,244,155,.50),
+          0 0 65px 30px rgba(255,235,120,.24),
+          0 0 140px 70px rgba(255,222,80,.09);
+      }
+      50% {
+        box-shadow:
+          0 0 34px 14px rgba(255,244,155,.60),
+          0 0 88px 42px rgba(255,235,120,.30),
+          0 0 190px 95px rgba(255,222,80,.12);
+      }
+    }
+
+    /* bamboo */
+    .bamboo-wrap {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 280px;
+      height: 92%;
+      pointer-events: none;
+      filter: drop-shadow(0 0 10px rgba(55, 170, 75, 0.22));
+    }
+    .bamboo-wrap svg { width: 100%; height: 100%; }
+
+    /* leaf sway */
+    .la { animation: swayA 5.2s ease-in-out infinite;       transform-origin: 50% 100%; }
+    .lb { animation: swayB 4.1s ease-in-out infinite;       transform-origin: 50% 100%; }
+    .lc { animation: swayA 6.0s ease-in-out infinite 0.9s;  transform-origin: 50% 100%; }
+    .ld { animation: swayB 4.7s ease-in-out infinite 1.6s;  transform-origin: 50% 100%; }
+    @keyframes swayA { 0%,100% { transform: rotate(-2deg) }   50% { transform: rotate(2.5deg) } }
+    @keyframes swayB { 0%,100% { transform: rotate(1.5deg) }  50% { transform: rotate(-2deg) } }
+
+    /* ground mist */
+    .mist {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 110px;
+      background: linear-gradient(to top, rgba(6,10,22,0.80) 0%, transparent 100%);
+    }
+
+    /* ── kaguya text theme ─────────────────────────────────────────────── */
+    body.theme-kaguya .header h1       { color: #7a9a88; }
+    body.theme-kaguya .header h1 span  { color: #c9aa40; }
+    body.theme-kaguya .code-input      { background: rgba(8,12,26,0.80); border-color: #243040; color: #c8c5b5; }
+    body.theme-kaguya .code-btn        { background: rgba(8,12,26,0.80); border-color: #243040; }
+    body.theme-kaguya .entry           { border-left-color: #2c4a38; }
+    body.theme-kaguya .entry-meta .tag { color: #c9aa40; }
+    body.theme-kaguya .entry-title     { color: #e8e0c5; }
+    body.theme-kaguya .entry-content   { color: #b5ad98; }
+
+    /* ── header ────────────────────────────────────────────────────────── */
+    .header { max-width: 560px; margin: 0 auto 48px; }
     .header h1 {
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: lowercase;
-      color: #888;
+      font-size: 1rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: lowercase;
+      color: #888; transition: color 2s;
     }
-    .header h1 span { color: #c0392b; }
+    .header h1 span { color: #c0392b; transition: color 2s; }
 
-    /* ── code entry ─────────────────────────────────────── */
-    .code-form {
-      max-width: 560px;
-      margin: 0 auto 56px;
-    }
-    .code-row {
-      display: flex;
-      gap: 8px;
-    }
+    /* ── code form ─────────────────────────────────────────────────────── */
+    .code-form { max-width: 560px; margin: 0 auto 56px; }
+    .code-row  { display: flex; gap: 8px; }
     .code-input {
-      flex: 1;
-      padding: 10px 14px;
-      background: #1a1a22;
-      border: 1px solid #2e2e3a;
-      border-radius: 4px;
-      color: #d4d4cc;
-      font-size: 0.95rem;
+      flex: 1; padding: 10px 14px;
+      background: #1a1a22; border: 1px solid #2e2e3a; border-radius: 4px;
+      color: #d4d4cc; font-size: 0.95rem;
       font-family: 'SF Mono', 'Fira Code', monospace;
-      letter-spacing: 0.05em;
-      outline: none;
-      transition: border-color 0.15s;
+      letter-spacing: 0.05em; outline: none;
+      transition: border-color 0.15s, background 2s, color 2s;
     }
     .code-input::placeholder { color: #444; }
     .code-input:focus { border-color: #555; }
     .code-input.error { border-color: #8b2020; animation: shake 0.25s; }
     @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-6px); }
-      75% { transform: translateX(6px); }
+      0%,100% { transform: translateX(0) }
+      25%      { transform: translateX(-6px) }
+      75%      { transform: translateX(6px) }
     }
     .code-btn {
-      padding: 10px 20px;
-      background: #1a1a22;
-      border: 1px solid #2e2e3a;
-      border-radius: 4px;
-      color: #888;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: background 0.1s, color 0.1s;
+      padding: 10px 20px; background: #1a1a22; border: 1px solid #2e2e3a;
+      border-radius: 4px; color: #888; font-size: 0.85rem; cursor: pointer;
+      transition: background 0.1s, color 0.1s, border-color 2s;
     }
     .code-btn:hover { background: #252530; color: #d4d4cc; }
-    .code-msg {
-      margin-top: 8px;
-      font-size: 0.8rem;
-      min-height: 1.2em;
-      color: #8b2020;
-    }
+    .code-msg { margin-top: 8px; font-size: 0.8rem; min-height: 1.2em; color: #8b2020; }
     .code-msg.ok { color: #4a8; }
 
-    /* ── unlocked entries ───────────────────────────────── */
-    .entries {
-      max-width: 560px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-    .entry {
-      border-left: 2px solid #2e2e3a;
-      padding-left: 20px;
-    }
-    .entry-meta {
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #555;
-      margin-bottom: 8px;
-    }
-    .entry-meta .tag {
-      color: #c0392b;
-      margin-right: 8px;
-    }
-    .entry-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #e0e0d8;
-      margin-bottom: 12px;
-    }
-    .entry-content {
-      font-size: 0.9rem;
-      line-height: 1.75;
-      color: #b0b0a8;
-    }
+    /* ── entries ───────────────────────────────────────────────────────── */
+    .entries { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+    .entry { border-left: 2px solid #2e2e3a; padding-left: 20px; transition: border-color 2s; }
+    .entry-meta { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 8px; }
+    .entry-meta .tag { color: #c0392b; margin-right: 8px; transition: color 2s; }
+    .entry-title { font-size: 1.05rem; font-weight: 600; color: #e0e0d8; margin-bottom: 12px; transition: color 2s; }
+    .entry-content { font-size: 0.9rem; line-height: 1.75; color: #b0b0a8; transition: color 2s; }
     .entry-content p + p { margin-top: 0.9em; }
-    .entry-content img {
-      max-width: 100%;
-      border-radius: 4px;
-      margin-top: 8px;
-    }
+    .entry-content img { max-width: 100%; border-radius: 4px; margin-top: 8px; }
     .entry-content a { color: #9bb; text-underline-offset: 3px; }
-
-    .empty {
-      max-width: 560px;
-      margin: 0 auto;
-      color: #333;
-      font-size: 0.85rem;
-    }
+    .empty { max-width: 560px; margin: 0 auto; color: #333; font-size: 0.85rem; }
   </style>
 </head>
 <body>
+
+  <div class="night-scene" id="nightScene" aria-hidden="true">
+    <canvas id="starCanvas"></canvas>
+    <div class="moon"></div>
+    <div class="bamboo-wrap">
+      <svg viewBox="0 0 260 700" preserveAspectRatio="xMinYMax meet" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="lf" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.2" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- stalk 1: tallest, x=40 -->
+        <rect x="33" y="0"   width="14" height="700" rx="6"   fill="#1c3d24"/>
+        <ellipse cx="40" cy="112" rx="9"   ry="3.5" fill="#13281a"/>
+        <ellipse cx="40" cy="234" rx="9"   ry="3.5" fill="#13281a"/>
+        <ellipse cx="40" cy="358" rx="9"   ry="3.5" fill="#13281a"/>
+        <ellipse cx="40" cy="480" rx="9"   ry="3.5" fill="#13281a"/>
+        <ellipse cx="40" cy="600" rx="9"   ry="3.5" fill="#13281a"/>
+        <g class="la" filter="url(#lf)">
+          <path d="M38 24  Q6  4  -12 -18 Q22 14 42 30 Z"    fill="#266030" opacity=".95"/>
+          <path d="M42 24  Q76  2  96 -20 Q60 16 38 30 Z"    fill="#266030" opacity=".90"/>
+          <path d="M36 54  Q0  36  -20 14 Q16 46 42 60 Z"    fill="#1e5228" opacity=".76"/>
+        </g>
+        <g class="lb" filter="url(#lf)">
+          <path d="M34 106 Q0  88  -18 64  Q18 98  42 114 Z" fill="#1e5228" opacity=".70"/>
+          <path d="M46 106 Q82  86  102 62 Q66 98  38 114 Z" fill="#1e5228" opacity=".66"/>
+        </g>
+
+        <!-- stalk 2: x=79, top y=108 -->
+        <rect x="72" y="108" width="13" height="592" rx="5.5" fill="#1a3c22"/>
+        <ellipse cx="79" cy="214" rx="8.5" ry="3"   fill="#112418"/>
+        <ellipse cx="79" cy="336" rx="8.5" ry="3"   fill="#112418"/>
+        <ellipse cx="79" cy="458" rx="8.5" ry="3"   fill="#112418"/>
+        <ellipse cx="79" cy="578" rx="8.5" ry="3"   fill="#112418"/>
+        <g class="lc" filter="url(#lf)">
+          <path d="M76 122 Q44 104  22 80   Q60 114 80 128 Z" fill="#266030" opacity=".92"/>
+          <path d="M82 122 Q116 102  136 78  Q98 114 80 128 Z" fill="#266030" opacity=".87"/>
+          <path d="M74 150 Q36 132  16 108  Q54 144 80 156 Z" fill="#1e5228" opacity=".68"/>
+        </g>
+        <g class="la" filter="url(#lf)">
+          <path d="M74 208 Q38 190  16 166  Q54 200 80 214 Z" fill="#1a4c22" opacity=".63"/>
+          <path d="M84 208 Q120 188  142 164 Q106 198 80 214 Z" fill="#1a4c22" opacity=".58"/>
+        </g>
+
+        <!-- stalk 3: x=109, top y=224 -->
+        <rect x="103" y="224" width="12" height="476" rx="5"   fill="#183a22"/>
+        <ellipse cx="109" cy="324" rx="8"   ry="2.8" fill="#0f2215"/>
+        <ellipse cx="109" cy="442" rx="8"   ry="2.8" fill="#0f2215"/>
+        <ellipse cx="109" cy="558" rx="8"   ry="2.8" fill="#0f2215"/>
+        <g class="ld" filter="url(#lf)">
+          <path d="M106 238 Q74 220  52 196  Q90 230 110 244 Z"  fill="#245c2c" opacity=".90"/>
+          <path d="M112 238 Q144 218  166 194 Q128 230 110 244 Z" fill="#245c2c" opacity=".84"/>
+          <path d="M104 264 Q68 246  48 222  Q84 258 110 270 Z"  fill="#1c5028" opacity=".65"/>
+        </g>
+        <g class="lb" filter="url(#lf)">
+          <path d="M106 318 Q72 300  52 276  Q88 312 110 324 Z"  fill="#184422" opacity=".56"/>
+          <path d="M112 318 Q146 298  168 274 Q130 310 110 324 Z" fill="#184422" opacity=".52"/>
+        </g>
+
+        <!-- stalk 4: shortest, x=135, top y=342 -->
+        <rect x="129" y="342" width="11" height="358" rx="4.5" fill="#163422"/>
+        <ellipse cx="135" cy="438" rx="7.5" ry="2.5" fill="#0d2014"/>
+        <ellipse cx="135" cy="548" rx="7.5" ry="2.5" fill="#0d2014"/>
+        <ellipse cx="135" cy="650" rx="7.5" ry="2.5" fill="#0d2014"/>
+        <g class="lc" filter="url(#lf)">
+          <path d="M132 356 Q102 338  82 314  Q116 350 136 362 Z"  fill="#22582c" opacity=".88"/>
+          <path d="M138 356 Q168 336  190 312 Q156 350 136 362 Z"  fill="#22582c" opacity=".82"/>
+        </g>
+        <g class="ld" filter="url(#lf)">
+          <path d="M130 432 Q98 416  78 392  Q112 428 136 442 Z"  fill="#1a4a26" opacity=".54"/>
+          <path d="M140 432 Q172 414  194 390 Q158 426 136 442 Z" fill="#1a4a26" opacity=".49"/>
+        </g>
+      </svg>
+    </div>
+    <div class="mist"></div>
+  </div>
 
   <div class="header">
     <h1>つ<span>ば</span>き / archive</h1>
@@ -135,7 +247,8 @@
 
   <div class="code-form">
     <div class="code-row">
-      <input id="codeInput" class="code-input" type="text" placeholder="enter code" autocomplete="off" spellcheck="false">
+      <input id="codeInput" class="code-input" type="text" placeholder="enter code"
+             autocomplete="off" spellcheck="false">
       <button class="code-btn" onclick="submitCode()">unlock</button>
     </div>
     <div id="codeMsg" class="code-msg"></div>
@@ -145,43 +258,92 @@
   <div id="empty" class="empty" style="display:none">— nothing unlocked yet —</div>
 
   <script>
-    // ── content registry ────────────────────────────────────────────────────
-    // Add entries here. key = code (case-insensitive), value = entry object.
-    // Fields: title (string), tag (string, optional), date (string, optional),
-    //         content (HTML string).
+    // ── deterministic star field ─────────────────────────────────────────
+    (function () {
+      const cv  = document.getElementById('starCanvas');
+      const ctx = cv.getContext('2d');
+      function rng32(seed) {
+        let s = seed;
+        return () => {
+          s = (s + 0x6D2B79F5) | 0;
+          let t = Math.imul(s ^ (s >>> 15), 1 | s);
+          t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      function draw() {
+        cv.width = window.innerWidth;
+        cv.height = window.innerHeight;
+        const r = rng32(0xC4A6B8D2);
+        for (let i = 0; i < 260; i++) {
+          const x = r() * cv.width;
+          const y = r() * cv.height * 0.84;
+          const radius = r() * 0.9 + 0.25;
+          const alpha  = r() * 0.60 + 0.22;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,240,${alpha.toFixed(2)})`;
+          ctx.fill();
+        }
+      }
+      window.addEventListener('resize', draw);
+      draw();
+    })();
+
+    // ── sha-256 via Web Crypto ───────────────────────────────────────────
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ── content registry ─────────────────────────────────────────────────
+    // Keys are SHA-256 hashes of the lowercased code.
+    // To add a new code, compute: node -e "require('crypto').createHash('sha256').update('yourcode').digest('hex')"
     const CODES = {
-      // example (remove before use):
-      // 'sakura': {
-      //   tag: 'letter',
-      //   date: '2026-07-19',
-      //   title: 'A note for you',
-      //   content: `<p>...</p>`
-      // },
+      '342555289c792d3ce36ef04c1162d54b8c9f6f41eaa24d870e38e7f2e76e4d9d': {
+        tag: 'かぐや',
+        title: 'Welcome.',
+        theme: 'kaguya',
+        content: `<p>You found the moon.</p>`,
+      },
     };
 
-    // ── state ───────────────────────────────────────────────────────────────
+    // ── persisted state (stored as hashes, never plaintext) ──────────────
     let unlocked = new Set();
     try {
-      const saved = JSON.parse(localStorage.getItem('archive_unlocked') || '[]');
-      saved.forEach(c => unlocked.add(c));
-    } catch(e) {}
+      JSON.parse(localStorage.getItem('archive_unlocked') || '[]')
+        .forEach(h => unlocked.add(h));
+    } catch (e) {}
 
-    // ── logic ────────────────────────────────────────────────────────────────
-    function submitCode() {
+    function applyThemes() {
+      const themes = [...unlocked]
+        .map(h => CODES[h]?.theme)
+        .filter(Boolean);
+      document.body.className = themes.map(t => 'theme-' + t).join(' ');
+    }
+
+    // ── submit ───────────────────────────────────────────────────────────
+    async function submitCode() {
       const input = document.getElementById('codeInput');
       const msg   = document.getElementById('codeMsg');
-      const code  = input.value.trim().toLowerCase();
-      if (!code) return;
+      const raw   = input.value.trim();
+      if (!raw) return;
 
-      if (CODES[code]) {
-        if (unlocked.has(code)) {
+      const hash = await sha256(raw.toLowerCase());
+
+      if (CODES[hash]) {
+        if (unlocked.has(hash)) {
           msg.className = 'code-msg ok';
           msg.textContent = 'already unlocked.';
         } else {
-          unlocked.add(code);
-          try { localStorage.setItem('archive_unlocked', JSON.stringify([...unlocked])); } catch(e) {}
+          unlocked.add(hash);
+          try {
+            localStorage.setItem('archive_unlocked', JSON.stringify([...unlocked]));
+          } catch (e) {}
           msg.className = 'code-msg ok';
           msg.textContent = 'unlocked.';
+          applyThemes();
           renderEntries();
         }
         input.value = '';
@@ -193,10 +355,11 @@
       }
     }
 
+    // ── render unlocked entries ──────────────────────────────────────────
     function renderEntries() {
       const container = document.getElementById('entries');
       const emptyEl   = document.getElementById('empty');
-      const active = [...unlocked].filter(c => CODES[c]);
+      const active    = [...unlocked].filter(h => CODES[h]);
 
       if (active.length === 0) {
         container.innerHTML = '';
@@ -204,18 +367,17 @@
         return;
       }
       emptyEl.style.display = 'none';
-      container.innerHTML = active.map(code => {
-        const e = CODES[code];
+      container.innerHTML = active.map(h => {
+        const e    = CODES[h];
         const meta = [
           e.tag  ? `<span class="tag">${e.tag}</span>` : '',
           e.date ? `<span>${e.date}</span>` : '',
         ].filter(Boolean).join('');
-        return `
-          <div class="entry">
-            ${meta ? `<div class="entry-meta">${meta}</div>` : ''}
-            <div class="entry-title">${e.title}</div>
-            <div class="entry-content">${e.content}</div>
-          </div>`;
+        return `<div class="entry">
+          ${meta ? `<div class="entry-meta">${meta}</div>` : ''}
+          <div class="entry-title">${e.title}</div>
+          <div class="entry-content">${e.content}</div>
+        </div>`;
       }).join('');
     }
 
@@ -223,6 +385,7 @@
       if (e.key === 'Enter') submitCode();
     });
 
+    applyThemes();
     renderEntries();
   </script>
 </body>
