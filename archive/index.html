@@ -176,6 +176,10 @@
     body.theme-kaguya .entry-title     { color: #e8e0c5; }
     body.theme-kaguya .entry-content   { color: #b5ad98; }
 
+    /* let clicks pass through to the bamboo behind empty parts of the page */
+    .page { pointer-events: none; }
+    .page .code-input, .page .code-btn, .page .entry-content a { pointer-events: auto; }
+
     /* ── header ────────────────────────────────────────────────────────── */
     .header { max-width: 560px; margin: 0 auto 48px; }
     .header h1 {
@@ -314,24 +318,26 @@
 
   <div class="bamboo-bubble" id="bambooBubble">*rustle* *rustle*</div>
 
-  <div class="header">
-    <h1>つ<span>ば</span>き / archive</h1>
-  </div>
-
-  <div class="code-form">
-    <div class="code-row">
-      <input id="codeInput" class="code-input" type="text" placeholder="..."
-             autocomplete="off" spellcheck="false">
-      <button class="code-btn" onclick="submitCode()">Reveal</button>
+  <div class="page">
+    <div class="header">
+      <h1>つ<span>ば</span>き / archive</h1>
     </div>
-    <div id="codeMsg" class="code-msg"></div>
-  </div>
 
-  <div class="countdown" id="countdown" aria-hidden="true">
-    <div class="countdown-clock" id="countdownClock">--:--:--:--</div>
-  </div>
+    <div class="code-form">
+      <div class="code-row">
+        <input id="codeInput" class="code-input" type="text" placeholder="..."
+               autocomplete="off" spellcheck="false">
+        <button class="code-btn" onclick="submitCode()">Reveal</button>
+      </div>
+      <div id="codeMsg" class="code-msg"></div>
+    </div>
 
-  <div id="entries" class="entries"></div>
+    <div class="countdown" id="countdown" aria-hidden="true">
+      <div class="countdown-clock" id="countdownClock">--:--:--:--</div>
+    </div>
+
+    <div id="entries" class="entries"></div>
+  </div>
 
   <script>
     // ── deterministic star field ─────────────────────────────────────────
