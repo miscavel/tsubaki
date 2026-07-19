@@ -101,6 +101,34 @@
       background: linear-gradient(to top, rgba(6,10,22,0.80) 0%, transparent 100%);
     }
 
+    /* countdown */
+    .countdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2.5s ease;
+    }
+    body.theme-kaguya .countdown { opacity: 1; }
+    .countdown-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #9a8a55;
+      margin-bottom: 10px;
+    }
+    .countdown-clock {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 2.6rem;
+      letter-spacing: 0.08em;
+      color: #f3e6a8;
+      text-shadow: 0 0 18px rgba(255,230,140,0.55), 0 0 44px rgba(255,220,120,0.25);
+    }
+
     /* ── kaguya text theme ─────────────────────────────────────────────── */
     body.theme-kaguya .header h1       { color: #7a9a88; }
     body.theme-kaguya .header h1 span  { color: #c9aa40; }
@@ -241,6 +269,11 @@
     <div class="mist"></div>
   </div>
 
+  <div class="countdown" id="countdown" aria-hidden="true">
+    <div class="countdown-label">until tsukimi</div>
+    <div class="countdown-clock" id="countdownClock">--:--:--:--</div>
+  </div>
+
   <div class="header">
     <h1>つ<span>ば</span>き / archive</h1>
   </div>
@@ -249,7 +282,7 @@
     <div class="code-row">
       <input id="codeInput" class="code-input" type="text" placeholder="enter code"
              autocomplete="off" spellcheck="false">
-      <button class="code-btn" onclick="submitCode()">unlock</button>
+      <button class="code-btn" onclick="submitCode()">reveal</button>
     </div>
     <div id="codeMsg" class="code-msg"></div>
   </div>
@@ -303,9 +336,11 @@
     const CODES = {
       '342555289c792d3ce36ef04c1162d54b8c9f6f41eaa24d870e38e7f2e76e4d9d': {
         tag: 'かぐや',
-        title: 'Welcome.',
+        title: '月を待つ',
         theme: 'kaguya',
-        content: `<p>You found the moon.</p>`,
+        content: `<p>The bamboo remembers a night that hasn't come yet.</p>
+                   <p>Something is folded shut inside it, waiting for the moon to grow round again — waiting for tsukimi.</p>
+                   <p>When the count reaches zero, it will open.</p>`,
       },
     };
 
@@ -333,19 +368,16 @@
       const hash = await sha256(raw.toLowerCase());
 
       if (CODES[hash]) {
-        if (unlocked.has(hash)) {
-          msg.className = 'code-msg ok';
-          msg.textContent = 'already unlocked.';
-        } else {
+        if (!unlocked.has(hash)) {
           unlocked.add(hash);
           try {
             localStorage.setItem('archive_unlocked', JSON.stringify([...unlocked]));
           } catch (e) {}
-          msg.className = 'code-msg ok';
-          msg.textContent = 'unlocked.';
           applyThemes();
           renderEntries();
         }
+        msg.className = 'code-msg';
+        msg.textContent = '';
         input.value = '';
       } else {
         msg.className = 'code-msg';
@@ -384,6 +416,23 @@
     document.getElementById('codeInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') submitCode();
     });
+
+    // ── tsukimi countdown ─────────────────────────────────────────────────
+    const TSUKIMI_TARGET = new Date(2026, 8, 25, 0, 0, 0);
+    function updateCountdown() {
+      const el = document.getElementById('countdownClock');
+      const diff = TSUKIMI_TARGET - new Date();
+      if (diff <= 0) { el.textContent = '00:00:00:00'; return; }
+      const totalSeconds = Math.floor(diff / 1000);
+      const days    = Math.floor(totalSeconds / 86400);
+      const hours   = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      const pad = n => String(n).padStart(2, '0');
+      el.textContent = `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 
     applyThemes();
     renderEntries();
