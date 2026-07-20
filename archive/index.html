@@ -161,6 +161,76 @@
       background: linear-gradient(to top, rgba(6,10,22,0.80) 0%, transparent 100%);
     }
 
+    /* ── touhou scene: gensokyo at dusk ──────────────────────────────────── */
+    .touhou-scene {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      transition: opacity 2.5s ease;
+      background: linear-gradient(to bottom,
+        #241a3a 0%, #5c2a4d 30%, #a8425f 50%, #e0703f 70%, #f3a355 85%, #f8c977 100%);
+    }
+    body.theme-touhou .touhou-scene { opacity: 1; }
+
+    .touhou-sun {
+      position: absolute;
+      left: 62%;
+      bottom: 22%;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      transform: translate(-50%, 50%);
+      background: radial-gradient(circle at 45% 40%, #fff6d8, #ffcf7a 55%, #ff8a4c 85%);
+      box-shadow:
+        0 0 30px 12px rgba(255, 190, 110, 0.55),
+        0 0 80px 40px rgba(255, 150, 80, 0.30),
+        0 0 160px 80px rgba(255, 120, 70, 0.14);
+    }
+
+    .touhou-land { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    .sakura {
+      position: absolute;
+      top: -5%;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle at 35% 35%, #ffd9e6, #ff9dbb 70%);
+      border-radius: 60% 40% 60% 40%;
+      opacity: 0;
+      animation: sakuraFall linear infinite;
+    }
+    .s1 { left: 15%; animation-duration: 11s; animation-delay: 0s; }
+    .s2 { left: 35%; animation-duration: 14s; animation-delay: 3s; }
+    .s3 { left: 55%; animation-duration: 9s;  animation-delay: 1.5s; }
+    .s4 { left: 75%; animation-duration: 13s; animation-delay: 5s; }
+    .s5 { left: 90%; animation-duration: 10s; animation-delay: 2s; }
+    @keyframes sakuraFall {
+      0%   { transform: translate(0, 0) rotate(0deg);        opacity: 0; }
+      10%  { opacity: .85; }
+      90%  { opacity: .7; }
+      100% { transform: translate(60px, 115vh) rotate(340deg); opacity: 0; }
+    }
+
+    .touhou-mist {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 130px;
+      background: linear-gradient(to top, rgba(20,10,25,0.55) 0%, transparent 100%);
+    }
+
+    /* ── touhou text theme ────────────────────────────────────────────────  */
+    body.theme-touhou .header h1       { color: #d98a6a; }
+    body.theme-touhou .header h1 span  { color: #e0567a; }
+    body.theme-touhou .code-input      { background: rgba(30,14,20,0.78); border-color: #5c2a34; color: #e8d2c8; }
+    body.theme-touhou .code-btn        { background: rgba(30,14,20,0.78); border-color: #5c2a34; }
+    body.theme-touhou .entry           { border-left-color: #7a3b46; }
+    body.theme-touhou .entry-meta .tag { color: #e0567a; }
+    body.theme-touhou .entry-title     { color: #f0ddd0; }
+    body.theme-touhou .entry-content   { color: #c9a99a; }
+
     /* countdown */
     .countdown {
       display: none;
@@ -327,6 +397,35 @@
     <div class="mist"></div>
   </div>
 
+  <div class="touhou-scene" id="touhouScene" aria-hidden="true">
+    <div class="touhou-sun"></div>
+    <svg class="touhou-land" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- distant mountains -->
+      <path d="M0,340 Q120,280 260,330 T520,310 T760,335 T1000,300 L1000,500 L0,500 Z" fill="#3d2b4a" opacity=".55"/>
+      <path d="M0,380 Q150,330 320,370 T620,350 T1000,375 L1000,500 L0,500 Z" fill="#2a1d38" opacity=".7"/>
+      <!-- shrine hill -->
+      <path d="M555,405 Q650,362 765,405 L765,500 L555,500 Z" fill="#1c1424"/>
+      <!-- shrine roof silhouette -->
+      <path d="M628,368 L660,340 L692,368 Z" fill="#150e1c"/>
+      <rect x="646" y="368" width="28" height="28" fill="#150e1c"/>
+      <!-- torii gate -->
+      <g class="torii">
+        <rect x="330" y="230" width="18" height="200" fill="#241016"/>
+        <rect x="500" y="230" width="18" height="200" fill="#241016"/>
+        <rect x="310" y="300" width="228" height="14" fill="#241016"/>
+        <rect x="415" y="244" width="20" height="20" fill="#2c1319"/>
+        <rect x="315" y="234" width="220" height="10" fill="#2c1319"/>
+        <rect x="295" y="215" width="260" height="16" rx="3" fill="#2c1319"/>
+      </g>
+    </svg>
+    <div class="sakura s1"></div>
+    <div class="sakura s2"></div>
+    <div class="sakura s3"></div>
+    <div class="sakura s4"></div>
+    <div class="sakura s5"></div>
+    <div class="touhou-mist"></div>
+  </div>
+
   <div class="bamboo-bubble" id="bambooBubble">*rustle* *rustle*</div>
   <button class="bamboo-hotspot" id="bambooHotspot" onclick="onBambooGlowClick(event)" aria-label="something rustles"></button>
 
@@ -426,6 +525,9 @@
     const CODES = {
       '342555289c792d3ce36ef04c1162d54b8c9f6f41eaa24d870e38e7f2e76e4d9d': {
         theme: 'kaguya',
+      },
+      '8b6445b5e21f1472b1e4b4403b0772a9c5cbdf324db228ae9e8e968edd1d2036': {
+        theme: 'touhou',
       },
     };
 
