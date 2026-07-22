@@ -866,6 +866,12 @@ const gameData = {
       {w:'よって',r:'よって',m:'therefore; due to; according to (～によって)',cat:'フィールド'},
       {w:'まま',r:'まま',m:'as is; while remaining in a state (e.g. 座ったまま = while staying seated)',cat:'フィールド'},
       {w:'必要',r:'ひつよう',m:'necessary; necessity',cat:'フィールド'},
+      {w:'受付',r:'うけつけ',m:'reception; front desk; acceptance (of an application)',cat:'フィールド'},
+      {w:'終了',r:'しゅうりょう',m:'end; conclusion; termination; completion',cat:'フィールド'},
+      {w:'練習',r:'れんしゅう',m:'practice; training; drill',cat:'フィールド'},
+      {w:'謎',r:'なぞ',m:'mystery; riddle; puzzle; enigma',cat:'フィールド'},
+      {w:'じっと',r:'じっと',m:'fixedly; intently; motionlessly; steadily',cat:'フィールド'},
+      {w:'られる',r:'られる',m:'passive / potential ending — to be done to; to be able to do (〜られる on ichidan verbs; 〜れる on godan, e.g. 読まれる)',cat:'フィールド'},
       // ── わざ ─────────────────────────────────────────────────────────
       {w:'体当たり',r:'たいあたり',m:'Tackle — throw oneself bodily at the target',cat:'わざ'},
       {w:'睨みつける',r:'にらみつける',m:'Leer — glare hard at the target to lower its Defense',cat:'わざ'},
@@ -1133,6 +1139,9 @@ const gameData = {
       {s:'ポケモンの種類によって鳴き声が違う。',r:'ポケモンのしゅるいによってなきごえがちがう。',a:'The cry differs depending on the kind of Pokémon.'},
       {s:'目を閉じたまま話を聞いた。',r:'めをとじたままはなしをきいた。',a:'I listened to the story with my eyes closed.'},
       {s:'強くなるためには練習が必要だ。',r:'つよくなるためにはれんしゅうがひつようだ。',a:'In order to become strong, practice is necessary.'},
+      {s:'受付で質問してみた。',r:'うけつけでしつもんしてみた。',a:'I tried asking a question at the reception desk.'},
+      {s:'戦闘が終了した。',r:'せんとうがしゅうりょうした。',a:'The battle ended.'},
+      {s:'ポケモンは大切に育てられる。',r:'ポケモンはたいせつにそだてられる。',a:'Pokémon are raised with care.'},
     ],
   },
 
