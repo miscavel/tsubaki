@@ -273,24 +273,43 @@
       position: fixed;
       inset: 0;
       display: none;
+      align-items: center;
+      justify-content: center;
+      padding-top: 112px;
       pointer-events: none;
       z-index: 1;
     }
-    body.theme-touhou .relic-field { display: block; }
+    body.theme-touhou .relic-field { display: flex; }
+
+    .relic-stage {
+      position: relative;
+      width: min(76vw, 60vh);
+      height: min(76vw, 60vh);
+      max-width: 460px;
+      max-height: 460px;
+    }
+    .relic-star-lines {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      overflow: visible;
+    }
+    .relic-star-lines path {
+      fill: none;
+      stroke: rgba(255, 214, 150, 0.4);
+      stroke-width: 0.6;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 3px rgba(255,180,110,0.55));
+    }
 
     .relic {
       position: absolute;
       transform: translate(-50%, -50%);
-      width: min(20vw, 17vh, 132px);
+      width: 22%;
       padding: 0;
       pointer-events: auto;
       cursor: pointer;
       background: none;
       border: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
     }
     .relic-frame {
       width: 100%;
@@ -320,19 +339,12 @@
       font-size: 0.7rem; color: #f6ab57;
       text-shadow: 0 0 4px rgba(0,0,0,0.9);
     }
-    .relic-label {
-      font-size: 0.62rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(233, 210, 200, 0.75);
-      text-shadow: 0 0 4px rgba(0,0,0,0.8);
-    }
 
-    .relic[data-part="head"]      { left: 50%; top: 11%; }
-    .relic[data-part="leftArm"]   { left: 13%; top: 42%; }
-    .relic[data-part="rightArm"]  { left: 87%; top: 42%; }
-    .relic[data-part="leftLeg"]   { left: 27%; top: 82%; }
-    .relic[data-part="rightLeg"]  { left: 73%; top: 82%; }
+    .relic[data-part="head"]      { left: 50%; top: 13%; }
+    .relic[data-part="leftArm"]   { left: 15%; top: 45%; }
+    .relic[data-part="rightArm"]  { left: 85%; top: 45%; }
+    .relic[data-part="leftLeg"]   { left: 28%; top: 84%; }
+    .relic[data-part="rightLeg"]  { left: 72%; top: 84%; }
 
     .relic-center {
       position: absolute;
@@ -689,7 +701,12 @@
   <button class="howto-btn" id="howtoBtn" type="button" aria-label="how to play">?</button>
 
   <div class="relic-field" id="relicField" aria-hidden="true">
-    <!-- relics + center injected by jigsaw.js -->
+    <div class="relic-stage" id="relicStage">
+      <svg class="relic-star-lines" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <path d="M50,13 L72,84 L15,45 L85,45 L28,84 Z"/>
+      </svg>
+      <!-- relics + center injected by jigsaw.js -->
+    </div>
   </div>
 
   <div class="reveal-modal" id="revealModal" aria-hidden="true">
@@ -716,7 +733,7 @@
       <button class="howto-close" id="howtoClose" type="button" aria-label="close">✕</button>
       <h2>How to play</h2>
       <ol>
-        <li>Grab your spellbook — yes, the little boogie board — and draw a 3×3 grid on it.</li>
+        <li>Grab your spellbook and draw a 3×3 grid on it.</li>
         <li>Each time a piece is revealed, sketch what you see into the matching square.</li>
         <li>Once all nine squares are filled in, type your guess for what the relic shows.</li>
       </ol>
@@ -888,7 +905,7 @@
     // ── exodia relic hunt ────────────────────────────────────────────────
     if (window.Jigsaw) {
       Jigsaw.createRelicHunt({
-        field: document.getElementById('relicField'),
+        field: document.getElementById('relicStage'),
         el: {
           modal:        document.getElementById('revealModal'),
           back:         document.getElementById('revealBack'),

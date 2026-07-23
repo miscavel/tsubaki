@@ -66,8 +66,12 @@
     });
     save();
 
+    // Only the single most-recently revealed piece is ever shown at once —
+    // earlier pieces are hidden again so the player has to actually draw
+    // each one onto their own grid instead of reading it off the screen.
     function revealedSet(st) {
-      return st.solved ? new Set([...Array(N).keys()]) : new Set(st.order.slice(0, st.revealedCount));
+      if (st.solved) return new Set([...Array(N).keys()]);
+      return st.revealedCount > 0 ? new Set([st.order[st.revealedCount - 1]]) : new Set();
     }
 
     // ── build relic buttons + centre ────────────────────────────────────
@@ -90,12 +94,7 @@
       frame.appendChild(preview);
       frame.appendChild(check);
 
-      const label = document.createElement('span');
-      label.className = 'relic-label';
-      label.textContent = p.label;
-
       btn.appendChild(frame);
-      btn.appendChild(label);
       btn.addEventListener('click', () => openReveal(i));
       field.appendChild(btn);
       relics.push({ btn, preview, check });
@@ -122,7 +121,7 @@
       const all = solvedCount === parts.length;
       center.classList.toggle('unlocked', all);
       center.innerHTML = all
-        ? `<span>${cfg.rewardCode}</span><small>your code</small>`
+        ? `<span>${cfg.rewardCode}</span>`
         : `<span>?</span><small>${solvedCount}/${parts.length}</small>`;
     }
     function renderAll() {
