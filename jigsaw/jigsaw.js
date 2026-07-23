@@ -75,7 +75,9 @@
     }
 
     // ── build relic buttons + centre ────────────────────────────────────
-    field.innerHTML = '';
+    // Only clear previously-injected relics/centre — the field also holds
+    // static markup (star lines, how-to button) that must survive re-init.
+    field.querySelectorAll('.relic, .relic-center').forEach(e => e.remove());
     const relics = [];
     parts.forEach((p, i) => {
       const btn = document.createElement('button');

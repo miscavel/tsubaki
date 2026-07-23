@@ -171,9 +171,48 @@
       overflow: hidden;
       transition: opacity 2.5s ease;
       background: linear-gradient(to bottom,
-        #3a2450 0%, #8a3f68 24%, #c8556e 44%, #ea7d4e 62%, #f6ab57 80%, #fcd489 100%);
+        #241640 0%, #3f2050 13%, #6b2f5e 26%, #9c3f68 39%, #c8506a 51%,
+        #e06f56 62%, #ec8c4e 72%, #f4ac5a 81%, #f9c877 89%, #fde3a3 96%, #fff0c2 100%);
     }
     body.theme-touhou .touhou-scene { opacity: 1; }
+
+    .touhou-cloud {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(20px);
+      background: radial-gradient(ellipse at center, rgba(255,224,190,0.75), transparent 72%);
+    }
+    .c1 { width: 280px; height: 62px; left: 6%;  top: 20%; opacity: .4; }
+    .c2 { width: 360px; height: 76px; left: 52%; top: 12%; opacity: .32; }
+    .c3 { width: 230px; height: 52px; left: 28%; top: 30%; opacity: .26; }
+
+    .touhou-glow {
+      position: absolute;
+      left: 62%;
+      bottom: 22%;
+      width: 900px;
+      height: 900px;
+      transform: translate(-50%, 50%);
+      background: radial-gradient(circle,
+        rgba(255,220,160,0.55) 0%, rgba(255,175,115,0.28) 30%,
+        rgba(225,110,110,0.12) 55%, transparent 75%);
+      mix-blend-mode: screen;
+    }
+    .touhou-rays {
+      position: absolute;
+      left: 62%;
+      bottom: 22%;
+      width: 1300px;
+      height: 1300px;
+      transform: translate(-50%, 50%);
+      background: repeating-conic-gradient(from 0deg,
+        rgba(255,236,195,0.16) 0deg 4deg, transparent 4deg 16deg);
+      -webkit-mask-image: radial-gradient(circle, black 0%, black 22%, transparent 65%);
+              mask-image: radial-gradient(circle, black 0%, black 22%, transparent 65%);
+      mix-blend-mode: soft-light;
+      animation: raysDrift 50s linear infinite;
+    }
+    @keyframes raysDrift { to { transform: translate(-50%, 50%) rotate(360deg); } }
 
     .touhou-sun {
       position: absolute;
@@ -253,20 +292,20 @@
     body.theme-touhou .code-form { position: relative; z-index: 4; margin-bottom: 0; }
 
     .howto-btn {
-      display: none;
-      position: fixed;
-      top: 14px; right: 14px;
+      position: absolute;
+      top: -10px; right: -10px;
       z-index: 6;
       width: 30px; height: 30px;
       border-radius: 50%;
       border: 1px solid #5c2a34;
-      background: rgba(30,14,20,0.8);
+      background: rgba(30,14,20,0.85);
       color: #e8d2c8;
       font-size: 0.85rem;
+      display: flex;
       align-items: center; justify-content: center;
       cursor: pointer;
+      pointer-events: auto;
     }
-    body.theme-touhou .howto-btn { display: flex; }
     .howto-btn:hover { background: rgba(50,22,30,0.9); }
 
     .relic-field {
@@ -294,11 +333,11 @@
       overflow: visible;
     }
     .relic-star-lines path {
-      fill: none;
-      stroke: rgba(255, 214, 150, 0.4);
-      stroke-width: 0.6;
+      fill: rgba(255, 205, 130, 0.06);
+      stroke: rgba(255, 226, 180, 0.85);
+      stroke-width: 1;
       stroke-linejoin: round;
-      filter: drop-shadow(0 0 3px rgba(255,180,110,0.55));
+      filter: drop-shadow(0 0 5px rgba(255,190,110,0.85)) drop-shadow(0 0 12px rgba(255,160,90,0.5));
     }
 
     .relic {
@@ -635,6 +674,11 @@
   </div>
 
   <div class="touhou-scene" id="touhouScene" aria-hidden="true">
+    <div class="touhou-cloud c1"></div>
+    <div class="touhou-cloud c2"></div>
+    <div class="touhou-cloud c3"></div>
+    <div class="touhou-glow"></div>
+    <div class="touhou-rays"></div>
     <div class="touhou-sun"></div>
     <svg class="touhou-land" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -698,13 +742,12 @@
     <div id="entries" class="entries"></div>
   </div>
 
-  <button class="howto-btn" id="howtoBtn" type="button" aria-label="how to play">?</button>
-
   <div class="relic-field" id="relicField" aria-hidden="true">
     <div class="relic-stage" id="relicStage">
       <svg class="relic-star-lines" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <path d="M50,13 L72,84 L15,45 L85,45 L28,84 Z"/>
       </svg>
+      <button class="howto-btn" id="howtoBtn" type="button" aria-label="how to play">?</button>
       <!-- relics + center injected by jigsaw.js -->
     </div>
   </div>
