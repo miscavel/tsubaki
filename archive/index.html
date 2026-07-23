@@ -247,104 +247,124 @@
       text-shadow: 0 0 18px rgba(255,230,140,0.55), 0 0 44px rgba(255,220,120,0.25);
     }
 
-    /* ── touhou: no scroll + Exodia star of jigsaw puzzles ───────────────── */
+    /* ── touhou: no scroll + Exodia relic hunt ────────────────────────────── */
     body.theme-touhou { overflow: hidden; }
     body.theme-touhou .header { display: none; }
     body.theme-touhou .code-form { position: relative; z-index: 4; margin-bottom: 0; }
 
-    .exodia {
+    .howto-btn {
+      display: none;
+      position: fixed;
+      top: 14px; right: 14px;
+      z-index: 6;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 1px solid #5c2a34;
+      background: rgba(30,14,20,0.8);
+      color: #e8d2c8;
+      font-size: 0.85rem;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    body.theme-touhou .howto-btn { display: flex; }
+    .howto-btn:hover { background: rgba(50,22,30,0.9); }
+
+    .relic-field {
       position: fixed;
       inset: 0;
       display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 76px 14px 22px;
       pointer-events: none;
       z-index: 1;
     }
-    body.theme-touhou .exodia { display: flex; }
+    body.theme-touhou .relic-field { display: block; }
 
-    .exodia-field {
-      position: relative;
-      width: min(92vw, 72vh);
-      height: min(92vw, 72vh);
-      max-width: 640px;
-      max-height: 640px;
-    }
-    .exodia-star-lines {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      overflow: visible;
-    }
-    .exodia-star-lines path {
-      fill: none;
-      stroke: rgba(255, 214, 150, 0.45);
-      stroke-width: 0.7;
-      stroke-linejoin: round;
-      filter: drop-shadow(0 0 3px rgba(255,180,110,0.6));
-    }
-
-    .exodia-point {
+    .relic {
       position: absolute;
       transform: translate(-50%, -50%);
-      width: 22%;
+      width: min(20vw, 17vh, 132px);
       padding: 0;
+      pointer-events: auto;
+      cursor: pointer;
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .relic-frame {
+      width: 100%;
+      aspect-ratio: 1;
       border: 2px solid rgba(255, 220, 160, 0.55);
       border-radius: 6px;
-      background: rgba(20, 10, 16, 0.5);
+      background: #000;
       box-shadow: 0 0 12px rgba(0,0,0,0.4);
-      cursor: pointer;
-      pointer-events: auto;
       overflow: hidden;
+      position: relative;
       transition: box-shadow 0.3s, border-color 0.3s;
     }
-    .exodia-point:hover { box-shadow: 0 0 18px rgba(255,180,110,0.5); }
-    .exodia-point.solved { border-color: #f6ab57; box-shadow: 0 0 16px 2px rgba(246,171,87,0.5); }
-    .exodia-preview {
+    .relic:hover .relic-frame { box-shadow: 0 0 18px rgba(255,180,110,0.5); }
+    .relic.solved .relic-frame { border-color: #f6ab57; box-shadow: 0 0 16px 2px rgba(246,171,87,0.5); }
+    .relic-preview {
       display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
       gap: 1px;
-      aspect-ratio: var(--slice-aspect, 800 / 227);
+      width: 100%; height: 100%;
       background: #000;
     }
-    .exodia-preview > div { background-repeat: no-repeat; }
-    .exodia-point.solved .exodia-preview { gap: 0; }
-    .exodia-check {
-      position: absolute; right: 4px; bottom: 1px;
+    .relic-preview > div { background-repeat: no-repeat; background-color: #050505; }
+    .relic.solved .relic-preview { gap: 0; }
+    .relic-check {
+      position: absolute; right: 3px; bottom: 1px;
       font-size: 0.7rem; color: #f6ab57;
       text-shadow: 0 0 4px rgba(0,0,0,0.9);
     }
+    .relic-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(233, 210, 200, 0.75);
+      text-shadow: 0 0 4px rgba(0,0,0,0.8);
+    }
 
-    .exodia-center {
+    .relic[data-part="head"]      { left: 50%; top: 11%; }
+    .relic[data-part="leftArm"]   { left: 13%; top: 42%; }
+    .relic[data-part="rightArm"]  { left: 87%; top: 42%; }
+    .relic[data-part="leftLeg"]   { left: 27%; top: 82%; }
+    .relic[data-part="rightLeg"]  { left: 73%; top: 82%; }
+
+    .relic-center {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 21%;
+      width: min(19vw, 16vh, 124px);
       aspect-ratio: 1;
       border-radius: 50%;
       border: 2px solid rgba(255, 220, 160, 0.5);
       background: radial-gradient(circle at 50% 45%, rgba(60,26,40,0.85), rgba(20,10,16,0.92));
       color: rgba(255, 225, 180, 0.62);
-      cursor: pointer;
       pointer-events: auto;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 1px;
       transition: box-shadow 0.5s, border-color 0.5s, color 0.5s;
     }
-    .exodia-center span { font-size: 1.15rem; line-height: 1; }
-    .exodia-center small { font-size: 0.58rem; letter-spacing: 0.1em; opacity: 0.75; }
-    .exodia-center.unlocked {
+    .relic-center span { font-size: 1.1rem; line-height: 1; }
+    .relic-center small { font-size: 0.56rem; letter-spacing: 0.08em; opacity: 0.75; }
+    .relic-center.unlocked {
       border-color: #ffd27a;
       color: #ffe9c0;
       animation: centerPulse 2.6s ease-in-out infinite;
     }
+    .relic-center.unlocked span { font-size: 1.35rem; font-family: 'SF Mono', 'Fira Code', monospace; letter-spacing: 0.1em; }
     @keyframes centerPulse {
       0%,100% { box-shadow: 0 0 20px 4px rgba(255,200,120,0.45), inset 0 0 14px rgba(255,190,110,0.3); }
       50%     { box-shadow: 0 0 34px 10px rgba(255,210,140,0.6), inset 0 0 22px rgba(255,200,130,0.45); }
     }
 
-    /* focused puzzle modal */
-    .puzzle-focus {
+    /* reveal modal */
+    .reveal-modal {
       position: fixed;
       inset: 0;
       display: none;
@@ -353,40 +373,104 @@
       flex-direction: column;
       gap: 14px;
       padding: 20px;
-      background: rgba(10, 6, 12, 0.82);
+      background: rgba(10, 6, 12, 0.86);
       z-index: 10;
     }
-    .puzzle-focus.open { display: flex; }
-    .puzzle-focus-grid {
-      width: min(92vw, 560px);
+    .reveal-modal.open { display: flex; }
+    .reveal-title { font-size: 0.95rem; letter-spacing: 0.05em; color: #f0ddd0; }
+    .reveal-grid {
+      width: min(78vw, 78vh, 420px);
       display: grid;
-      gap: 2px;
-      aspect-ratio: var(--slice-aspect, 800 / 227);
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 3px;
+      aspect-ratio: 1;
       background: #000;
       border-radius: 4px;
       overflow: hidden;
       box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 8px 30px rgba(0,0,0,0.5);
       transition: box-shadow 0.6s ease, gap 0.4s ease;
     }
-    .puzzle-focus-grid.solved { gap: 0; box-shadow: 0 0 30px 6px rgba(246,171,87,0.5); }
-    .puzzle-tile {
-      padding: 0; border: none; cursor: pointer;
+    .reveal-grid.solved { gap: 0; box-shadow: 0 0 30px 6px rgba(246,171,87,0.5); }
+    .reveal-cell {
+      background-color: #0c0810;
       background-repeat: no-repeat;
-      outline: 2px solid transparent; outline-offset: -2px;
-      transition: outline-color 0.15s;
+      transition: background-color 0.2s;
     }
-    .puzzle-tile.selected { outline-color: #f6ab57; }
-    .puzzle-focus-grid.solved .puzzle-tile { cursor: default; }
-    .puzzle-back {
-      align-self: flex-start;
+    .reveal-progress { font-size: 0.8rem; color: rgba(233,210,200,0.75); letter-spacing: 0.03em; }
+
+    .reveal-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .reveal-btn, .puzzle-back {
       background: rgba(30,14,20,0.8);
       border: 1px solid #5c2a34;
       color: #e8d2c8;
       padding: 8px 16px; border-radius: 4px;
       font-size: 0.85rem; cursor: pointer;
     }
-    .puzzle-back:hover { background: rgba(50,22,30,0.9); }
-    .puzzle-hint { font-size: 0.78rem; color: rgba(233,210,200,0.6); letter-spacing: 0.03em; }
+    .reveal-btn:hover, .puzzle-back:hover { background: rgba(50,22,30,0.9); }
+    .reveal-btn:disabled { opacity: 0.4; cursor: default; }
+    .puzzle-back { align-self: flex-start; position: absolute; top: 20px; left: 20px; }
+
+    .reveal-guess { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .reveal-guess-row { display: flex; gap: 8px; }
+    .reveal-guess-row input {
+      width: 160px;
+      padding: 9px 12px;
+      background: rgba(30,14,20,0.8);
+      border: 1px solid #5c2a34;
+      border-radius: 4px;
+      color: #e8d2c8;
+      font-size: 0.9rem;
+      text-align: center;
+      outline: none;
+    }
+    .reveal-guess-row input.error { border-color: #b3403f; animation: relicShake 0.25s; }
+    @keyframes relicShake {
+      0%,100% { transform: translateX(0) }
+      25%      { transform: translateX(-6px) }
+      75%      { transform: translateX(6px) }
+    }
+    .reveal-guess-row button {
+      background: rgba(30,14,20,0.8);
+      border: 1px solid #5c2a34;
+      color: #e8d2c8;
+      padding: 9px 16px; border-radius: 4px;
+      font-size: 0.85rem; cursor: pointer;
+    }
+    .reveal-guess-row button:hover { background: rgba(50,22,30,0.9); }
+    .reveal-hint { font-size: 0.72rem; color: rgba(233,210,200,0.55); }
+    .reveal-solved-note { font-size: 0.85rem; color: #f6ab57; }
+
+    /* how-to-play modal */
+    .howto-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(10, 6, 12, 0.86);
+      z-index: 11;
+    }
+    .howto-modal.open { display: flex; }
+    .howto-card {
+      position: relative;
+      max-width: 380px;
+      width: 100%;
+      background: rgba(24,12,18,0.95);
+      border: 1px solid #5c2a34;
+      border-radius: 8px;
+      padding: 24px 22px;
+      color: #e8d2c8;
+    }
+    .howto-card h2 { font-size: 1rem; margin-bottom: 14px; color: #f0ddd0; }
+    .howto-card ol { padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem; line-height: 1.5; color: #d8c5bc; }
+    .howto-close {
+      position: absolute; top: 12px; right: 12px;
+      background: none; border: none;
+      color: #e8d2c8; font-size: 1rem; cursor: pointer;
+      width: 26px; height: 26px;
+    }
 
     /* ── kaguya text theme ─────────────────────────────────────────────── */
     body.theme-kaguya .header h1       { color: #7a9a88; }
@@ -602,19 +686,41 @@
     <div id="entries" class="entries"></div>
   </div>
 
-  <div class="exodia" id="exodia" aria-hidden="true">
-    <div class="exodia-field" id="exodiaField">
-      <svg class="exodia-star-lines" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <path d="M50,5 L76.5,86.4 L7.2,36.1 L92.8,36.1 L23.5,86.4 Z"/>
-      </svg>
-      <!-- points + center injected by jigsaw.js -->
-    </div>
+  <button class="howto-btn" id="howtoBtn" type="button" aria-label="how to play">?</button>
+
+  <div class="relic-field" id="relicField" aria-hidden="true">
+    <!-- relics + center injected by jigsaw.js -->
   </div>
 
-  <div class="puzzle-focus" id="puzzleFocus" aria-hidden="true">
-    <button class="puzzle-back" id="puzzleBack" type="button">← back</button>
-    <div class="puzzle-focus-grid" id="puzzleFocusGrid"></div>
-    <div class="puzzle-hint">tap two pieces to swap them</div>
+  <div class="reveal-modal" id="revealModal" aria-hidden="true">
+    <button class="puzzle-back" id="revealBack" type="button">← back</button>
+    <div class="reveal-title" id="revealTitle"></div>
+    <div class="reveal-grid" id="revealGrid"></div>
+    <div class="reveal-progress" id="revealProgress"></div>
+    <div class="reveal-controls">
+      <button class="reveal-btn" id="revealNextBtn" type="button">Reveal next piece</button>
+      <button class="reveal-btn" id="revealRestartBtn" type="button" style="display:none">Restart</button>
+    </div>
+    <div class="reveal-guess" id="revealGuess">
+      <div class="reveal-guess-row">
+        <input id="revealGuessInput" type="text" autocomplete="off" spellcheck="false" placeholder="your guess">
+        <button id="revealGuessBtn" type="button">Guess</button>
+      </div>
+      <div class="reveal-hint" id="revealHint"></div>
+    </div>
+    <div class="reveal-solved-note" id="revealSolvedNote" style="display:none"></div>
+  </div>
+
+  <div class="howto-modal" id="howtoModal" aria-hidden="true">
+    <div class="howto-card">
+      <button class="howto-close" id="howtoClose" type="button" aria-label="close">✕</button>
+      <h2>How to play</h2>
+      <ol>
+        <li>Grab your spellbook — yes, the little boogie board — and draw a 3×3 grid on it.</li>
+        <li>Each time a piece is revealed, sketch what you see into the matching square.</li>
+        <li>Once all nine squares are filled in, type your guess for what the relic shows.</li>
+      </ol>
+    </div>
   </div>
 
   <script src="../jigsaw/jigsaw.js"></script>
@@ -779,17 +885,43 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // ── exodia jigsaw star ─────────────────────────────────────────────────
+    // ── exodia relic hunt ────────────────────────────────────────────────
     if (window.Jigsaw) {
-      Jigsaw.createExodia({
-        field:     document.getElementById('exodiaField'),
-        focus:     document.getElementById('puzzleFocus'),
-        focusGrid: document.getElementById('puzzleFocusGrid'),
-        backBtn:   document.getElementById('puzzleBack'),
-        image: '../jigsaw/14176249_p0.jpg',
-        imageW: 800, imageH: 1135,
-        cols: 3, rowsPerSlice: 2, slices: 5,
-        storageKey: 'archive_touhou_exodia_v1',
+      Jigsaw.createRelicHunt({
+        field: document.getElementById('relicField'),
+        el: {
+          modal:        document.getElementById('revealModal'),
+          back:         document.getElementById('revealBack'),
+          title:        document.getElementById('revealTitle'),
+          grid:         document.getElementById('revealGrid'),
+          progress:     document.getElementById('revealProgress'),
+          nextBtn:      document.getElementById('revealNextBtn'),
+          restartBtn:   document.getElementById('revealRestartBtn'),
+          guessWrap:    document.getElementById('revealGuess'),
+          guessInput:   document.getElementById('revealGuessInput'),
+          guessBtn:     document.getElementById('revealGuessBtn'),
+          hint:         document.getElementById('revealHint'),
+          solvedNote:   document.getElementById('revealSolvedNote'),
+        },
+        howto: {
+          openBtn:  document.getElementById('howtoBtn'),
+          modal:    document.getElementById('howtoModal'),
+          closeBtn: document.getElementById('howtoClose'),
+        },
+        storageKey: 'archive_touhou_relics_v1',
+        rewardCode: '000',
+        parts: [
+          { key: 'head',     label: 'Head',       image: '../jigsaw/head.png',
+            answerHash: 'dfe5b6fcfa43874b206b67ff0d6df26f39c6b923ac6868f04db113aef3904761', answerLength: 4 },
+          { key: 'leftArm',  label: 'Left Arm',    image: '../jigsaw/left_arm.png',
+            answerHash: 'f045b9ca8f63f35d8c8da4254d18f914ac5b2d47f87e763b3b2e435ad2f7373d', answerLength: 2 },
+          { key: 'rightArm', label: 'Right Arm',   image: '../jigsaw/right_arm.jpeg',
+            answerHash: '161e1fb0094a653b4f2ffaae9988be294e0a7adb612f0cef94fd619b64e886c3', answerLength: 3 },
+          { key: 'leftLeg',  label: 'Left Leg',    image: '../jigsaw/left_leg.jpg',
+            answerHash: '69bdaae2f6a215b745094455de3e6cecb5ec52fffe1cedaf98f42c9fa8c7f4e4', answerLength: 1 },
+          { key: 'rightLeg', label: 'Right Leg',   image: '../jigsaw/right_leg.gif',
+            answerHash: '60577f3b537744ead749e5793e5346210ecf52cea87f186ea7bcf6f45ab59e45', answerLength: 4 },
+        ],
       });
     }
 
