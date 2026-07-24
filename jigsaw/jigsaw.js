@@ -147,7 +147,7 @@
         el.grid.appendChild(cell);
         cellEls.push(cell);
       }
-      el.hint.textContent = `${p.answerLength} character${p.answerLength === 1 ? '' : 's'}`;
+      el.hint.textContent = `${p.answerLength} character${p.answerLength === 1 ? '' : 's'}, in kanji`;
       el.guessInput.value = '';
       el.guessInput.classList.remove('error');
       renderModal();
