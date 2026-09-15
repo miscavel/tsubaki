@@ -28,12 +28,12 @@
       overflow: hidden;
       transition: opacity 2.5s ease;
       background: linear-gradient(to bottom,
-        #03030e 0%, #07071e 35%, #0c1226 65%, #101820 100%);
+        #0b0b0c 0%, #121214 35%, #191a1b 65%, #131416 100%);
     }
     body.theme-kaguya .night-scene { opacity: 1; }
 
     /* stars */
-    #starCanvas { position: absolute; inset: 0; }
+    #starCanvas { position: absolute; inset: 0; opacity: .42; }
 
     /* moon */
     .moon {
@@ -44,12 +44,12 @@
       height: 148px;
       border-radius: 50%;
       background: radial-gradient(circle at 38% 35%,
-        #fffef8, #f7e87a 52%, #e2c848);
+        #9c9c98, #75756f 52%, #4f4f4a);
+      /* no warm pulse any more — whatever was watching has gone home */
       box-shadow:
-        0 0 24px 9px  rgba(255, 244, 155, 0.50),
-        0 0 65px 30px rgba(255, 235, 120, 0.24),
-        0 0 140px 70px rgba(255, 222, 80, 0.09);
-      animation: moonPulse 7s ease-in-out infinite;
+        0 0 16px 5px   rgba(150, 150, 145, 0.14),
+        0 0 44px 18px  rgba(125, 125, 120, 0.07),
+        0 0 100px 46px rgba(110, 110, 106, 0.035);
     }
     .moon::after {
       content: '';
@@ -57,22 +57,8 @@
       inset: 0;
       border-radius: 50%;
       background:
-        radial-gradient(circle at 62% 28%, rgba(255,255,255,0.18) 0%, transparent 35%),
-        radial-gradient(circle at 28% 68%, rgba(200,185,140,0.22) 0%, transparent 28%);
-    }
-    @keyframes moonPulse {
-      0%, 100% {
-        box-shadow:
-          0 0 24px 9px  rgba(255,244,155,.50),
-          0 0 65px 30px rgba(255,235,120,.24),
-          0 0 140px 70px rgba(255,222,80,.09);
-      }
-      50% {
-        box-shadow:
-          0 0 34px 14px rgba(255,244,155,.60),
-          0 0 88px 42px rgba(255,235,120,.30),
-          0 0 190px 95px rgba(255,222,80,.12);
-      }
+        radial-gradient(circle at 62% 28%, rgba(255,255,255,0.10) 0%, transparent 35%),
+        radial-gradient(circle at 28% 68%, rgba(120,120,116,0.30) 0%, transparent 28%);
     }
 
     /* bamboo */
@@ -83,25 +69,55 @@
       width: 280px;
       height: 92%;
       pointer-events: none;
-      filter: drop-shadow(0 0 10px rgba(55, 170, 75, 0.22));
+      filter: grayscale(1) brightness(.88) drop-shadow(0 0 10px rgba(150, 150, 146, 0.14));
     }
     .bamboo-wrap svg { width: 100%; height: 100%; }
 
-    /* the segment where something is folded shut, glowing softly */
+    /* the segment that once glowed — the light in it has gone out, leaving
+       the culm scorched where it used to shine through */
     .glow-halo {
-      fill: #ffe9ac;
-      filter: blur(5px);
+      fill: #101410;
+      filter: blur(4px);
       opacity: .45;
-      animation: bambooGlow 3.4s ease-in-out infinite;
     }
     .glow-core {
-      fill: #fff8e2;
-      opacity: .75;
-      animation: bambooGlow 3.4s ease-in-out infinite;
+      fill: #1d221e;
+      opacity: .50;
     }
-    @keyframes bambooGlow {
-      0%, 100% { opacity: .30; }
-      50%      { opacity: .80; }
+
+    /* what is left in the segment: a dull, clouded pearl with a hairline
+       fissure through it. It lives outside .bamboo-wrap so the grayscale
+       filter above does not flatten its jade cast; JS parks it over the
+       segment the same way the hotspot is parked. */
+    .dead-pearl {
+      position: fixed;
+      z-index: 2;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 2.5s ease;
+      background:
+        radial-gradient(circle at 34% 28%,
+          rgba(226,233,225,0.50) 0%, rgba(150,164,152,0.22) 36%, transparent 64%),
+        radial-gradient(circle at 62% 74%,
+          #4f5a53 0%, #363e39 72%, #272d2a 100%);
+      box-shadow:
+        inset 0 0 9px rgba(0,0,0,0.55),
+        0 0 12px 3px  rgba(122,142,128,0.10);
+      animation: pearlDim 9s ease-in-out infinite;
+    }
+    body.theme-kaguya .dead-pearl { opacity: 1; }
+    .dead-pearl::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(112deg, transparent 45%,
+        rgba(18,22,19,0.70) 46.5%, rgba(18,22,19,0.70) 48.5%, transparent 50%);
+    }
+    @keyframes pearlDim {
+      0%, 100% { filter: brightness(1); }
+      50%      { filter: brightness(.78); }
     }
 
     /* rustle bubble */
@@ -109,9 +125,9 @@
       position: fixed;
       z-index: 5;
       transform: translate(-50%, -100%);
-      background: rgba(18, 24, 18, 0.92);
-      border: 1px solid #3a4a3a;
-      color: #e8e0c5;
+      background: rgba(20, 20, 21, 0.92);
+      border: 1px solid #3d3d3d;
+      color: #b9b9b3;
       padding: 7px 14px;
       border-radius: 10px;
       font-size: 0.82rem;
@@ -129,7 +145,7 @@
       transform: translateX(-50%);
       border-width: 6px 6px 0 6px;
       border-style: solid;
-      border-color: rgba(18, 24, 18, 0.92) transparent transparent transparent;
+      border-color: rgba(20, 20, 21, 0.92) transparent transparent transparent;
     }
     .bamboo-bubble.show { opacity: 1; transform: translate(-50%, -114%); }
 
@@ -158,7 +174,7 @@
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 110px;
-      background: linear-gradient(to top, rgba(6,10,22,0.80) 0%, transparent 100%);
+      background: linear-gradient(to top, rgba(9,9,10,0.85) 0%, transparent 100%);
     }
 
     /* ── touhou scene: gensokyo at dusk ──────────────────────────────────── */
@@ -278,12 +294,51 @@
       text-align: center;
     }
     body.theme-kaguya .countdown { display: block; }
+    /* the clock is broken: dead grey, flickering, and torn in two along a
+       seam that slips sideways every few seconds. Both tear layers echo the
+       live readout through data-v, which the JS writes alongside the text. */
     .countdown-clock {
+      position: relative;
       font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 2.6rem;
+      /* clamped so the 11-character readout still fits a phone */
+      font-size: clamp(1.5rem, 9vw, 2.6rem);
       letter-spacing: 0.08em;
-      color: #f3e6a8;
-      text-shadow: 0 0 18px rgba(255,230,140,0.55), 0 0 44px rgba(255,220,120,0.25);
+      color: #6f6f6b;
+      animation: clockFlicker 3.1s steps(1, end) infinite;
+    }
+    .countdown-clock::before,
+    .countdown-clock::after {
+      content: attr(data-v);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      color: #8e8e88;
+      pointer-events: none;
+    }
+    .countdown-clock::before {
+      clip-path: inset(0 0 52% 0);
+      animation: clockTearTop 2.3s steps(1, end) infinite;
+    }
+    .countdown-clock::after {
+      clip-path: inset(54% 0 0 0);
+      animation: clockTearBottom 1.7s steps(1, end) infinite;
+    }
+    @keyframes clockFlicker {
+      0%, 47%, 49%, 77%, 100% { opacity: 1; }
+      48% { opacity: .32; }
+      78% { opacity: .55; }
+    }
+    @keyframes clockTearTop {
+      0%, 82%, 94%, 100% { transform: translateX(0);    opacity: 0; }
+      84% { transform: translateX(-4px); opacity: .85; }
+      88% { transform: translateX(3px);  opacity: .70; }
+      92% { transform: translateX(-2px); opacity: .80; }
+    }
+    @keyframes clockTearBottom {
+      0%, 70%, 84%, 100% { transform: translateX(0);   opacity: 0; }
+      74% { transform: translateX(5px);  opacity: .80; }
+      80% { transform: translateX(-3px); opacity: .65; }
     }
 
     /* ── touhou: no scroll + Exodia relic hunt ────────────────────────────── */
@@ -524,14 +579,14 @@
     }
 
     /* ── kaguya text theme ─────────────────────────────────────────────── */
-    body.theme-kaguya .header h1       { color: #7a9a88; }
-    body.theme-kaguya .header h1 span  { color: #c9aa40; }
-    body.theme-kaguya .code-input      { background: rgba(8,12,26,0.80); border-color: #243040; color: #c8c5b5; }
-    body.theme-kaguya .code-btn        { background: rgba(8,12,26,0.80); border-color: #243040; }
-    body.theme-kaguya .entry           { border-left-color: #2c4a38; }
-    body.theme-kaguya .entry-meta .tag { color: #c9aa40; }
-    body.theme-kaguya .entry-title     { color: #e8e0c5; }
-    body.theme-kaguya .entry-content   { color: #b5ad98; }
+    body.theme-kaguya .header h1       { color: #7c7c78; }
+    body.theme-kaguya .header h1 span  { color: #a9a9a3; }
+    body.theme-kaguya .code-input      { background: rgba(14,14,16,0.82); border-color: #2c2c2e; color: #bdbdb7; }
+    body.theme-kaguya .code-btn        { background: rgba(14,14,16,0.82); border-color: #2c2c2e; }
+    body.theme-kaguya .entry           { border-left-color: #35352f; }
+    body.theme-kaguya .entry-meta .tag { color: #8d8d87; }
+    body.theme-kaguya .entry-title     { color: #cfcfc9; }
+    body.theme-kaguya .entry-content   { color: #9a9a94; }
 
     /* let clicks pass through to the bamboo behind empty parts of the page */
     .page { pointer-events: none; }
@@ -718,8 +773,9 @@
     <div class="touhou-mist"></div>
   </div>
 
-  <div class="bamboo-bubble" id="bambooBubble">*rustle* *rustle*</div>
-  <button class="bamboo-hotspot" id="bambooHotspot" onclick="onBambooGlowClick(event)" aria-label="something rustles"></button>
+  <div class="dead-pearl" id="deadPearl" aria-hidden="true"></div>
+  <div class="bamboo-bubble" id="bambooBubble">*nothing stirs*</div>
+  <button class="bamboo-hotspot" id="bambooHotspot" onclick="onBambooGlowClick(event)" aria-label="a dull pearl"></button>
 
   <div class="page">
     <div class="header">
@@ -736,7 +792,7 @@
     </div>
 
     <div class="countdown" id="countdown" aria-hidden="true">
-      <div class="countdown-clock" id="countdownClock">--:--:--:--</div>
+      <div class="countdown-clock" id="countdownClock" data-v="--:--:--:--">--:--:--:--</div>
     </div>
 
     <div id="entries" class="entries"></div>
@@ -809,7 +865,7 @@
           const alpha  = r() * 0.60 + 0.22;
           ctx.beginPath();
           ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,255,240,${alpha.toFixed(2)})`;
+          ctx.fillStyle = `rgba(238,238,238,${alpha.toFixed(2)})`;
           ctx.fill();
         }
       }
@@ -817,23 +873,36 @@
       draw();
     })();
 
-    // ── glowing bamboo segment ────────────────────────────────────────────
+    // ── the dead bamboo segment ───────────────────────────────────────────
     // The hotspot is a plain <button>, positioned via JS to exactly cover
-    // the SVG glow segment. Filtered ancestors (.bamboo-wrap's drop-shadow)
+    // the SVG segment. Filtered ancestors (.bamboo-wrap's drop-shadow)
     // combined with pointer-events:none can break click hit-testing on
     // nested SVG in some mobile browsers, so we avoid relying on that path.
-    function positionBambooHotspot() {
-      const target  = document.querySelector('.glow-hit');
+    // The pearl rides along the same way: it has to sit outside the
+    // grayscaled .bamboo-wrap, so it is placed from the culm's own box.
+    function positionBambooOverlays() {
+      const hit     = document.querySelector('.glow-hit');
+      const culm    = document.querySelector('.glow-core');
       const hotspot = document.getElementById('bambooHotspot');
-      if (!target || !hotspot) return;
-      const rect = target.getBoundingClientRect();
+      const pearl   = document.getElementById('deadPearl');
+      if (!hit || !hotspot) return;
+      const rect = hit.getBoundingClientRect();
       hotspot.style.left   = rect.left + 'px';
       hotspot.style.top    = rect.top + 'px';
       hotspot.style.width  = rect.width + 'px';
       hotspot.style.height = rect.height + 'px';
+
+      if (pearl && culm) {
+        const c    = culm.getBoundingClientRect();
+        const size = Math.max(18, c.width * 1.65);
+        pearl.style.width  = size + 'px';
+        pearl.style.height = size + 'px';
+        pearl.style.left   = (c.left + c.width  / 2 - size / 2) + 'px';
+        pearl.style.top    = (c.top  + c.height / 2 - size / 2) + 'px';
+      }
     }
-    window.addEventListener('resize', positionBambooHotspot);
-    positionBambooHotspot();
+    window.addEventListener('resize', positionBambooOverlays);
+    positionBambooOverlays();
 
     let bambooBubbleTimer = null;
     function onBambooGlowClick(e) {
@@ -928,22 +997,33 @@
       if (e.key === 'Enter') submitCode();
     });
 
-    // ── tsukimi countdown ─────────────────────────────────────────────────
-    const TSUKIMI_TARGET = new Date(2026, 8, 27, 0, 0, 0);
+    // ── tsukimi countdown: the trial was failed, so it no longer runs ─────
+    // The readout is stuck at the moment it gave out and corrupts a couple
+    // of characters each tick, dropping out entirely now and then. data-v
+    // mirrors the text so the CSS tear layers can echo it.
+    const DEAD_READOUT = '00:00:00:00';
+    const GARBAGE = '0123456789#%&?*-';
+    function corruptReadout(base) {
+      const chars = base.split('');
+      const hits  = 1 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < hits; i++) {
+        const at = Math.floor(Math.random() * chars.length);
+        if (chars[at] === ':') continue;
+        chars[at] = GARBAGE[Math.floor(Math.random() * GARBAGE.length)];
+      }
+      return chars.join('');
+    }
     function updateCountdown() {
-      const el = document.getElementById('countdownClock');
-      const diff = TSUKIMI_TARGET - new Date();
-      if (diff <= 0) { el.textContent = '00:00:00:00'; return; }
-      const totalSeconds = Math.floor(diff / 1000);
-      const days    = Math.floor(totalSeconds / 86400);
-      const hours   = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      const pad = n => String(n).padStart(2, '0');
-      el.textContent = `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+      const el   = document.getElementById('countdownClock');
+      const roll = Math.random();
+      const text = roll < 0.18 ? '--:--:--:--'
+                 : roll < 0.75 ? corruptReadout(DEAD_READOUT)
+                 : DEAD_READOUT;
+      el.textContent = text;
+      el.dataset.v   = text;
     }
     updateCountdown();
-    setInterval(updateCountdown, 1000);
+    setInterval(updateCountdown, 220);
 
     // ── exodia relic hunt ────────────────────────────────────────────────
     if (window.Jigsaw) {
