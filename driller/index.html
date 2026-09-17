@@ -1157,17 +1157,162 @@ function applyUiLang() {
 }
 
 // ── Persistence ───────────────────────────────────────────────────────────────
-function toB64(str) {
-  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+const _JM = ['vocab', 'grammar', 'mix'];
+const _GM = ['vocab', 'imi', 'yomi', 'sentence'];
+const _SUF = ['', '_imi', '_yomi'];
+
+function _bytesToB64(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000)
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
-function fromB64(b64) {
+function _b64ToBytes(b64) {
   const std = b64.replace(/-/g, '+').replace(/_/g, '/');
-  const padded = std + '='.repeat((4 - std.length % 4) % 4);
-  return decodeURIComponent(atob(padded).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
+  const bin = atob(std + '='.repeat((4 - std.length % 4) % 4));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
 }
-function encodeState() {
-  // v4: category-relative indices — adding words in one category never shifts indices in another
+function _Writer() {
+  const b = [];
+  return {
+    u8: v => b.push(v & 255),
+    vint(v) { v >>>= 0; while (v > 127) { b.push((v & 127) | 128); v >>>= 7; } b.push(v); },
+    str(s) { const u = new TextEncoder().encode(s); this.vint(u.length); for (const c of u) b.push(c); },
+    bytes(a) { for (const c of a) b.push(c); },
+    done: () => new Uint8Array(b),
+  };
+}
+function _Reader(bytes) {
+  let p = 0;
+  return {
+    u8: () => bytes[p++],
+    vint() { let v = 0, s = 0, c; do { c = bytes[p++]; v |= (c & 127) << s; s += 7; } while (c & 128); return v >>> 0; },
+    str() { const n = this.vint(); const s = new TextDecoder().decode(bytes.subarray(p, p + n)); p += n; return s; },
+    bytes(n) { const s = bytes.subarray(p, p + n); p += n; return s; },
+  };
+}
+function _vlen(v) { let n = 1; while (v > 127) { v >>>= 7; n++; } return n; }
+// sorted index list → whichever of bitset / delta-list is shorter (dense decks
+// favour the bitset, a handful of high indices favours the deltas)
+function _packIdx(w, idxArr) {
+  if (!idxArr.length) { w.u8(0); return; }
+  const nBytes = (idxArr[idxArr.length - 1] >> 3) + 1;
+  const dw = _Writer();
+  let prev = 0;
+  for (const i of idxArr) { dw.vint(i - prev); prev = i; }
+  const dv = dw.done();
+  if (nBytes + _vlen(nBytes) <= dv.length + _vlen(idxArr.length)) {
+    w.u8(1); w.vint(nBytes);
+    const bits = new Uint8Array(nBytes);
+    for (const i of idxArr) bits[i >> 3] |= 1 << (i & 7);
+    w.bytes(bits);
+  } else {
+    w.u8(2); w.vint(idxArr.length); w.bytes(dv);
+  }
+}
+function _unpackIdx(r) {
+  const mode = r.u8(), out = [];
+  if (mode === 1) {
+    const n = r.vint(), bits = r.bytes(n);
+    for (let i = 0; i < n * 8; i++) if (bits[i >> 3] & (1 << (i & 7))) out.push(i);
+  } else if (mode === 2) {
+    let prev = 0;
+    for (let i = r.vint(); i > 0; i--) { prev += r.vint(); out.push(prev); }
+  }
+  return out;
+}
+// v5: the v4 state packed as bytes — index lists become bitsets, the three
+// decks of a game share one copy of its id and category names
+function packState(st) {
+  const w = _Writer();
+  w.u8(5);
+  w.vint(st.s); w.vint(st.t); w.vint(st.x);
+  let lvMask = 0;
+  for (const lv of st.lv) { const m = /^n([1-5])$/.exec(lv); if (m) lvMask |= 1 << (+m[1] - 1); }
+  w.u8((st.am === 'game' ? 1 : 0) | (st.p ? 2 : 0) | (st.hr ? 4 : 0) | (lvMask << 3));
+  w.u8(Math.max(0, _JM.indexOf(st.jm)) | (Math.max(0, _GM.indexOf(st.gm)) << 2));
+  w.str(st.gi); w.str(st.gc);
+  const games = {};
+  for (const eid of new Set([...Object.keys(st.kw), ...Object.keys(st.ww)])) {
+    const base = eid.replace(/_imi$|_yomi$/, '');
+    (games[base] = games[base] || []).push(eid);
+  }
+  const gEntries = Object.entries(games);
+  w.vint(gEntries.length);
+  for (const [base, eids] of gEntries) {
+    w.str(base);
+    const cats = [];
+    for (const eid of eids)
+      for (const c of [...Object.keys(st.kw[eid] || {}), ...Object.keys(st.ww[eid] || {})])
+        if (!cats.includes(c)) cats.push(c);
+    w.vint(cats.length);
+    for (const c of cats) w.str(c);
+    w.vint(eids.length);
+    for (const eid of eids) {
+      w.u8(_SUF.indexOf(eid.slice(base.length)));
+      const kw = st.kw[eid] || {}, ww = st.ww[eid] || {};
+      const used = cats.filter(c => kw[c] || ww[c]);
+      w.vint(used.length);
+      for (const c of used) {
+        w.vint(cats.indexOf(c));
+        _packIdx(w, (kw[c] || []).slice().sort((a, b) => a - b));
+        const pairs = (ww[c] || []).slice().sort((a, b) => a[0] - b[0]);
+        w.vint(pairs.length);
+        let prev = 0;
+        for (const [idx, iw] of pairs) { w.vint(idx - prev); w.u8(Math.min(255, Math.max(0, iw))); prev = idx; }
+      }
+    }
+  }
+  return w.done();
+}
+function unpackState(bytes) {
+  const r = _Reader(bytes);
+  r.u8(); // version
+  const st = { v: 4, kw: {}, ww: {} };
+  st.s = r.vint(); st.t = r.vint(); st.x = r.vint();
+  const f = r.u8(), e = r.u8();
+  st.am = (f & 1) ? 'game' : 'jlpt';
+  st.p = (f & 2) ? 1 : 0;
+  st.hr = (f & 4) ? 1 : 0;
+  st.jm = _JM[e & 3] || 'vocab';
+  st.gm = _GM[(e >> 2) & 7] || 'vocab';
+  st.lv = [];
+  for (let i = 0; i < 5; i++) if ((f >> 3) & (1 << i)) st.lv.push(`n${i + 1}`);
+  if (!st.lv.length) st.lv = ['n3'];
+  st.gi = r.str(); st.gc = r.str();
+  for (let g = r.vint(); g > 0; g--) {
+    const base = r.str();
+    const cats = [];
+    for (let i = r.vint(); i > 0; i--) cats.push(r.str());
+    for (let d = r.vint(); d > 0; d--) {
+      const eid = base + _SUF[r.u8()];
+      for (let n = r.vint(); n > 0; n--) {
+        const cat = cats[r.vint()];
+        const idx = _unpackIdx(r);
+        if (idx.length) (st.kw[eid] = st.kw[eid] || {})[cat] = idx;
+        const nw = r.vint();
+        if (nw) {
+          const pairs = [];
+          let prev = 0;
+          for (let i = 0; i < nw; i++) { prev += r.vint(); pairs.push([prev, r.u8()]); }
+          (st.ww[eid] = st.ww[eid] || {})[cat] = pairs;
+        }
+      }
+    }
+  }
+  return st;
+}
+// v5 codes are raw bytes starting with 5; anything else is a pre-v5 JSON code
+function decodeState(code) {
+  const bytes = _b64ToBytes(code.trim());
+  if (bytes[0] === 5) return unpackState(bytes);
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function _stateObj() {
+  // category-relative indices — adding words in one category never shifts
+  // indices in another — adding words in one category never shifts indices in another
   const kwG = {}, wwG = {};
   const eids = new Set();
   for (const k of knownWords) eids.add(k.slice(0, k.indexOf(':')));
@@ -1203,7 +1348,7 @@ function encodeState() {
     }
     if (Object.keys(wwCats).length) wwG[eid] = wwCats;
   }
-  return toB64(JSON.stringify({
+  return {
     s: score, t: total, x: streak,
     am: appMode, jm: jlptMode,
     lv: [...activeLevels],
@@ -1212,7 +1357,10 @@ function encodeState() {
     gi: gameId, gc: gameCategory,
     gm: gameMode,
     kw: kwG, ww: wwG, v: 4,
-  }));
+  };
+}
+function encodeState() {
+  return _bytesToB64(packState(_stateObj()));
 }
 function _buildCatWordArrays(vocabArr) {
   const m = {};
@@ -1271,7 +1419,7 @@ function saveProgress() {
 function loadProgress() {
   try {
     const raw = localStorage.getItem('tsubaki_driller') || localStorage.getItem('tsubaki_progress');
-    if (raw) applyState(JSON.parse(fromB64(raw)));
+    if (raw) applyState(decodeState(raw));
   } catch(e) {}
 }
 
@@ -1515,7 +1663,7 @@ document.getElementById('load-btn').addEventListener('click', () => {
   const raw = document.getElementById('load-input').value.trim();
   if (!raw) return;
   try {
-    applyState(JSON.parse(fromB64(raw)));
+    applyState(decodeState(raw));
     recentKeys = [];
     document.getElementById('save-area').style.display = 'none';
     document.getElementById('load-input').value = '';
@@ -1549,7 +1697,7 @@ loadProgress();
 const _urlS = new URLSearchParams(location.search).get('s');
 if (_urlS) {
   try {
-    applyState(JSON.parse(fromB64(_urlS)));
+    applyState(decodeState(_urlS));
     saveProgress();
     history.replaceState(null, '', location.pathname);
   } catch(e) {}
